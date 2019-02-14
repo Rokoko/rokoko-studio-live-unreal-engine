@@ -39,7 +39,7 @@ A Smartsuit Controller can be added from the Modes panel. A Smartsuit Controller
 
 #### Virtual Production Prop
 
-You can add this component to any Actor in the level through the Add Component menu in the Details. This component will move and rotate the Actor based on the prop position and rotation.
+You can add this component to any Actor in the level through the Add Component menu in the Details. This component will move and rotate the Actor based on the prop position and rotation. For this to work the Transform must be marked as Moveable.
 
 | Parameter  | Description |
 | ------------- | ------------- |
@@ -49,7 +49,7 @@ You can add this component to any Actor in the level through the Add Component m
 
 #### Virtual Production Tracker
 
-You can add this component to any Actor in the level through the Add Component menu in the Details. This component will move and rotate the Actor based on the prop position and rotation.
+You can add this component to any Actor in the level through the Add Component menu in the Details. This component will move and rotate the Actor based on the prop position and rotation. For this to work the Transform must be marked as Moveable.
 
 | Parameter  | Description |
 | ------------- | ------------- |
