@@ -71,3 +71,13 @@ You can add this component to any Actor in the level through the Add Component m
 To animate a character you have to use the nodes "Get Smartsuit Controller" and "Smartsuit body pose". In Smartsuit body pose you have to map the bones of your character. 
 
 <img src="Images/BlueprintCharacterAnimation.PNG">
+
+## Issues
+
+File a bug in [GitHub Issues](https://github.com/RokokoElectronics/rokoko-studio-unreal-sample-project/issues)
+
+## License
+
+Copyright (c) Rokoko Electronics ApS. All rights reserved.
+
+Licensed under the [GNU GPLv3](https://github.com/RokokoElectronics/rokoko-studio-unreal-sample-project/blob/master/LICENSE.md) License.
