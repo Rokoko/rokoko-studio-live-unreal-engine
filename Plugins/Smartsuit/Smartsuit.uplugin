@@ -1,0 +1,40 @@
+{
+	"FileVersion": 3,
+	"Version": 3,
+	"VersionName": "1.3.0",
+	"FriendlyName": "Smartsuit Live",
+	"Description": "Now you can use your Smartsuit Pro natively in Unreal! With Smartsuit Live you are able to stream and visualize Smartsuit Pro data inside Unreal Engine.",
+	"Category": "Animation",
+	"CreatedBy": "Rokoko Electronics ApS",
+	"CreatedByURL": "https://www.rokoko.com",
+	"EngineVersion" : "4.21.0",
+	"DocsURL": "https://rokokoelectronics.github.io/Smartsuit-Unreal-Plugin-Docs/1.0.0b/annotated.html",
+	"MarketplaceURL" : "com.epicgames.launcher://ue/marketplace/content/7e20fe7d4247410cb4f7d3e162d61c21",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"Installed": true,
+	"EnabledByDefault" : true,
+	"Modules": [
+		{
+			"Name": "Smartsuit",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms" :
+			[
+				"Win64",
+				"Mac"
+			]
+		},
+		{
+			"Name": "SmartsuitEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms" :
+			[
+				"Win64",
+				"Mac"
+			]
+		}
+	]
+}
