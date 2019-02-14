@@ -62,3 +62,12 @@ You can add this component to any Actor in the level through the Add Component m
 | Virtual Production -> Is Live  | If this toggle is checked, the tracker will bind only for tive trackers. If it is not checked, it will bind on playback trackers. This is used now to avoid conflicts when there's a playback with the same tracker ids as live.  |
 
 <img src="Images/VirtualProductionTrackerComponent.PNG">
+
+
+### Blueprints
+
+#### Character animation blueprint example
+
+To animate a character you have to use the nodes "Get Smartsuit Controller" and "Smartsuit body pose". In Smartsuit body pose you have to map the bones of your character. 
+
+<img src="Images/BlueprintCharacterAnimation.PNG">
