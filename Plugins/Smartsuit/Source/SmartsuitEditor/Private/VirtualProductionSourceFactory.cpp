@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "VirtualProductionSourceFactory.h"
-#include "LiveLinkMessageBusSource.h"
+#include "VirtualProductionSource.h"
+//#include "LiveLinkMessageBusSource.h"
 //#include "C:/Program Files/Epic Games/UE_4.21/Engine/Plugins/Animation/LiveLink/Source/LiveLinkEditor/Private/LiveLinkMessageBusSourceEditor.h"
 #include "VirtualProductionSourceEditor.h"
 #include "LiveLinkMessageBusFinder.h"
@@ -10,12 +11,12 @@
 
 FText UVirtualProductionSourceFactory::GetSourceDisplayName() const
 {
-	return LOCTEXT("SourceDisplayName", "Message Bus Source");
+	return LOCTEXT("SourceDisplayName", "Rokoko Virtual Production Source");
 }
 
 FText UVirtualProductionSourceFactory::GetSourceTooltip() const
 {
-	return LOCTEXT("SourceTooltip", "Creates a connection to a Message Bus based Live Link Source");
+	return LOCTEXT("SourceTooltip", "Creates a connection to a Rokoko Virtual Production Source");
 }
 
 TSharedPtr<SWidget> UVirtualProductionSourceFactory::CreateSourceCreationPanel()
@@ -30,14 +31,14 @@ TSharedPtr<SWidget> UVirtualProductionSourceFactory::CreateSourceCreationPanel()
 TSharedPtr<ILiveLinkSource> UVirtualProductionSourceFactory::OnSourceCreationPanelClosed(bool bMakeSource)
 {
 	//Clean up
-	TSharedPtr<FLiveLinkMessageBusSource> NewSource = nullptr;
+	TSharedPtr<FVirtualProductionSource> NewSource = nullptr;
 
 	if (bMakeSource && ActiveSourceEditor.IsValid())
 	{
 		FProviderPollResultPtr Result = ActiveSourceEditor->GetSelectedSource();
 		if (Result.IsValid())
 		{
-			NewSource = MakeShared<FLiveLinkMessageBusSource>(FText::FromString(Result->Name), FText::FromString(Result->MachineName), Result->Address);
+			NewSource = MakeShared<FVirtualProductionSource>(FText::FromString(Result->Name), FText::FromString(Result->MachineName), Result->Address);
 		}
 	}
 	ActiveSourceEditor = nullptr;
