@@ -7,7 +7,25 @@
 		{
 			"Name": "UnrealSampleProject",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"LiveLinkInterface"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "VirtualCamera",
+			"Enabled": true
+		},
+		{
+			"Name": "LiveLink",
+			"Enabled": true
+		},
+		{
+			"Name": "Smartsuit",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/7e20fe7d4247410cb4f7d3e162d61c21"
 		}
 	]
 }

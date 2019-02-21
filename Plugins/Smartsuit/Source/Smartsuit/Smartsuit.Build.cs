@@ -24,6 +24,7 @@ public class Smartsuit : ModuleRules
         PublicIncludePaths.AddRange(
             new string[] {
                 "Smartsuit/Public",
+                "C:/Program Files/Epic Games/UE_4.21/Engine/Plugins/Animation/LiveLink/Source/LiveLink/Public/",
 				// ... add public include paths required here ...
 			}
             );
@@ -32,6 +33,9 @@ public class Smartsuit : ModuleRules
         PrivateIncludePaths.AddRange(
             new string[] {
                 "Smartsuit/Private",
+                "LiveLink/Private",
+                "C:/Program Files/Epic Games/UE_4.21/Engine/Plugins/Animation/LiveLink/Source/LiveLink/Private/"
+
 				// ... add other private include paths required here ...
 			}
             );
@@ -42,7 +46,7 @@ public class Smartsuit : ModuleRules
             {
                 //"Core",
                 //"Core", "AnimGraph", "BlueprintGraph", "AnimGraphRuntime", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking",
-                "ApplicationCore", "Core", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking","AnimGraphRuntime","Json", "JsonUtilities"
+                "ApplicationCore", "Core", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking","AnimGraphRuntime","Json", "JsonUtilities", "LiveLink", "LiveLinkInterface"
 				// ... add other public dependencies that you statically link with here ...
 			}
             );
@@ -51,7 +55,20 @@ public class Smartsuit : ModuleRules
         PrivateDependencyModuleNames.AddRange(
             new string[]
             {
-                
+                //"LiveLinkEditor", "LiveLinkInterface", "LiveLinkMessageBusFramework",
+                "Core",
+                "CoreUObject",
+                "Engine",
+                "MovieScene",
+                "MovieSceneTracks",
+                "Projects",
+
+                "Messaging",
+                "LiveLink",
+                "LiveLinkInterface",
+                "LiveLinkMessageBusFramework",
+                "HeadMountedDisplay",
+                "TimeManagement"
                 //"CoreUObject",
                 //"Engine",
                 //"Slate",
@@ -70,8 +87,7 @@ public class Smartsuit : ModuleRules
         DynamicallyLoadedModuleNames.AddRange(
             new string[]
             {
-                
-				// ... add any modules that your module loads dynamically here ...
+                // ... add any modules that your module loads dynamically here ...
 			}
             );
 

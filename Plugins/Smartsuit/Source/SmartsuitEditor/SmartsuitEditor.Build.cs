@@ -18,7 +18,7 @@ public class SmartsuitEditor : ModuleRules
         PrivateIncludePaths.AddRange(
             new string[] {
                 "SmartsuitEditor/Private",
-				// ... add other private include paths required here ...
+                // ... add other private include paths required here ...
 			}
             );
 
@@ -28,7 +28,7 @@ public class SmartsuitEditor : ModuleRules
             {
                 //"Core",
                 //"Core", "AnimGraph", "BlueprintGraph", "AnimGraphRuntime", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking",
-                "ApplicationCore", "Core", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking", "AnimGraph", "BlueprintGraph","AnimGraphRuntime", "Smartsuit"
+                "ApplicationCore", "Core", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking", "AnimGraph", "BlueprintGraph","AnimGraphRuntime", "Smartsuit", "LiveLinkInterface"
 				// ... add other public dependencies that you statically link with here ...
 			}
             );
@@ -49,8 +49,33 @@ public class SmartsuitEditor : ModuleRules
                 //"Networking",
                 //"Sockets",
                 //"AnimGraphRuntime",
-				// ... add private dependencies that you statically link with here ...	
-			}
+				// ... add private dependencies that you statically link with here ...
+                
+                "Core",
+                "CoreUObject",
+                "Engine",
+                "Projects",
+                "DetailCustomizations",
+                "HeadMountedDisplay",
+                "MovieScene",
+                "MovieSceneTools",
+                "MovieSceneTracks",
+                "WorkspaceMenuStructure",
+                "EditorStyle",
+                "Sequencer",
+                "SequenceRecorder",
+                "SlateCore",
+                "Slate",
+                "InputCore",
+
+                //"Messaging",
+                "LiveLinkInterface",
+                "LiveLinkMessageBusFramework",
+                "BlueprintGraph",
+                "LiveLink",
+                "AnimGraph",
+                "Persona"
+            }
             );
 
 
