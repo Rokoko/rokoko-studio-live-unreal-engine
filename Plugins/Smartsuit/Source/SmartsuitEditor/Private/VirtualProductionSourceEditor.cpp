@@ -109,6 +109,14 @@ void SVirtualProductionSourceEditor::Tick(const FGeometry& AllottedGeometry, con
 		//FText sourceType = LOCTEXT("k1", "t1");
 		//FText machine = LOCTEXT("k2", "t2");
 		//FVirtualProductionSource *source = new FVirtualProductionSource(sourceType, machine, addr);
+		UE_LOG(LogTemp, Display, TEXT("EVERYTHING OK"));
+		//*VPFrame = *VPnet->GetVirtualProductionFrame();//VPStreamingNetwork::GetVirtualProductionFrame();
+		//VPnet->GetVirtualProductionFrame();
+		//VPFrame = &VPnet->GetVirtualProductionFrame();
+		UE_LOG(LogTemp, Display, TEXT("GlobalVPFrame versionnn"));
+		//UE_LOG(LogTemp, Display, TEXT("GlobalVPFrame version %d"), VPFrame->version);
+		//GetVirtualProductionFrame
+		
 		FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString("NAme"), FString("Machine"));
 		FProviderPollResultPtr *poll = new FProviderPollResultPtr(result);
 

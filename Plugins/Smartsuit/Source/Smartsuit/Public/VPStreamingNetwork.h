@@ -52,6 +52,15 @@ public:
 
 	FProp* GetPropByName(FString name, bool isLive);
 	FTracker* GetTrackerByName(FString name, bool isLive);
+	FVirtualProductionFrame* GetVirtualProductionFrame() {
+		FVirtualProductionFrame* newInstance = new FVirtualProductionFrame();
+		mtx.lock();
+		// copy GlobalVPFrame to newInstance
+		memcpy(&newInstance, &GlobalVPFrame, sizeof(GlobalVPFrame));
+		mtx.unlock();
+		return newInstance;
+		//return GlobalVPFrame;
+	}
 
 private:
 	std::mutex mtx;

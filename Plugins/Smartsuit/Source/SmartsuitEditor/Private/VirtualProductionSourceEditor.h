@@ -18,6 +18,8 @@ public:
 #include "IMessageContext.h"
 #include "MessageEndpoint.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
+#include "VPStreamingNetwork.h"
+#include "VirtualProductionFrame.h"
 #include "Misc/Guid.h"
 
 struct FLiveLinkPongMessage;
@@ -68,4 +70,7 @@ private:
 
 	// Time since our UI was last ticked, allow us to refresh if we haven't been onscreen for a while
 	double LastTickTime;
+
+	VPStreamingNetwork *VPnet;
+	FVirtualProductionFrame *VPFrame;
 };
