@@ -40,7 +40,11 @@ class SVirtualProductionSourceEditor : public SCompoundWidget
 
 	void Construct(const FArguments& Args);
 
-	FProviderPollResultPtr GetSelectedSource() const { return SelectedResult; }
+	FProviderPollResultPtr GetSelectedSource() const { 
+		
+		UE_LOG(LogTemp, Display, TEXT("GetSelectedSource %d"), SelectedResult.IsValid());
+		return SelectedResult;
+	}
 
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime);
 

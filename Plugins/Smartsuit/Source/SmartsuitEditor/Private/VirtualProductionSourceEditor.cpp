@@ -27,7 +27,8 @@ public:
 
 	void Construct(const FArguments& Args, const TSharedRef<STableViewBase>& OwnerTableView)
 	{
-		PollResultPtr = Args._PollResultPtr;
+			UE_LOG(LogTemp, Display, TEXT("Construct2"));
+			PollResultPtr = Args._PollResultPtr;
 
 		SMultiColumnTableRow<FProviderPollResultPtr>::Construct(
 			FSuperRowType::FArguments()
@@ -39,6 +40,7 @@ public:
 	/** Overridden from SMultiColumnTableRow.  Generates a widget for this column of the list view. */
 	virtual TSharedRef<SWidget> GenerateWidgetForColumn(const FName& ColumnName) override
 	{
+		UE_LOG(LogTemp, Display, TEXT("GenerateWidgetForColumn"));
 		if (ColumnName == ProviderPollUI::TypeColumnName)
 		{
 			return	SNew(STextBlock)
@@ -66,11 +68,12 @@ SVirtualProductionSourceEditor::~SVirtualProductionSourceEditor()
 
 void SVirtualProductionSourceEditor::Construct(const FArguments& Args)
 {
+	UE_LOG(LogTemp, Display, TEXT("Construct"));
 	LastTickTime = 0.0;
 
 	MessageEndpoint = FMessageEndpoint::Builder(TEXT("VirtualProductionSource"))
 		.Handling<FLiveLinkPongMessage>(this, &SVirtualProductionSourceEditor::HandlePongMessage);
-
+	
 	ChildSlot
 		[
 			SNew(SBox)
@@ -102,6 +105,15 @@ void SVirtualProductionSourceEditor::Tick(const FGeometry& AllottedGeometry, con
 	if (CurrentTickTime - LastTickTime > 1.f)
 	{
 		PollData.Reset();
+		//const FMessageAddress addr = FMessageAddress::NewAddress();
+		//FText sourceType = LOCTEXT("k1", "t1");
+		//FText machine = LOCTEXT("k2", "t2");
+		//FVirtualProductionSource *source = new FVirtualProductionSource(sourceType, machine, addr);
+		FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString("NAme"), FString("Machine"));
+		FProviderPollResultPtr *poll = new FProviderPollResultPtr(result);
+
+		
+		PollData.Add(*poll);
 		ListView->RequestListRefresh();
 
 		CurrentPollRequest = FGuid::NewGuid();
@@ -113,16 +125,19 @@ void SVirtualProductionSourceEditor::Tick(const FGeometry& AllottedGeometry, con
 
 TSharedRef<ITableRow> SVirtualProductionSourceEditor::MakeSourceListViewWidget(FProviderPollResultPtr PollResult, const TSharedRef<STableViewBase>& OwnerTable) const
 {
+	UE_LOG(LogTemp, Display, TEXT("MakeSourceListViewWidget %d"), PollResult.IsValid());
 	return SNew(SProviderPollRow, OwnerTable).PollResultPtr(PollResult);
 }
 
 void SVirtualProductionSourceEditor::OnSourceListSelectionChanged(FProviderPollResultPtr PollResult, ESelectInfo::Type SelectionType)
 {
+	UE_LOG(LogTemp, Display, TEXT("OnSourceListSelectionChanged result %d"), PollResult.IsValid());
 	SelectedResult = PollResult;
 }
 
 void SVirtualProductionSourceEditor::HandlePongMessage(const FLiveLinkPongMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context)
 {
+	UE_LOG(LogTemp, Display, TEXT("HandlePongMessage"));
 	if (Message.PollRequest == CurrentPollRequest)
 	{
 		PollData.Add(MakeShared<FProviderPollResult>(Context->GetSender(), Message.ProviderName, Message.MachineName));
