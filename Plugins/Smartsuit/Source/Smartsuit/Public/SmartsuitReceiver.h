@@ -107,6 +107,28 @@ public:
 	HubInfo* CheckForHubInfo(FString suitname);
 	void SetSupportsWiFiAPI(FString suitname);
 	
+	static TArray<FProp> GetAllProps() {
+		TArray<FProp> result;
+		UE_LOG(LogTemp, Display, TEXT("Yeeee1"));
+		bool found = false;
+		int i = 0;
+		for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+		{
+			UE_LOG(LogTemp, Display, TEXT("Looking up receiver %d"), i);
+			i++;
+			if (It->realLife) {
+				found = true;
+				UE_LOG(LogTemp, Display, TEXT("Real life!"));
+				result = It->VPlistener.GetAllProps();
+			}
+		}
+		if (!found) {
+			UE_LOG(LogTemp, Display, TEXT("not Real life..."));
+		}
+		UE_LOG(LogTemp, Display, TEXT("Yeeee2 %d"), result.Num());
+		return result;
+	}
+
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a prop by name."))
 	static FProp GetProp(FString name, bool isLive) {
 		FProp result;

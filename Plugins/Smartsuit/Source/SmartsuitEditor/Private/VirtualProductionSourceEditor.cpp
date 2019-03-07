@@ -113,12 +113,13 @@ void SVirtualProductionSourceEditor::Tick(const FGeometry& AllottedGeometry, con
 		//*VPFrame = *VPnet->GetVirtualProductionFrame();//VPStreamingNetwork::GetVirtualProductionFrame();
 		//VPnet->GetVirtualProductionFrame();
 		//VPFrame = &VPnet->GetVirtualProductionFrame();
-		//TArray<FProp> props = VPnet->GetAllProps();
-		UE_LOG(LogTemp, Display, TEXT("GlobalVPFrame versionnn"));
+		TArray<FProp> props = ASmartsuitReceiver::GetAllProps();
+		//receiver->
+		UE_LOG(LogTemp, Display, TEXT("GlobalVPFrame versionnn %d"), props.Num());
 		//UE_LOG(LogTemp, Display, TEXT("GlobalVPFrame version %d"), VPFrame->version);
 		//GetVirtualProductionFrame
 		
-		/*for (int i = 0; i < props.Num(); i++) {
+		for (int i = 0; i < props.Num(); i++) {
 			FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString(props[i].name), FString("Studio"));
 			FProviderPollResultPtr *poll = new FProviderPollResultPtr(result);
 
@@ -129,7 +130,7 @@ void SVirtualProductionSourceEditor::Tick(const FGeometry& AllottedGeometry, con
 			CurrentPollRequest = FGuid::NewGuid();
 
 			MessageEndpoint->Publish(new FLiveLinkPingMessage(CurrentPollRequest));
-		}*/
+		}
 	}
 	LastTickTime = CurrentTickTime;
 }

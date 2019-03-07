@@ -19,6 +19,7 @@ public:
 #include "MessageEndpoint.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "VPStreamingNetwork.h"
+#include "SmartsuitReceiver.h"
 #include "VirtualProductionFrame.h"
 #include "Misc/Guid.h"
 
@@ -71,6 +72,7 @@ private:
 	// Time since our UI was last ticked, allow us to refresh if we haven't been onscreen for a while
 	double LastTickTime;
 
+	ASmartsuitReceiver *receiver;
 	VPStreamingNetwork *VPnet;
 	FVirtualProductionFrame *VPFrame;
 };

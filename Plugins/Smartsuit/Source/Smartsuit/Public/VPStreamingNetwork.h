@@ -4,8 +4,8 @@
 #include "Runtime/Sockets/Public/Sockets.h"
 #include "Runtime/Core/Public/HAL/Runnable.h"
 #include "Runtime/Core/Public/HAL/RunnableThread.h"
-#include "Runtime/Core/Public/Unix/UnixCriticalSection.h"
-//#include <mutex>
+//#include "Runtime/Core/Public/Unix/UnixCriticalSection.h"
+#include <mutex>
 
 #include "VirtualProductionFrame.h"
 
@@ -66,23 +66,23 @@ public:
 	TArray<FProp> GetAllProps() {
 		//return nullptr;
 		TArray<FProp> result;
-		UE_LOG(LogTemp, Display, TEXT("Yeeee1")); 
-		//mtx.lock();
-		UE_LOG(LogTemp, Display, TEXT("Yeeee2"));
-		//if (GlobalVPFrame) {
-		//	for (int i = 0; i < GlobalVPFrame->props.Num(); i++) {
-		//		result.Add(GlobalVPFrame->props[i]);
-		//		//result->Add
-		//	}
-		//}
-		//mtx.unlock();
+		UE_LOG(LogTemp, Display, TEXT("Yeeee1.1")); 
+		mtx.lock();
+		if (GlobalVPFrame) {
+			for (int i = 0; i < GlobalVPFrame->props.Num(); i++) {
+				result.Add(GlobalVPFrame->props[i]);
+				//result->Add
+			}
+		}
+		UE_LOG(LogTemp, Display, TEXT("Yeeee2.1 %d"), result.Num());
+		mtx.unlock();
 		//UE_LOG(LogTemp, Display, TEXT("Yeeee3"));
 		return result;
 	}
 
 private:
-	//std::mutex mtx;
-	FPThreadsCriticalSection FCriticalSection;
+	std::mutex mtx;
+	//FPThreadsCriticalSection FCriticalSection;
 	int streaming_port;
 	FSocket *Socket = NULL;
 	/** Used to tell that the thread is stopping */
