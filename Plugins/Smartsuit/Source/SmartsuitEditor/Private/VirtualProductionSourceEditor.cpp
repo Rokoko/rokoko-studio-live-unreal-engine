@@ -113,20 +113,23 @@ void SVirtualProductionSourceEditor::Tick(const FGeometry& AllottedGeometry, con
 		//*VPFrame = *VPnet->GetVirtualProductionFrame();//VPStreamingNetwork::GetVirtualProductionFrame();
 		//VPnet->GetVirtualProductionFrame();
 		//VPFrame = &VPnet->GetVirtualProductionFrame();
+		//TArray<FProp> props = VPnet->GetAllProps();
 		UE_LOG(LogTemp, Display, TEXT("GlobalVPFrame versionnn"));
 		//UE_LOG(LogTemp, Display, TEXT("GlobalVPFrame version %d"), VPFrame->version);
 		//GetVirtualProductionFrame
 		
-		FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString("NAme"), FString("Machine"));
-		FProviderPollResultPtr *poll = new FProviderPollResultPtr(result);
+		/*for (int i = 0; i < props.Num(); i++) {
+			FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString(props[i].name), FString("Studio"));
+			FProviderPollResultPtr *poll = new FProviderPollResultPtr(result);
 
-		
-		PollData.Add(*poll);
-		ListView->RequestListRefresh();
 
-		CurrentPollRequest = FGuid::NewGuid();
+			PollData.Add(*poll);
+			ListView->RequestListRefresh();
 
-		MessageEndpoint->Publish(new FLiveLinkPingMessage(CurrentPollRequest));
+			CurrentPollRequest = FGuid::NewGuid();
+
+			MessageEndpoint->Publish(new FLiveLinkPingMessage(CurrentPollRequest));
+		}*/
 	}
 	LastTickTime = CurrentTickTime;
 }

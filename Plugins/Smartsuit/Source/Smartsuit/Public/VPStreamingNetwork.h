@@ -4,7 +4,8 @@
 #include "Runtime/Sockets/Public/Sockets.h"
 #include "Runtime/Core/Public/HAL/Runnable.h"
 #include "Runtime/Core/Public/HAL/RunnableThread.h"
-#include <mutex>
+#include "Runtime/Core/Public/Unix/UnixCriticalSection.h"
+//#include <mutex>
 
 #include "VirtualProductionFrame.h"
 
@@ -52,18 +53,36 @@ public:
 
 	FProp* GetPropByName(FString name, bool isLive);
 	FTracker* GetTrackerByName(FString name, bool isLive);
-	FVirtualProductionFrame* GetVirtualProductionFrame() {
-		FVirtualProductionFrame* newInstance = new FVirtualProductionFrame();
-		mtx.lock();
-		// copy GlobalVPFrame to newInstance
-		memcpy(&newInstance, &GlobalVPFrame, sizeof(GlobalVPFrame));
-		mtx.unlock();
-		return newInstance;
-		//return GlobalVPFrame;
+	//FVirtualProductionFrame* GetVirtualProductionFrame() {
+	//	FVirtualProductionFrame* newInstance = new FVirtualProductionFrame();
+	//	mtx.lock();
+	//	// copy GlobalVPFrame to newInstance
+	//	memcpy(&newInstance, &GlobalVPFrame, sizeof(GlobalVPFrame));
+	//	mtx.unlock();
+	//	return newInstance;
+	//	//return GlobalVPFrame;
+	//}
+
+	TArray<FProp> GetAllProps() {
+		//return nullptr;
+		TArray<FProp> result;
+		UE_LOG(LogTemp, Display, TEXT("Yeeee1")); 
+		//mtx.lock();
+		UE_LOG(LogTemp, Display, TEXT("Yeeee2"));
+		//if (GlobalVPFrame) {
+		//	for (int i = 0; i < GlobalVPFrame->props.Num(); i++) {
+		//		result.Add(GlobalVPFrame->props[i]);
+		//		//result->Add
+		//	}
+		//}
+		//mtx.unlock();
+		//UE_LOG(LogTemp, Display, TEXT("Yeeee3"));
+		return result;
 	}
 
 private:
-	std::mutex mtx;
+	//std::mutex mtx;
+	FPThreadsCriticalSection FCriticalSection;
 	int streaming_port;
 	FSocket *Socket = NULL;
 	/** Used to tell that the thread is stopping */
