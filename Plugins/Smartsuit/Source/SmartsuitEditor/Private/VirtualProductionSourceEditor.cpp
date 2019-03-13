@@ -3,6 +3,7 @@
 #include "VirtualProductionSourceEditor.h"
 #include "LiveLinkMessageBusFinder.h"
 #include "LiveLinkMessages.h"
+#include "LiveLinkEditor/Private/LiveLinkClientPanel.h"
 #include "Widgets/Layout/SBox.h"
 
 #include "MessageEndpointBuilder.h"
@@ -119,7 +120,7 @@ void SVirtualProductionSourceEditor::Tick(const FGeometry& AllottedGeometry, con
 		//UE_LOG(LogTemp, Display, TEXT("GlobalVPFrame version %d"), VPFrame->version);
 		//GetVirtualProductionFrame
 		
-		for (int i = 0; i < props.Num(); i++) {
+		/*for (int i = 0; i < props.Num(); i++) {
 			FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString(props[i].name), FString("Studio"));
 			FProviderPollResultPtr *poll = new FProviderPollResultPtr(result);
 
@@ -130,7 +131,21 @@ void SVirtualProductionSourceEditor::Tick(const FGeometry& AllottedGeometry, con
 			CurrentPollRequest = FGuid::NewGuid();
 
 			MessageEndpoint->Publish(new FLiveLinkPingMessage(CurrentPollRequest));
-		}
+		}*/
+
+		FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString("Studio"), FString(""));
+		FProviderPollResultPtr *poll = new FProviderPollResultPtr(result);
+
+
+		PollData.Add(*poll);
+		ListView->RequestListRefresh();
+
+		CurrentPollRequest = FGuid::NewGuid();
+
+		MessageEndpoint->Publish(new FLiveLinkPingMessage(CurrentPollRequest));
+		FText subject = LOCTEXT("Studio", "Studio");
+		//SLiveLinkClientPanel::HandleAddVirtualSubject(subject, ETextCommit::Type::Default);
+
 	}
 	LastTickTime = CurrentTickTime;
 }

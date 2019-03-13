@@ -43,28 +43,28 @@ uint32 FVirtualProductionHeartbeatManager::Run()
 			TArray<FVirtualProductionSource*> SourcesToRemove;
 
 			// Loop through all sources and send heartbeat
-			for (const auto& MessageBusSource : MessageBusSources)
+			for (const auto& MessageBusSource : VPSources)
 			{
 				if (MessageBusSource != nullptr)
 				{
-					//bool bStillValid = MessageBusSource->IsSourceStillValid();
-					//if (bStillValid)
-					//{
-					//	bStillValid = MessageBusSource->SendHeartbeat();
-					//}
+					bool bStillValid = MessageBusSource->IsSourceStillValid();
+					if (bStillValid)
+					{
+						bStillValid = MessageBusSource->SendHeartbeat();
+					}
 
-					//if (!bStillValid)
-					//{
-					//	// Source is invalid, queue it for removal
-					//	SourcesToRemove.Emplace(MessageBusSource);
-					//}
+					if (!bStillValid)
+					{
+						// Source is invalid, queue it for removal
+						SourcesToRemove.Emplace(MessageBusSource);
+					}
 				}
 			}
 
 			// Remove any dead sources
 			for (const auto& SourceToRemove : SourcesToRemove)
 			{
-				MessageBusSources.Remove(SourceToRemove);
+				VPSources.Remove(SourceToRemove);
 			}
 		}
 		FPlatformProcess::Sleep(LL_HEARTBEAT_SLEEP_TIME);
@@ -81,14 +81,14 @@ void FVirtualProductionHeartbeatManager::RegisterSource(FVirtualProductionSource
 {
 	FScopeLock Lock(&SourcesCriticalSection);
 
-	MessageBusSources.Add(InSource);
+	VPSources.Add(InSource);
 };
 
 void FVirtualProductionHeartbeatManager::RemoveSource(FVirtualProductionSource* const InSource)
 {
 	FScopeLock Lock(&SourcesCriticalSection);
 
-	MessageBusSources.Remove(InSource);
+	VPSources.Remove(InSource);
 };
 
 bool FVirtualProductionHeartbeatManager::IsRunning() const

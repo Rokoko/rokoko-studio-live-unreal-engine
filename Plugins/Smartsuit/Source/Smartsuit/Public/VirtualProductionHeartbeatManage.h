@@ -6,6 +6,7 @@
 #include "HAL/RunnableThread.h"
 #include "HAL/ThreadSafeBool.h"
 #include "HAL/CriticalSection.h"
+#include "VirtualProductionSource.h"
 #include "Containers/Set.h"
 
 class FVirtualProductionSource;
@@ -48,5 +49,5 @@ private:
 	FCriticalSection SourcesCriticalSection;
 
 	// Set of sources we are currently sending heartbeats for
-	TSet<FVirtualProductionSource*> MessageBusSources;
+	TSet<FVirtualProductionSource*> VPSources;
 };
