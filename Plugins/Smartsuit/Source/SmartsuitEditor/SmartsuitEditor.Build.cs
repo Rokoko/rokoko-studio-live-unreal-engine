@@ -6,6 +6,9 @@ public class SmartsuitEditor : ModuleRules
 {
     public SmartsuitEditor(ReadOnlyTargetRules Target) : base(Target)
     {
+        MinFilesUsingPrecompiledHeaderOverride = 1;
+        bFasterWithoutUnity = true;
+
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicIncludePaths.AddRange(
             new string[] {
@@ -26,9 +29,15 @@ public class SmartsuitEditor : ModuleRules
         PublicDependencyModuleNames.AddRange(
             new string[]
             {
-                //"Core",
-                //"Core", "AnimGraph", "BlueprintGraph", "AnimGraphRuntime", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking",
-                "ApplicationCore", "Core", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking", "AnimGraph", "BlueprintGraph","AnimGraphRuntime", "Smartsuit", "LiveLinkInterface"
+                "Core",
+                "CoreUObject",
+                "Engine",
+                "InputCore",
+                "AnimGraph",
+                "BlueprintGraph",
+                "AnimGraphRuntime",
+                "Smartsuit",
+                "LiveLinkInterface"
 				// ... add other public dependencies that you statically link with here ...
 			}
             );
@@ -39,42 +48,11 @@ public class SmartsuitEditor : ModuleRules
             {
                 "UnrealEd",
                 "GraphEditor",
-                //"CoreUObject",
-                //"Engine",
-                //"Slate",
-                //"SlateCore",
-                //"InputCore",
-                //"AnimGraph",
-                //"BlueprintGraph",
-                //"Networking",
-                //"Sockets",
-                //"AnimGraphRuntime",
-				// ... add private dependencies that you statically link with here ...
                 
-                "Core",
-                "CoreUObject",
-                "Engine",
-                "Projects",
-                "DetailCustomizations",
-                "HeadMountedDisplay",
-                "MovieScene",
-                "MovieSceneTools",
-                "MovieSceneTracks",
-                "WorkspaceMenuStructure",
-                "EditorStyle",
-                "Sequencer",
-                "SequenceRecorder",
                 "SlateCore",
                 "Slate",
-                "InputCore",
 
-                //"Messaging",
-                "LiveLinkInterface",
-                "LiveLinkMessageBusFramework",
-                "BlueprintGraph",
-                "LiveLink",
-                "AnimGraph",
-                "Persona"
+                "LiveLinkInterface"
             }
             );
 

@@ -5,7 +5,6 @@
 #include "LiveLinkMessages.h"
 #include "ILiveLinkClient.h"
 //#include "LiveLinkMessageBusHeartbeatManager.h"
-#include "VirtualProductionHeartbeatManage.h"
 
 #include "MessageEndpointBuilder.h"
 
@@ -14,48 +13,30 @@ const double LL_HALF_CONNECTION_TIMEOUT = LL_CONNECTION_TIMEOUT / 2.0;
 
 void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid InSourceGuid)
 {
+
 	Client = InClient;
 	SourceGuid = InSourceGuid;
+	source = this;
+	UE_LOG(LogTemp, Warning, TEXT(" - - - RECEIVE CLIENT!!!"));
+	//MessageEndpoint = FMessageEndpoint::Builder(TEXT("VirtualProductionSource"))
+	//	.Handling<FLiveLinkSubjectDataMessage>(this, &FVirtualProductionSource::HandleSubjectData)
+	//	.Handling<FLiveLinkSubjectFrameMessage>(this, &FVirtualProductionSource::HandleSubjectFrame)
+	//	.Handling<FLiveLinkHeartbeatMessage>(this, &FVirtualProductionSource::HandleHeartbeat)
+	//	.Handling<FLiveLinkClearSubject>(this, &FVirtualProductionSource::HandleClearSubject);
 
-	MessageEndpoint = FMessageEndpoint::Builder(TEXT("VirtualProductionSource"))
-		.Handling<FLiveLinkSubjectDataMessage>(this, &FVirtualProductionSource::HandleSubjectData)
-		.Handling<FLiveLinkSubjectFrameMessage>(this, &FVirtualProductionSource::HandleSubjectFrame)
-		.Handling<FLiveLinkHeartbeatMessage>(this, &FVirtualProductionSource::HandleHeartbeat)
-		.Handling<FLiveLinkClearSubject>(this, &FVirtualProductionSource::HandleClearSubject);
 
-
-	MessageEndpoint->Send(new FLiveLinkConnectMessage(), ConnectionAddress);
+	//MessageEndpoint->Send(new FLiveLinkConnectMessage(), ConnectionAddress);
 
 	// Register for heartbeats
 	bIsValid = true;
-	FVirtualProductionHeartbeatManager::Get()->RegisterSource(this);
 }
 
-bool FVirtualProductionSource::SendHeartbeat()
-{
-	const double CurrentTime = FPlatformTime::Seconds();
 
-	if (HeartbeatLastSent > (CurrentTime - LL_HALF_CONNECTION_TIMEOUT) &&
-		ConnectionLastActive < (CurrentTime - LL_CONNECTION_TIMEOUT))
-	{
-		//We have recently tried to heartbeat and not received anything back
-		bIsValid = false;
-	}
-
-	MessageEndpoint->Send(new FLiveLinkHeartbeatMessage(), ConnectionAddress);
-	HeartbeatLastSent = CurrentTime;
-	return bIsValid;
-}
 
 
 bool FVirtualProductionSource::IsSourceStillValid()
 {
 	return bIsValid;
-}
-
-void FVirtualProductionSource::HandleHeartbeat(const FLiveLinkHeartbeatMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context)
-{
-	ConnectionLastActive = FPlatformTime::Seconds();
 }
 
 void FVirtualProductionSource::HandleClearSubject(const FLiveLinkClearSubject& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context)
@@ -66,12 +47,8 @@ void FVirtualProductionSource::HandleClearSubject(const FLiveLinkClearSubject& M
 
 bool FVirtualProductionSource::RequestSourceShutdown()
 {
-	FVirtualProductionHeartbeatManager* HeartbeatManager = FVirtualProductionHeartbeatManager::Get();
-	if (HeartbeatManager->IsRunning())
-	{
-		HeartbeatManager->RemoveSource(this);
-	}
-	FMessageEndpoint::SafeRelease(MessageEndpoint);
+	//instance = nullptr;
+	source = nullptr;
 	return true;
 }
 
@@ -104,8 +81,9 @@ void FVirtualProductionSource::HandleSubjectData(const FLiveLinkSubjectDataMessa
 	{
 	UE_LOG(LogTemp, Warning, TEXT("INVALID BONE NAMES RECIEVED %i != existing %i"), Message.BoneNames.Num(), BoneNames.Num());
 	}*/
-
+	UE_LOG(LogTemp, Warning, TEXT("Handle Subject Data!!"));
 	Client->PushSubjectSkeleton(SourceGuid, Message.SubjectName, Message.RefSkeleton);
+	
 }
 
 void FVirtualProductionSource::HandleSubjectFrame(const FLiveLinkSubjectFrameMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context)

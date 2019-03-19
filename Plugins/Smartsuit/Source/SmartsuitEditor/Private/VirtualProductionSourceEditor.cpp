@@ -2,7 +2,6 @@
 
 #include "VirtualProductionSourceEditor.h"
 #include "LiveLinkMessageBusFinder.h"
-#include "LiveLinkMessages.h"
 #include "LiveLinkEditor/Private/LiveLinkClientPanel.h"
 #include "Widgets/Layout/SBox.h"
 
@@ -64,7 +63,7 @@ private:
 
 SVirtualProductionSourceEditor::~SVirtualProductionSourceEditor()
 {
-	FMessageEndpoint::SafeRelease(MessageEndpoint);
+	//FMessageEndpoint::SafeRelease(MessageEndpoint);
 }
 
 void SVirtualProductionSourceEditor::Construct(const FArguments& Args)
@@ -72,8 +71,8 @@ void SVirtualProductionSourceEditor::Construct(const FArguments& Args)
 	UE_LOG(LogTemp, Display, TEXT("Construct"));
 	LastTickTime = 0.0;
 
-	MessageEndpoint = FMessageEndpoint::Builder(TEXT("VirtualProductionSource"))
-		.Handling<FLiveLinkPongMessage>(this, &SVirtualProductionSourceEditor::HandlePongMessage);
+	//MessageEndpoint = FMessageEndpoint::Builder(TEXT("VirtualProductionSource"))
+	//	.Handling<FLiveLinkPongMessage>(this, &SVirtualProductionSourceEditor::HandlePongMessage);
 	
 	ChildSlot
 		[
@@ -142,7 +141,7 @@ void SVirtualProductionSourceEditor::Tick(const FGeometry& AllottedGeometry, con
 
 		CurrentPollRequest = FGuid::NewGuid();
 
-		MessageEndpoint->Publish(new FLiveLinkPingMessage(CurrentPollRequest));
+		//MessageEndpoint->Publish(new FLiveLinkPingMessage(CurrentPollRequest));
 		FText subject = LOCTEXT("Studio", "Studio");
 		//SLiveLinkClientPanel::HandleAddVirtualSubject(subject, ETextCommit::Type::Default);
 
@@ -162,15 +161,15 @@ void SVirtualProductionSourceEditor::OnSourceListSelectionChanged(FProviderPollR
 	SelectedResult = PollResult;
 }
 
-void SVirtualProductionSourceEditor::HandlePongMessage(const FLiveLinkPongMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context)
-{
-	UE_LOG(LogTemp, Display, TEXT("HandlePongMessage"));
-	if (Message.PollRequest == CurrentPollRequest)
-	{
-		PollData.Add(MakeShared<FProviderPollResult>(Context->GetSender(), Message.ProviderName, Message.MachineName));
-
-		ListView->RequestListRefresh();
-	}
-}
+//void SVirtualProductionSourceEditor::HandlePongMessage(const FLiveLinkPongMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context)
+//{
+//	//UE_LOG(LogTemp, Display, TEXT("HandlePongMessage"));
+//	///*if (Message.PollRequest == CurrentPollRequest)
+//	//{
+//	//	PollData.Add(MakeShared<FProviderPollResult>(Context->GetSender(), Message.ProviderName, Message.MachineName));
+//
+//	//	ListView->RequestListRefresh();
+//	//}*/
+//}
 
 #undef LOCTEXT_NAMESPACE

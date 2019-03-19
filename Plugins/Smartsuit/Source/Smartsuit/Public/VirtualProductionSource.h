@@ -20,7 +20,9 @@ struct FLiveLinkClearSubject;
 class SMARTSUIT_API FVirtualProductionSource : public ILiveLinkSource
 {
 public:
-
+	FVirtualProductionSource* Get() {
+		return source;
+	}
 	FVirtualProductionSource(const FText& InSourceType, const FText& InSourceMachineName, const FMessageAddress& InConnectionAddress)
 		: ConnectionAddress(InConnectionAddress)
 		, SourceType(InSourceType)
@@ -41,14 +43,12 @@ public:
 	virtual FText GetSourceMachineName() const { return SourceMachineName; }
 	virtual FText GetSourceStatus() const { return SourceStatus; }
 
-	bool SendHeartbeat();
 
 private:
 
 	// Message bus message handlers
 	void HandleSubjectData(const FLiveLinkSubjectDataMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context);
 	void HandleSubjectFrame(const FLiveLinkSubjectFrameMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context);
-	void HandleHeartbeat(const FLiveLinkHeartbeatMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context);
 	void HandleClearSubject(const FLiveLinkClearSubject& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context);
 	// End Message bus message handlers
 
@@ -57,7 +57,7 @@ private:
 	// Our identifier in LiveLink
 	FGuid SourceGuid;
 
-	TSharedPtr<FMessageEndpoint, ESPMode::ThreadSafe> MessageEndpoint;
+	//TSharedPtr<FMessageEndpoint, ESPMode::ThreadSafe> MessageEndpoint;
 
 	FMessageAddress ConnectionAddress;
 
@@ -73,4 +73,8 @@ private:
 
 	// Current Validity of Source
 	FThreadSafeBool bIsValid;
+	FVirtualProductionSource *source;
+	//singleton instance
+	//static FVirtualProductionSource *instance;
+
 };

@@ -20,6 +20,9 @@ public class Smartsuit : ModuleRules
 
     public Smartsuit(ReadOnlyTargetRules Target) : base (Target)
     {
+        //MinFilesUsingPrecompiledHeaderOverride = 1;
+        //bFasterWithoutUnity = true;
+
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicIncludePaths.AddRange(
             new string[] {
@@ -46,7 +49,7 @@ public class Smartsuit : ModuleRules
             {
                 //"Core",
                 //"Core", "AnimGraph", "BlueprintGraph", "AnimGraphRuntime", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking",
-                "ApplicationCore", "Core", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking","AnimGraphRuntime","Json", "JsonUtilities", "LiveLink", "LiveLinkInterface"
+                "Core", "CoreUObject", "Engine", "Sockets", "Networking","AnimGraphRuntime","Json", "JsonUtilities", "LiveLink"/*, "LiveLinkInterface"*/
 				// ... add other public dependencies that you statically link with here ...
 			}
             );
@@ -56,12 +59,12 @@ public class Smartsuit : ModuleRules
             new string[]
             {
                 //"LiveLinkEditor", "LiveLinkInterface", "LiveLinkMessageBusFramework",
-                "Core",
-                "CoreUObject",
-                "Engine",
-                "MovieScene",
-                "MovieSceneTracks",
-                "Projects",
+                //"Core",
+                //"CoreUObject",
+                //"Engine",
+                //"MovieScene",
+                //"MovieSceneTracks",
+                //"Projects",
 
                 "Messaging",
                 "LiveLink",

@@ -23,7 +23,7 @@ public:
 #include "VirtualProductionFrame.h"
 #include "Misc/Guid.h"
 
-struct FLiveLinkPongMessage;
+//struct FLiveLinkPongMessage;
 struct FMessageAddress;
 struct FProviderPollResult;
 class ITableRow;
@@ -53,7 +53,7 @@ class SVirtualProductionSourceEditor : public SCompoundWidget
 
 private:
 
-	void HandlePongMessage(const FLiveLinkPongMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context);
+	//void HandlePongMessage(const FLiveLinkPongMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context);
 
 	TSharedRef<ITableRow> MakeSourceListViewWidget(FProviderPollResultPtr PollResult, const TSharedRef<STableViewBase>& OwnerTable) const;
 
@@ -65,7 +65,7 @@ private:
 
 	FProviderPollResultPtr SelectedResult;
 
-	TSharedPtr<FMessageEndpoint, ESPMode::ThreadSafe> MessageEndpoint;
+	//TSharedPtr<FMessageEndpoint, ESPMode::ThreadSafe> MessageEndpoint;
 
 	FGuid CurrentPollRequest;
 

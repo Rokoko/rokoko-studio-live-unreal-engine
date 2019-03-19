@@ -29,6 +29,7 @@ TSharedPtr<SWidget> UVirtualProductionSourceFactory::CreateSourceCreationPanel()
 	return ActiveSourceEditor;
 }
 
+
 TSharedPtr<ILiveLinkSource> UVirtualProductionSourceFactory::OnSourceCreationPanelClosed(bool bMakeSource)
 {
 	//Clean up
