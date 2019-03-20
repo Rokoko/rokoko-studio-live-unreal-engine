@@ -2,14 +2,16 @@
 
 #pragma once
 #include "Runtime/Sockets/Public/Sockets.h"
+#include "Runtime/Sockets/Public/SocketSubsystem.h"
+#include "Runtime/Networking/Public/Common/UdpSocketBuilder.h"
 #include "Runtime/Core/Public/HAL/Runnable.h"
 #include "Runtime/Core/Public/HAL/RunnableThread.h"
 //#include "Runtime/Core/Public/Unix/UnixCriticalSection.h"
 #include <mutex>
-
 #include "VirtualProductionFrame.h"
-
+#include "VirtualProductionSource.h"
 #define DEFAULT_ENDPOINT FIPv4Endpoint(FIPv4Address(127, 0, 0, 1), 5005)
+struct FLiveLinkSubjectDataMessage;
 
 class VPStreamingNetwork : public FRunnable
 {
@@ -91,6 +93,9 @@ private:
 	/** Connection thread, used to not block the editor when waiting for connections */
 	FRunnableThread* Thread = NULL;
 	FVirtualProductionFrame *GlobalVPFrame;
+	FVirtualProductionSource *GetLiveLink() {
+		return FVirtualProductionSource::Get();
+	}
 };
 /// @endcond
 

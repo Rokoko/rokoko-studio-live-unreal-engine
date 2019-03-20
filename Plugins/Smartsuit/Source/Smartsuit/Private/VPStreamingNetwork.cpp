@@ -103,6 +103,19 @@ uint32 VPStreamingNetwork::Run()
 					for (int i = 0; i < VPFrame.trackers.Num(); i++) {
 						GlobalVPFrame->trackers.Add(VPFrame.trackers[i]);
 					}
+					FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
+					if (livelink) {
+						
+						
+						/*SubjectData->RefSkeleton = Subject.RefSkeleton;
+						SubjectData->SubjectName = SubjectName;
+*/
+						//message.RefSkeleton.SetBoneNames()
+						const FLiveLinkRefSkeleton skeleton;
+						const FName subjectName("MaName");
+						livelink->HandleSubjectData(subjectName, skeleton);
+						UE_LOG(LogTemp, Warning, TEXT("I see livelink!!"));
+					}
 					mtx.unlock();
 				//}, TStatId(), NULL, ENamedThreads::GameThread);
 

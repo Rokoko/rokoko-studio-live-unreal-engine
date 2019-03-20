@@ -43,10 +43,9 @@ public:
 		return instance;
 	}
 
-	// Message bus message handlers
-	void HandleSubjectData(const FLiveLinkSubjectDataMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context);
-	void HandleSubjectFrame(const FLiveLinkSubjectFrameMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context);
-	void HandleClearSubject(const FLiveLinkClearSubject& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context);
+	void HandleSubjectData(const FName subjectName, const FLiveLinkRefSkeleton skeleton);
+	void HandleSubjectFrame(const FLiveLinkSubjectFrameMessage& Message);
+	void HandleClearSubject(const FLiveLinkClearSubject& Message);
 
 
 private:

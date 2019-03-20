@@ -43,7 +43,7 @@ bool FVirtualProductionSource::IsSourceStillValid()
 	return bIsValid;
 }
 
-void FVirtualProductionSource::HandleClearSubject(const FLiveLinkClearSubject& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context)
+void FVirtualProductionSource::HandleClearSubject(const FLiveLinkClearSubject& Message)
 {
 	ConnectionLastActive = FPlatformTime::Seconds();
 	Client->ClearSubject(Message.SubjectName);
@@ -56,7 +56,7 @@ bool FVirtualProductionSource::RequestSourceShutdown()
 	return true;
 }
 
-void FVirtualProductionSource::HandleSubjectData(const FLiveLinkSubjectDataMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context)
+void FVirtualProductionSource::HandleSubjectData(const FName subjectName, const FLiveLinkRefSkeleton skeleton)
 {
 	ConnectionLastActive = FPlatformTime::Seconds();
 
@@ -86,11 +86,12 @@ void FVirtualProductionSource::HandleSubjectData(const FLiveLinkSubjectDataMessa
 	UE_LOG(LogTemp, Warning, TEXT("INVALID BONE NAMES RECIEVED %i != existing %i"), Message.BoneNames.Num(), BoneNames.Num());
 	}*/
 	UE_LOG(LogTemp, Warning, TEXT("Handle Subject Data!!"));
-	Client->PushSubjectSkeleton(SourceGuid, Message.SubjectName, Message.RefSkeleton);
+	
+	Client->PushSubjectSkeleton(SourceGuid, subjectName, skeleton);
 	
 }
 
-void FVirtualProductionSource::HandleSubjectFrame(const FLiveLinkSubjectFrameMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context)
+void FVirtualProductionSource::HandleSubjectFrame(const FLiveLinkSubjectFrameMessage& Message)
 {
 	ConnectionLastActive = FPlatformTime::Seconds();
 
