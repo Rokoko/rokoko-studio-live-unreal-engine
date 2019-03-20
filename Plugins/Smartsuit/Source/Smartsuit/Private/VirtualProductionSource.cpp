@@ -11,12 +11,15 @@
 const double LL_CONNECTION_TIMEOUT = 15.0;
 const double LL_HALF_CONNECTION_TIMEOUT = LL_CONNECTION_TIMEOUT / 2.0;
 
+FVirtualProductionSource* FVirtualProductionSource::instance = 0;
+
 void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid InSourceGuid)
 {
 
 	Client = InClient;
 	SourceGuid = InSourceGuid;
 	source = this;
+	instance = this;
 	UE_LOG(LogTemp, Warning, TEXT(" - - - RECEIVE CLIENT!!!"));
 	//MessageEndpoint = FMessageEndpoint::Builder(TEXT("VirtualProductionSource"))
 	//	.Handling<FLiveLinkSubjectDataMessage>(this, &FVirtualProductionSource::HandleSubjectData)
@@ -29,6 +32,7 @@ void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid In
 
 	// Register for heartbeats
 	bIsValid = true;
+	
 }
 
 

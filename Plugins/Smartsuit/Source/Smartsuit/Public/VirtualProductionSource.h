@@ -20,9 +20,6 @@ struct FLiveLinkClearSubject;
 class SMARTSUIT_API FVirtualProductionSource : public ILiveLinkSource
 {
 public:
-	FVirtualProductionSource* Get() {
-		return source;
-	}
 	FVirtualProductionSource(const FText& InSourceType, const FText& InSourceMachineName, const FMessageAddress& InConnectionAddress)
 		: ConnectionAddress(InConnectionAddress)
 		, SourceType(InSourceType)
@@ -42,14 +39,18 @@ public:
 	virtual FText GetSourceType() const { return SourceType; }
 	virtual FText GetSourceMachineName() const { return SourceMachineName; }
 	virtual FText GetSourceStatus() const { return SourceStatus; }
-
-
-private:
+	static FVirtualProductionSource* Get() {
+		return instance;
+	}
 
 	// Message bus message handlers
 	void HandleSubjectData(const FLiveLinkSubjectDataMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context);
 	void HandleSubjectFrame(const FLiveLinkSubjectFrameMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context);
 	void HandleClearSubject(const FLiveLinkClearSubject& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context);
+
+
+private:
+
 	// End Message bus message handlers
 
 	ILiveLinkClient* Client;
@@ -75,6 +76,6 @@ private:
 	FThreadSafeBool bIsValid;
 	FVirtualProductionSource *source;
 	//singleton instance
-	//static FVirtualProductionSource *instance;
+	static FVirtualProductionSource *instance;
 
 };
