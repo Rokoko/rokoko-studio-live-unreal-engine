@@ -15,10 +15,8 @@ FVirtualProductionSource* FVirtualProductionSource::instance = 0;
 
 void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid InSourceGuid)
 {
-
 	Client = InClient;
 	SourceGuid = InSourceGuid;
-	source = this;
 	instance = this;
 	UE_LOG(LogTemp, Warning, TEXT(" - - - RECEIVE CLIENT!!!"));
 	//MessageEndpoint = FMessageEndpoint::Builder(TEXT("VirtualProductionSource"))
@@ -32,11 +30,7 @@ void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid In
 
 	// Register for heartbeats
 	bIsValid = true;
-	
 }
-
-
-
 
 bool FVirtualProductionSource::IsSourceStillValid()
 {
@@ -51,8 +45,7 @@ void FVirtualProductionSource::HandleClearSubject(const FLiveLinkClearSubject& M
 
 bool FVirtualProductionSource::RequestSourceShutdown()
 {
-	//instance = nullptr;
-	source = nullptr;
+	instance = nullptr;
 	return true;
 }
 
@@ -86,9 +79,10 @@ void FVirtualProductionSource::HandleSubjectData(const FName subjectName, const 
 	UE_LOG(LogTemp, Warning, TEXT("INVALID BONE NAMES RECIEVED %i != existing %i"), Message.BoneNames.Num(), BoneNames.Num());
 	}*/
 	UE_LOG(LogTemp, Warning, TEXT("Handle Subject Data!!"));
+	UE_LOG(LogTemp, Warning, TEXT("SUBJECT!! %s"), &subjectName);
+	//UE_LOG(LogTemp, Warning, TEXT("SKELETON!! "), skeleton);
 	
 	Client->PushSubjectSkeleton(SourceGuid, subjectName, skeleton);
-	
 }
 
 void FVirtualProductionSource::HandleSubjectFrame(const FLiveLinkSubjectFrameMessage& Message)

@@ -71,6 +71,7 @@ FString BytesToStringFixed(const uint8 *In, int32 Count)
 
 uint32 VPStreamingNetwork::Run()
 {
+	bool added = false;
 	while (!Stopping)
 	{
 		auto addr_in = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
@@ -111,10 +112,22 @@ uint32 VPStreamingNetwork::Run()
 						SubjectData->SubjectName = SubjectName;
 */
 						//message.RefSkeleton.SetBoneNames()
-						const FLiveLinkRefSkeleton skeleton;
-						const FName subjectName("MaName");
-						livelink->HandleSubjectData(subjectName, skeleton);
+						if (!added) {
+							added = true;
+							const FLiveLinkRefSkeleton skeleton;
+							const FName subjectName("MaName");
+							livelink->HandleSubjectData(subjectName, skeleton);
+							//for (int i = 0; i < VPFrame.props.Num(); i++) {
+							//	GlobalVPFrame->props.Add(VPFrame.props[i]);
+							//}
+							//for (int i = 0; i < VPFrame.trackers.Num(); i++) {
+							//	GlobalVPFrame->trackers.Add(VPFrame.trackers[i]);
+							//}
+						}
 						UE_LOG(LogTemp, Warning, TEXT("I see livelink!!"));
+					}
+					else {
+						UE_LOG(LogTemp, Warning, TEXT("no livelink!!"));
 					}
 					mtx.unlock();
 				//}, TStatId(), NULL, ENamedThreads::GameThread);

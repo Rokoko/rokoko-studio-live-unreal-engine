@@ -73,7 +73,6 @@ private:
 
 	// Current Validity of Source
 	FThreadSafeBool bIsValid;
-	FVirtualProductionSource *source;
 	//singleton instance
 	static FVirtualProductionSource *instance;
 
