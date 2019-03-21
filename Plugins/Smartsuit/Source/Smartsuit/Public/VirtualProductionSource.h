@@ -44,12 +44,12 @@ public:
 	}
 
 	void HandleSubjectData(const FName subjectName, const FLiveLinkRefSkeleton skeleton);
-	void HandleSubjectFrame(const FLiveLinkSubjectFrameMessage& Message);
-	void HandleClearSubject(const FLiveLinkClearSubject& Message);
+	void HandleSubjectFrame(const FName subjectName, const TArray<FLiveLinkCurveElement>& Message);
+	void HandleClearSubject(const FName subjectName);
 
 
 private:
-
+	TArray<FName> subjectNames;
 	// End Message bus message handlers
 
 	ILiveLinkClient* Client;

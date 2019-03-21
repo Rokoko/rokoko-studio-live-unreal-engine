@@ -11,7 +11,22 @@
 #include "VirtualProductionFrame.h"
 #include "VirtualProductionSource.h"
 #define DEFAULT_ENDPOINT FIPv4Endpoint(FIPv4Address(127, 0, 0, 1), 5005)
+//
+//#include "ILiveLinkSource.h"
+//#include "MessageEndpoint.h"
+//#include "IMessageContext.h"
+//#include "HAL/ThreadSafeBool.h"
+
+class ILiveLinkClient;
+struct FLiveLinkPongMessage;
 struct FLiveLinkSubjectDataMessage;
+struct FLiveLinkSubjectFrameMessage;
+struct FLiveLinkHeartbeatMessage;
+struct FLiveLinkClearSubject;
+
+
+struct FLiveLinkSubjectDataMessage;
+struct FLiveLinkClearSubject;
 
 class VPStreamingNetwork : public FRunnable
 {
@@ -68,7 +83,6 @@ public:
 	TArray<FProp> GetAllProps() {
 		//return nullptr;
 		TArray<FProp> result;
-		UE_LOG(LogTemp, Display, TEXT("Yeeee1.1")); 
 		mtx.lock();
 		if (GlobalVPFrame) {
 			for (int i = 0; i < GlobalVPFrame->props.Num(); i++) {
@@ -76,7 +90,6 @@ public:
 				//result->Add
 			}
 		}
-		UE_LOG(LogTemp, Display, TEXT("Yeeee2.1 %d"), result.Num());
 		mtx.unlock();
 		//UE_LOG(LogTemp, Display, TEXT("Yeeee3"));
 		return result;
@@ -89,7 +102,8 @@ private:
 	FSocket *Socket = NULL;
 	/** Used to tell that the thread is stopping */
 	bool Stopping;
-
+	//FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
+	TArray <FName> subjectNames;
 	/** Connection thread, used to not block the editor when waiting for connections */
 	FRunnableThread* Thread = NULL;
 	FVirtualProductionFrame *GlobalVPFrame;

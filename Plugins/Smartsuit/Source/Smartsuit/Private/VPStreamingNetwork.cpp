@@ -17,6 +17,13 @@ VPStreamingNetwork::~VPStreamingNetwork()
 {
 	// Stop the runnable
 	Stop();
+	FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
+	if (livelink) {
+		for (int i = 0; i < subjectNames.Num(); i++) {
+			livelink->HandleClearSubject(subjectNames[i]);
+		}
+	}
+	//livelink->HandleClearSubject(FLiveLinkClearSubject(FString("subjectNames")));
 
 	if (Socket) {
 		Socket->Close();
@@ -115,15 +122,27 @@ uint32 VPStreamingNetwork::Run()
 						if (!added) {
 							added = true;
 							const FLiveLinkRefSkeleton skeleton;
-							const FName subjectName("MaName");
-							livelink->HandleSubjectData(subjectName, skeleton);
-							//for (int i = 0; i < VPFrame.props.Num(); i++) {
-							//	GlobalVPFrame->props.Add(VPFrame.props[i]);
-							//}
-							//for (int i = 0; i < VPFrame.trackers.Num(); i++) {
-							//	GlobalVPFrame->trackers.Add(VPFrame.trackers[i]);
-							//}
+							//const FName subjectName("MaName");
+							//livelink->HandleSubjectData(subjectName, skeleton);
+							for (int i = 0; i < VPFrame.props.Num(); i++) {
+								const FName subjectName = FName(*VPFrame.props[i].name);
+								livelink->HandleSubjectData(subjectName, skeleton);
+								subjectNames.Add(subjectName);
+							}
+							for (int i = 0; i < VPFrame.trackers.Num(); i++) {
+								const FName subjectName = FName(*VPFrame.trackers[i].name);
+								livelink->HandleSubjectData(subjectName, skeleton);
+								subjectNames.Add(subjectName);
+							}
 						}
+						TArray<FLiveLinkCurveElement> frame;
+						//FLiveLinkCurveElement curve;
+						//curve.CurveName = "x";
+						//curve.CurveValue = 1;
+						//frame.AddUnique(curve)
+						const FName camera2("Camera-2");
+						livelink->HandleSubjectFrame(camera2, frame);
+
 						UE_LOG(LogTemp, Warning, TEXT("I see livelink!!"));
 					}
 					else {

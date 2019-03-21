@@ -4,6 +4,7 @@
 
 #include "LiveLinkMessages.h"
 #include "ILiveLinkClient.h"
+#include "Runtime/RenderCore/Public/RenderCore.h"
 //#include "LiveLinkMessageBusHeartbeatManager.h"
 
 #include "MessageEndpointBuilder.h"
@@ -37,14 +38,19 @@ bool FVirtualProductionSource::IsSourceStillValid()
 	return bIsValid;
 }
 
-void FVirtualProductionSource::HandleClearSubject(const FLiveLinkClearSubject& Message)
+void FVirtualProductionSource::HandleClearSubject(const FName subjectName)
 {
 	ConnectionLastActive = FPlatformTime::Seconds();
-	Client->ClearSubject(Message.SubjectName);
+	Client->ClearSubject(subjectName);
 }
 
 bool FVirtualProductionSource::RequestSourceShutdown()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Shutting down"));
+	//HandleClearSubject(FLiveLinkClearSubject("Studio"));
+	for (int i = 0; i < subjectNames.Num(); i++) {
+		HandleClearSubject(subjectNames[i]);
+	}
 	instance = nullptr;
 	return true;
 }
@@ -81,11 +87,11 @@ void FVirtualProductionSource::HandleSubjectData(const FName subjectName, const 
 	UE_LOG(LogTemp, Warning, TEXT("Handle Subject Data!!"));
 	UE_LOG(LogTemp, Warning, TEXT("SUBJECT!! %s"), &subjectName);
 	//UE_LOG(LogTemp, Warning, TEXT("SKELETON!! "), skeleton);
-	
+	subjectNames.Add(subjectName);
 	Client->PushSubjectSkeleton(SourceGuid, subjectName, skeleton);
 }
-
-void FVirtualProductionSource::HandleSubjectFrame(const FLiveLinkSubjectFrameMessage& Message)
+	
+void FVirtualProductionSource::HandleSubjectFrame(const FName subjectName, const TArray<FLiveLinkCurveElement>& Message)
 {
 	ConnectionLastActive = FPlatformTime::Seconds();
 
@@ -99,10 +105,19 @@ void FVirtualProductionSource::HandleSubjectFrame(const FLiveLinkSubjectFrameMes
 	FPlatformMisc::LowLevelOutputDebugStringf(TEXT("\tTransform: %s\n"), *T.ToString());
 	}*/
 
+	FTransform hardCodedTransform;
+	hardCodedTransform.TransformPosition(FVector(20, 20, 200));
+	hardCodedTransform.TransformRotation(FQuat::MakeFromEuler(FVector(45, 45, 45)));
+
 	FLiveLinkFrameData FrameData;
-	FrameData.Transforms = Message.Transforms;
-	FrameData.CurveElements = Message.Curves;
-	FrameData.MetaData = Message.MetaData;
-	FrameData.WorldTime = FLiveLinkWorldTime(Message.Time);
-	Client->PushSubjectData(SourceGuid, Message.SubjectName, FrameData);
+	FrameData.Transforms.Add(hardCodedTransform);
+	
+
+	//FrameData.Transforms = Message.Transforms;
+	//FrameData.CurveElements = Message.Curves;
+	//FrameData.MetaData = Message.MetaData;
+	FTimer timer;
+	
+	FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+	Client->PushSubjectData(SourceGuid, subjectName, FrameData);
 }
