@@ -118,12 +118,12 @@ uint32 VPStreamingNetwork::Run()
 					if (livelink) {
 						propSubjects.Empty();
 						for (int i = 0; i < VPFrame.props.Num(); i++) {
-							FVirtualProductionSubject subject = VPFrame.props[i].GetSubject();
+							FVirtualProductionSubject subject = GlobalVPFrame->props[i].GetSubject();
 							propSubjects.Add(subject);
 						}
 						trackerSubjects.Empty();
 						for (int i = 0; i < VPFrame.trackers.Num(); i++) {
-							FVirtualProductionSubject subject = VPFrame.trackers[i].GetSubject();
+							FVirtualProductionSubject subject = GlobalVPFrame->trackers[i].GetSubject();
 							trackerSubjects.Add(subject);
 						}
 						SendToLiveLink(propSubjects);
