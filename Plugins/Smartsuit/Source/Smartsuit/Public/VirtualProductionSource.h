@@ -44,12 +44,13 @@ public:
 		return instance;
 	}
 
-	void HandleSubjectData(FVirtualProductionSubject virtualProductionObject);
-	void HandleSubjectFrame(FVirtualProductionSubject virtualProductionObject);
-	void HandleClearSubject(const FName subjectName);
+	void HandleSubjectFrame(TArray<FVirtualProductionSubject> virtualProductionObject);
+	void ClearAllSubjects();
 
 
 private:
+	void HandleClearSubject(const FName subjectName);
+	void HandleSubjectData(FVirtualProductionSubject virtualProductionObject);
 	TArray<FName> subjectNames;
 	// End Message bus message handlers
 

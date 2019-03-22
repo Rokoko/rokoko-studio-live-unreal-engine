@@ -217,6 +217,7 @@ struct FTracker {
 	FVirtualProductionSubject GetSubject() {
 		return FVirtualProductionSubject(UPosition(), FQuatToRotator().Quaternion(), FName(*(FString("tracker:") + FString(name))));
 	}
+
 };
 
 /*! \brief Information about a specific tracker, including its status, rotation, position.*/

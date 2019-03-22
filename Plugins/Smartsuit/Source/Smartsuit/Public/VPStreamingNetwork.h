@@ -103,14 +103,15 @@ private:
 	/** Used to tell that the thread is stopping */
 	bool Stopping;
 	//FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
-	TArray <FName> subjectNames;
+	//TArray <FName> subjectNames;
 	/** Connection thread, used to not block the editor when waiting for connections */
 	FRunnableThread* Thread = NULL;
 	FVirtualProductionFrame *GlobalVPFrame;
 	FVirtualProductionSource *GetLiveLink() {
 		return FVirtualProductionSource::Get();
 	}
-	void SendToLiveLink(FVirtualProductionSubject movable);
+	TArray<FVirtualProductionSubject> subjects;
+	void SendToLiveLink(TArray<FVirtualProductionSubject> subjects);
 };
 /// @endcond
 
