@@ -116,17 +116,18 @@ uint32 VPStreamingNetwork::Run()
 					}
 					FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
 					if (livelink) {
-						subjects.Empty();
+						propSubjects.Empty();
 						for (int i = 0; i < VPFrame.props.Num(); i++) {
 							FVirtualProductionSubject subject = VPFrame.props[i].GetSubject();
-							subjects.Add(subject);
+							propSubjects.Add(subject);
 						}
-
-						/*for (int i = 0; i < VPFrame.trackers.Num(); i++) {
+						trackerSubjects.Empty();
+						for (int i = 0; i < VPFrame.trackers.Num(); i++) {
 							FVirtualProductionSubject subject = VPFrame.trackers[i].GetSubject();
-							subjects.Add(subject);
-						}*/
-						SendToLiveLink(subjects);
+							trackerSubjects.Add(subject);
+						}
+						SendToLiveLink(propSubjects);
+						SendToLiveLink(trackerSubjects);
 
 						UE_LOG(LogTemp, Warning, TEXT("I see livelink!!"));
 					}
