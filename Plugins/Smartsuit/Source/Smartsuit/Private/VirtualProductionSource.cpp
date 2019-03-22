@@ -58,66 +58,43 @@ bool FVirtualProductionSource::RequestSourceShutdown()
 void FVirtualProductionSource::HandleSubjectData(const FName subjectName, const FLiveLinkRefSkeleton skeleton)
 {
 	ConnectionLastActive = FPlatformTime::Seconds();
-
-	//FPlatformMisc::LowLevelOutputDebugStringf(TEXT("HandleSubjectData %s\n"), *Message.SubjectName);
-	/*for (const FString& Name : Message.BoneNames)
-	{
-	FPlatformMisc::LowLevelOutputDebugStringf(TEXT("\tName: %s\n"), *Name);
-	}*/
-	/*FScopeLock Lock(&GBoneDataCS);
-
-	if (BoneID != (Message.BoneID - 1))
-	{
-	UE_LOG(LogTemp, Warning, TEXT("BONE ID SKIP Was On:%i Now:%i"), BoneID, Message.BoneID);
-	}
-	if (BoneNames.Num() == Message.BoneNames.Num() || BoneNames.Num() == 0)
-	{
-	BoneNames.Reset();
-	for (const FString& Name : Message.BoneNames)
-	{
-	BoneNames.Add(FName(*Name));
-	}
-	//BoneTransforms.Reset();
-	BoneID = Message.BoneID;
-	}
-	else
-	{
-	UE_LOG(LogTemp, Warning, TEXT("INVALID BONE NAMES RECIEVED %i != existing %i"), Message.BoneNames.Num(), BoneNames.Num());
-	}*/
 	UE_LOG(LogTemp, Warning, TEXT("Handle Subject Data!!"));
 	UE_LOG(LogTemp, Warning, TEXT("SUBJECT!! %s"), &subjectName);
 	//UE_LOG(LogTemp, Warning, TEXT("SKELETON!! "), skeleton);
 	subjectNames.Add(subjectName);
-	Client->PushSubjectSkeleton(SourceGuid, subjectName, skeleton);
+	FLiveLinkRefSkeleton skeletonRef;
+	TArray<FName> boneNames;
+	boneNames.Add("Root");
+	skeletonRef.SetBoneNames(boneNames);
+	TArray<int32> boneParents;
+	boneParents.Add(0);
+	skeletonRef.SetBoneParents(boneParents);
+	Client->PushSubjectSkeleton(SourceGuid, subjectName, skeletonRef);
 }
 	
 void FVirtualProductionSource::HandleSubjectFrame(const FName subjectName, const TArray<FLiveLinkCurveElement>& Message)
 {
 	ConnectionLastActive = FPlatformTime::Seconds();
 
-	//FPlatformMisc::LowLevelOutputDebugString(TEXT("HandleSubjectFrame\n"));
-	/*if (BoneID != Message.BoneID)
-	{
-	UE_LOG(LogTemp, Warning, TEXT("BONE ID MISMATCH Exp:%i Got:%i"), BoneID, Message.BoneID);
-	}*/
-	/*for (const FTransform& T : Message.Transforms)
-	{
-	FPlatformMisc::LowLevelOutputDebugStringf(TEXT("\tTransform: %s\n"), *T.ToString());
-	}*/
-
 	FTransform hardCodedTransform;
-	hardCodedTransform.TransformPosition(FVector(20, 20, 200));
-	hardCodedTransform.TransformRotation(FQuat::MakeFromEuler(FVector(45, 45, 45)));
+	hardCodedTransform.SetTranslation(FVector(20, 20, 200));
+	hardCodedTransform.SetRotation(FQuat::MakeFromEuler(FVector(45, 45, 45)));
+	hardCodedTransform.SetScale3D(FVector(1, 1, 1));
 
 	FLiveLinkFrameData FrameData;
 	FrameData.Transforms.Add(hardCodedTransform);
-	
-
-	//FrameData.Transforms = Message.Transforms;
-	//FrameData.CurveElements = Message.Curves;
-	//FrameData.MetaData = Message.MetaData;
 	FTimer timer;
+
 	
-	FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+	FrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+	FLiveLinkCurveElement curve;
+	curve.CurveName = "Root.position.z";
+	curve.CurveValue = -200;
+	FrameData.CurveElements.Add(curve);
+	FLiveLinkCurveElement curve2;
+	curve2.CurveName = "Root.rotation.z";
+	curve2.CurveValue = 45;
+	FrameData.CurveElements.Add(curve2);
+
 	Client->PushSubjectData(SourceGuid, subjectName, FrameData);
 }
