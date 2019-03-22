@@ -55,13 +55,13 @@ bool FVirtualProductionSource::RequestSourceShutdown()
 	return true;
 }
 
-void FVirtualProductionSource::HandleSubjectData(const FName subjectName, const FLiveLinkRefSkeleton skeleton)
+void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtualProductionObject)
 {
 	ConnectionLastActive = FPlatformTime::Seconds();
 	UE_LOG(LogTemp, Warning, TEXT("Handle Subject Data!!"));
-	UE_LOG(LogTemp, Warning, TEXT("SUBJECT!! %s"), &subjectName);
+	UE_LOG(LogTemp, Warning, TEXT("SUBJECT!! %s"), &virtualProductionObject.name);
 	//UE_LOG(LogTemp, Warning, TEXT("SKELETON!! "), skeleton);
-	subjectNames.Add(subjectName);
+	subjectNames.Add(virtualProductionObject.name);
 	FLiveLinkRefSkeleton skeletonRef;
 	TArray<FName> boneNames;
 	boneNames.Add("Root");
@@ -69,32 +69,30 @@ void FVirtualProductionSource::HandleSubjectData(const FName subjectName, const 
 	TArray<int32> boneParents;
 	boneParents.Add(0);
 	skeletonRef.SetBoneParents(boneParents);
-	Client->PushSubjectSkeleton(SourceGuid, subjectName, skeletonRef);
+	Client->PushSubjectSkeleton(SourceGuid, virtualProductionObject.name, skeletonRef);
 }
 	
-void FVirtualProductionSource::HandleSubjectFrame(const FName subjectName, const TArray<FLiveLinkCurveElement>& Message)
+void FVirtualProductionSource::HandleSubjectFrame(FVirtualProductionSubject virtualProductionObject)
 {
 	ConnectionLastActive = FPlatformTime::Seconds();
-
 	FTransform hardCodedTransform;
-	hardCodedTransform.SetTranslation(FVector(20, 20, 200));
-	hardCodedTransform.SetRotation(FQuat::MakeFromEuler(FVector(45, 45, 45)));
+	hardCodedTransform.SetTranslation(virtualProductionObject.position);
+	hardCodedTransform.SetRotation(virtualProductionObject.rotation);
 	hardCodedTransform.SetScale3D(FVector(1, 1, 1));
 
 	FLiveLinkFrameData FrameData;
 	FrameData.Transforms.Add(hardCodedTransform);
 	FTimer timer;
 
-	
 	FrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
-	FLiveLinkCurveElement curve;
-	curve.CurveName = "Root.position.z";
-	curve.CurveValue = -200;
-	FrameData.CurveElements.Add(curve);
-	FLiveLinkCurveElement curve2;
-	curve2.CurveName = "Root.rotation.z";
-	curve2.CurveValue = 45;
-	FrameData.CurveElements.Add(curve2);
+	//FLiveLinkCurveElement curve;
+	//curve.CurveName = "Root.position.z";
+	//curve.CurveValue = -200;
+	//FrameData.CurveElements.Add(curve);
+	//FLiveLinkCurveElement curve2;
+	//curve2.CurveName = "Root.rotation.z";
+	//curve2.CurveValue = 45;
+	//FrameData.CurveElements.Add(curve2);
 
-	Client->PushSubjectData(SourceGuid, subjectName, FrameData);
+	Client->PushSubjectData(SourceGuid, virtualProductionObject.name, FrameData);
 }

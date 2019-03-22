@@ -110,6 +110,7 @@ private:
 	FVirtualProductionSource *GetLiveLink() {
 		return FVirtualProductionSource::Get();
 	}
+	void SendToLiveLink(FVirtualProductionSubject movable);
 };
 /// @endcond
 

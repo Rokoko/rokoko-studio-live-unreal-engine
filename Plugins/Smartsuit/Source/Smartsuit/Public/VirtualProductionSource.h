@@ -6,6 +6,7 @@
 #include "MessageEndpoint.h"
 #include "IMessageContext.h"
 #include "HAL/ThreadSafeBool.h"
+#include "VirtualProductionFrame.h"
 
 class ILiveLinkClient;
 struct FLiveLinkPongMessage;
@@ -43,8 +44,8 @@ public:
 		return instance;
 	}
 
-	void HandleSubjectData(const FName subjectName, const FLiveLinkRefSkeleton skeleton);
-	void HandleSubjectFrame(const FName subjectName, const TArray<FLiveLinkCurveElement>& Message);
+	void HandleSubjectData(FVirtualProductionSubject virtualProductionObject);
+	void HandleSubjectFrame(FVirtualProductionSubject virtualProductionObject);
 	void HandleClearSubject(const FName subjectName);
 
 

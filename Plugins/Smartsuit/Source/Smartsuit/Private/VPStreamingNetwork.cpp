@@ -74,7 +74,12 @@ FString BytesToStringFixed(const uint8 *In, int32 Count)
 	return Fixed;
 }
 
-
+void VPStreamingNetwork::SendToLiveLink(FVirtualProductionSubject movable) {
+	FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
+	if (livelink) {
+		livelink->HandleSubjectFrame(movable);
+	}
+}
 
 uint32 VPStreamingNetwork::Run()
 {
@@ -121,28 +126,32 @@ uint32 VPStreamingNetwork::Run()
 						//message.RefSkeleton.SetBoneNames()
 						if (!added) {
 							added = true;
-							const FLiveLinkRefSkeleton skeleton;
-							//const FName subjectName("MaName");
-							//livelink->HandleSubjectData(subjectName, skeleton);
 							for (int i = 0; i < VPFrame.props.Num(); i++) {
-								const FName subjectName = FName(*VPFrame.props[i].name);
-								livelink->HandleSubjectData(subjectName, skeleton);
-								subjectNames.Add(subjectName);
+								livelink->HandleSubjectData(VPFrame.props[i].GetSubject());
+								subjectNames.Add(VPFrame.props[i].GetSubject().name);
 							}
 							for (int i = 0; i < VPFrame.trackers.Num(); i++) {
-								const FName subjectName = FName(*VPFrame.trackers[i].name);
-								livelink->HandleSubjectData(subjectName, skeleton);
-								subjectNames.Add(subjectName);
+								livelink->HandleSubjectData(VPFrame.trackers[i].GetSubject());
+								subjectNames.Add(VPFrame.trackers[i].GetSubject().name);
 							}
 						}
+
+						for (int i = 0; i < VPFrame.props.Num(); i++) {
+							SendToLiveLink(VPFrame.props[i].GetSubject());
+							
+						}
+						for (int i = 0; i < VPFrame.trackers.Num(); i++) {
+							SendToLiveLink(VPFrame.trackers[i].GetSubject());
+						}
+
 						TArray<FLiveLinkCurveElement> frame;
 						//FLiveLinkCurveElement curve;
 						//curve.CurveName = "x";
 						//curve.CurveValue = 1;
 						//frame.AddUnique(curve)
-						const FName camera2("Camera-2");
-						livelink->HandleSubjectFrame(camera2, frame);
-
+						//const FName camera2("Camera-2");
+						//livelink->HandleSubjectFrame(camera2, frame);
+						
 						UE_LOG(LogTemp, Warning, TEXT("I see livelink!!"));
 					}
 					else {

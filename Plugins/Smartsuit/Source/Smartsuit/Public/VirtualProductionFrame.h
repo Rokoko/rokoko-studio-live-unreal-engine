@@ -91,6 +91,18 @@ struct FProfile {
 	//FProfile() {}
 };
 
+struct FVirtualProductionSubject {
+	FVector position;
+	FQuat rotation;
+	FName name;
+
+	FVirtualProductionSubject(FVector in_position, FQuat in_rotation, FName in_name) {
+		position = in_position;
+		rotation = in_rotation;
+		name = in_name;
+	}
+};
+
 /*! \brief Information about a specific props, including its status, rotation, position.*/
 USTRUCT(BlueprintType, meta = (ToolTip = "Contains all information about a prop."))
 struct FProp {
@@ -135,6 +147,10 @@ struct FProp {
 		FQuat result(rotation.Z, rotation.X, rotation.Y, rotation.W);
 		FRotator Rotator = result.Rotator();
 		return Rotator;
+	}
+
+	FVirtualProductionSubject GetSubject() {
+		return FVirtualProductionSubject(UPosition(), FQuatToRotator().Quaternion(), FName(*(FString("prop:") + FString(name))));
 	}
 };
 
@@ -196,6 +212,10 @@ struct FTracker {
 		FQuat result(rotation.Z, rotation.X, rotation.Y, rotation.W);
 		FRotator Rotator = result.Rotator();
 		return Rotator;
+	}
+
+	FVirtualProductionSubject GetSubject() {
+		return FVirtualProductionSubject(UPosition(), FQuatToRotator().Quaternion(), FName(*(FString("tracker:") + FString(name))));
 	}
 };
 
