@@ -105,8 +105,11 @@ uint32 VPStreamingNetwork::Run()
 					FVirtualProductionFrame VPFrame;
 					FString result = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
 					FJsonObjectConverter::JsonObjectStringToUStruct(result, &VPFrame, 0, 0);
-
-					GlobalVPFrame = new FVirtualProductionFrame();
+					if (!GlobalVPFrame) {
+						GlobalVPFrame = new FVirtualProductionFrame();
+					}
+					GlobalVPFrame->props.Empty();
+					GlobalVPFrame->trackers.Empty();
 					GlobalVPFrame->version = VPFrame.version;
 					FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
 
@@ -132,7 +135,7 @@ uint32 VPStreamingNetwork::Run()
 						for (int i = 0; i < VPFrame.trackers.Num(); i++) {
 							GlobalVPFrame->trackers.Add(VPFrame.trackers[i]);
 						}
-					}
+
 					mtx.unlock();
 				//}, TStatId(), NULL, ENamedThreads::GameThread);
 
