@@ -25,7 +25,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	/**
 	* The port number used to listen for trackers and props data.
 	*/

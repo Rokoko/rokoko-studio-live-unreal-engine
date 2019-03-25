@@ -47,7 +47,6 @@ public:
 	void HandleSubjectFrame(TArray<FVirtualProductionSubject> virtualProductionObject);
 	void ClearAllSubjects();
 
-
 private:
 	void HandleClearSubject(const FName subjectName);
 	void HandleSubjectData(FVirtualProductionSubject virtualProductionObject);

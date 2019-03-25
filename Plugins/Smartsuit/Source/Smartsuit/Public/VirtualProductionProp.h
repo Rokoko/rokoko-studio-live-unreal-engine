@@ -1,5 +1,4 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
-
 #pragma once
 
 #include "CoreMinimal.h"

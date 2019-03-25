@@ -138,10 +138,6 @@ uint32 VPStreamingNetwork::Run()
 						//UE_LOG(LogTemp, Warning, TEXT("no livelink!!"));
 					}
 					mtx.unlock();
-				//}, TStatId(), NULL, ENamedThreads::GameThread);
-
-				// If you want to wait for the code above to complete do this:
-				//FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
 
 			}
 		}

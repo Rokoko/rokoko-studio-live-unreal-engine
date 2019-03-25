@@ -53,21 +53,6 @@ void ASmartsuitController::Tick(float DeltaTime)
 		return;
 	}
 
-	//check if you received any new body model...
-	Body * body = listener->CheckForBodyCommand(suitname);
-	if (body) {
-		bodyModel.SetBody(*body);
-	}
-	if (!hubInfo && (hubInfo = listener->CheckForHubInfo(suitname)) != nullptr) {
-		UpdateWiFiApiString();
-		if (SupportsWiFi())
-			listener->SetSupportsWiFiAPI(suitname);
-	}
-	if (SupportsWiFi() && !bodyModelRequested) {
-		bodyModelRequested = true;
-		GetBodyModel();
-	}
-
 	if (AutoConnect) {
 		TArray<FString> suits = listener->GetAvailableSmartsuits();
 		if (suits.Num() > 0) {
@@ -96,56 +81,56 @@ void ASmartsuitController::Tick(float DeltaTime)
 	}
 }
 
-void ASmartsuitController::SendCommand(unsigned char cmd, uint8 *customData = nullptr, int customDataLength = 0) {
-	if (!SupportsWiFi() && cmd != SMARTSUIT_COMMAND_READ_HUB_INFO) {
-		UE_LOG(LogTemp, Warning, TEXT("Can't execute command, since this suit has an unsupported WiFi API version"));
-		return;
-	}
-	
-	uint32 myIp = GetLocalIP();
-
-	ASmartsuitReceiver * receiver = GetReceiver();
-	if (receiver && myIp != 0) {
-		if (customData != nullptr) {
-			receiver->SendCommand(suitname, customData, customDataLength);
-		}
-		else {
-			unsigned char data[4] = { GetByte(myIp, 3), GetByte(myIp, 2), cmd, cmd };
-			receiver->SendCommand(suitname, data, sizeof(char) * 4);
-		}
-	}
-}
+//void ASmartsuitController::SendCommand(unsigned char cmd, uint8 *customData = nullptr, int customDataLength = 0) {
+//	if (!SupportsWiFi() && cmd != SMARTSUIT_COMMAND_READ_HUB_INFO) {
+//		UE_LOG(LogTemp, Warning, TEXT("Can't execute command, since this suit has an unsupported WiFi API version"));
+//		return;
+//	}
+//	
+//	uint32 myIp = GetLocalIP();
+//
+//	ASmartsuitReceiver * receiver = GetReceiver();
+//	if (receiver && myIp != 0) {
+//		if (customData != nullptr) {
+//			//receiver->SendCommand(suitname, customData, customDataLength);
+//		}
+//		else {
+//			unsigned char data[4] = { GetByte(myIp, 3), GetByte(myIp, 2), cmd, cmd };
+//			//receiver->SendCommand(suitname, data, sizeof(char) * 4);
+//		}
+//	}
+//}
 
 void ASmartsuitController::Restart() {
-	SendCommand(SMARTSUIT_COMMAND_RESET_KALMAN_FILTER);
+	//SendCommand(SMARTSUIT_COMMAND_RESET_KALMAN_FILTER);
 }
 
 void ASmartsuitController::Calibrate() {
-	SendCommand(SMARTSUIT_COMMAND_PERFORM_APOSE);
+	//SendCommand(SMARTSUIT_COMMAND_PERFORM_APOSE);
 }
 
 void ASmartsuitController::Broadcast() {
-	SendCommand(SMARTSUIT_COMMAND_USE_BROADCAST_ADDR);
+	//SendCommand(SMARTSUIT_COMMAND_USE_BROADCAST_ADDR);
 }
 
 void ASmartsuitController::Unicast() {
-	SendCommand(SMARTSUIT_COMMAND_USE_SPECIFIC_ADDR);
+	//SendCommand(SMARTSUIT_COMMAND_USE_SPECIFIC_ADDR);
 }
 
 void ASmartsuitController::SetBodyModel(FBodyModel bodyToSet) {
-	unsigned char b[sizeof(Body)];
-	Body body = bodyToSet.GetBody();
-	memcpy(b, &body, sizeof(Body));
+	//unsigned char b[sizeof(Body)];
+	//Body body = bodyToSet.GetBody();
+	//memcpy(b, &body, sizeof(Body));
 
-	SendCommand(0, b, sizeof(Body));
+	//SendCommand(0, b, sizeof(Body));
 }
 
 void ASmartsuitController::GetBodyModel() {
-	SendCommand(SMARTSUIT_COMMAND_GET_BODY_DIMENSIONS);
+	//SendCommand(SMARTSUIT_COMMAND_GET_BODY_DIMENSIONS);
 }
 
 void ASmartsuitController::GetHubInfo() {
-	SendCommand(SMARTSUIT_COMMAND_READ_HUB_INFO);
+	//SendCommand(SMARTSUIT_COMMAND_READ_HUB_INFO);
 }
 
 uint8 ASmartsuitController::GetByte(uint32 value, int i) {
@@ -163,44 +148,44 @@ uint8 ASmartsuitController::GetByte(uint32 value, int i) {
 	}
 }
 
-uint32 ASmartsuitController::GetLocalIP() {
-	
-	ASmartsuitReceiver *receiver = GetReceiver();
-	if (!receiver) {
-		return 0;
-	}
-	SuitData* data = receiver->GetSmartsuit(suitname);
-	if (!data) {
-		return 0;
-	}
-    
-    bool canBind = false;
-    TArray<TSharedPtr<FInternetAddr>> addresses;
-    if(!ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalAdapterAddresses(addresses))
-        UE_LOG(LogTemp, Warning, TEXT("Failed to get local adapter addresses"));
-
-    uint32 myIp;
-	for (int i = 0; i < addresses.Num(); i++) {
-		TSharedPtr<FInternetAddr> anIp = addresses[i];
-		if (anIp->IsValid()) {
-			anIp->GetIp(myIp);
-			if (GetByte(myIp, 2) == GetByte(data->url, 2)) {
-				return myIp;
-			}
-		}
-	}
-    
-#if PLATFORM_MAC
-    // On Mac, the GetLocalAdapterAddresses function only returns the single wildcard ip 0.0.0.0,
-    // so we use the linux function getifaddrs() to obtain the local ip in that case (see GetLocalMacIP)
-    myIp = GetLocalMacIP();
-    if (GetByte(myIp, 2) == GetByte(data->url, 2)) {
-        return myIp;
-    }
-#endif
-    
-	return 0;
-}
+//uint32 ASmartsuitController::GetLocalIP() {
+//	
+//	ASmartsuitReceiver *receiver = GetReceiver();
+//	if (!receiver) {
+//		return 0;
+//	}
+//	SuitData* data = receiver->GetSmartsuit(suitname);
+//	if (!data) {
+//		return 0;
+//	}
+//    
+//    bool canBind = false;
+//    TArray<TSharedPtr<FInternetAddr>> addresses;
+//    if(!ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalAdapterAddresses(addresses))
+//        UE_LOG(LogTemp, Warning, TEXT("Failed to get local adapter addresses"));
+//
+//    uint32 myIp;
+//	for (int i = 0; i < addresses.Num(); i++) {
+//		TSharedPtr<FInternetAddr> anIp = addresses[i];
+//		if (anIp->IsValid()) {
+//			anIp->GetIp(myIp);
+//			if (GetByte(myIp, 2) == GetByte(data->url, 2)) {
+//				return myIp;
+//			}
+//		}
+//	}
+//    
+//#if PLATFORM_MAC
+//    // On Mac, the GetLocalAdapterAddresses function only returns the single wildcard ip 0.0.0.0,
+//    // so we use the linux function getifaddrs() to obtain the local ip in that case (see GetLocalMacIP)
+//    myIp = GetLocalMacIP();
+//    if (GetByte(myIp, 2) == GetByte(data->url, 2)) {
+//        return myIp;
+//    }
+//#endif
+//    
+//	return 0;
+//}
 
 bool ASmartsuitController::SupportsWiFi() {
 	return hubInfo && ((hubInfo->wifiApiVersion >> 24) & 0xff) == SUPPORTED_MAJOR_WIFI_API;

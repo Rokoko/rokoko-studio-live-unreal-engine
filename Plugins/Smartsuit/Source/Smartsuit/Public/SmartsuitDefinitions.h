@@ -114,10 +114,7 @@ struct Sensor {
 		if (FGenericPlatformMath::IsNaN(quaternion.X) || FGenericPlatformMath::IsNaN(quaternion.Y) || FGenericPlatformMath::IsNaN(quaternion.Z) || FGenericPlatformMath::IsNaN(quaternion.W)) {
 			return FQuat::Identity;
 		}
-		//return quaternion;
 		return NED2Unreal(quaternion);
-		//return NED2UnityQ(quaternion);
-		//return Unity2Unreal(NED2UnityQ(quaternion));
 
 	}
 

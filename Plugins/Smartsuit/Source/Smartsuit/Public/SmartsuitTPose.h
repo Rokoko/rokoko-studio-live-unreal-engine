@@ -25,7 +25,6 @@ struct TPose {
 	FTransform rightFoot;
 };
 
-
 /**
  * Helper function that stores the T Pose for a Smartsuit character.
  */

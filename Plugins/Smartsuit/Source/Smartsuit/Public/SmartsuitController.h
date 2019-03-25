@@ -4,7 +4,6 @@
 
 #include "GameFramework/Actor.h"
 #include "SmartsuitStreamingNetwork.h"
-#include "SmartsuitCommandNetwork.h"
 #include "SmartsuitReceiver.h"
 #include "SmartsuitDefinitions.h"
 

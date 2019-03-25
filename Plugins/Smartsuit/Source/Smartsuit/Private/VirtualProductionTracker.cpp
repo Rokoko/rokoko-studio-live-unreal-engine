@@ -45,8 +45,6 @@ void UVirtualProductionTracker::TickComponent(float DeltaTime, ELevelTick TickTy
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
-
 	ASmartsuitReceiver * listener = GetReceiver();
 	if (!listener) {
 		return;

@@ -4,7 +4,6 @@
 
 #include "GameFramework/Actor.h"
 #include "SmartsuitStreamingNetwork.h"
-#include "SmartsuitCommandNetwork.h"
 #include "VPStreamingNetwork.h"
 #include "VirtualProductionFrame.h"
 #include "Engine.h"
@@ -81,30 +80,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
 		int VPListenPort = 14045;
 
-	/**
-	* Sends a command to a Smartsuit.
-	* @param suitName The name of the Smartsuit to send the command to.
-	* @param cmd the Command to send. A list of all available commands is found in SmartsuitDefinitions.
-	*/
-	void SendCommand(FString suitName, uint8 *cmd, int length) {
-		SuitData* suit = GetSmartsuit(suitName);
-		if (suit) {
-			//UE_LOG(LogTemp, Warning,
-				//TEXT("Sending command to url %s, %s, %u"), *suitName, *FString(suit->suitname), suit->url);
-
-			commander.SendCommand(cmd, suit->url, length);
-		}
-		else {
-			UE_LOG(LogTemp, Warning, TEXT("Failed to find suit to send command..."));
-		}
-	}
-
 	FProp* GetPropByNameFromVP(FString name, bool isLive);
 	FTracker* GetTrackerByNameFromVP(FString name, bool isLive);
 
 	/// @cond nodoc
-	Body* CheckForBodyCommand(FString suitname);
-	HubInfo* CheckForHubInfo(FString suitname);
+	//Body* CheckForBodyCommand(FString suitname);
+	//HubInfo* CheckForHubInfo(FString suitname);
 	void SetSupportsWiFiAPI(FString suitname);
 	
 	static TArray<FProp> GetAllProps() {
@@ -168,7 +149,6 @@ public:
 
 private:
 	SmartsuitStreamingNetwork listener;
-	SmartsuitCommandNetwork commander;
 	VPStreamingNetwork VPlistener;
 
 protected:

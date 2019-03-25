@@ -90,9 +90,6 @@ struct SMARTSUIT_API FSmartsuitBodyMap {
 	/**Right toe bone reference.*/
 	UPROPERTY(EditAnywhere, Category = SkeletalControl, meta = (ToolTip = "The right toe bone to control."))
 		FBoneReference rightToe;
-	//FSmartsuitBodyMap() {
-	//	//do nothing here...
-	//}
 };
 
 

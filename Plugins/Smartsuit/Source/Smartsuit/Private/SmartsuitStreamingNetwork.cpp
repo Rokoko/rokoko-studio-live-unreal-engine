@@ -91,11 +91,6 @@ uint32 SmartsuitStreamingNetwork::Run()
 				}
 				//UE_LOG(LogTemp, Warning, TEXT("received something3....."));
 
-				//FGraphEventRef Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]()
-				//{
-				//	UE_LOG(LogTemp, Display, TEXT("Received : %d"), bytes_read);
-				//}, TStatId(), NULL, ENamedThreads::GameThread);
-				//FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
 				SuitDataDef *def = lib.ParseFrame(data, bytes_read);
 				SuitData sd;
 

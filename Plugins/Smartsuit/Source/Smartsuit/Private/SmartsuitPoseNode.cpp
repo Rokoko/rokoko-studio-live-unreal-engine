@@ -298,7 +298,6 @@ void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp
 	FQuat modifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
 	FQuat forwardModifier = FQuat::MakeFromEuler(FVector(0, 0, 90));
 
-
 	FQuat hipQuat = GetRotation(SENSOR_HIP, data->sensors, 19) * modifier;
 	FVector hipPosition = GetPosition(SENSOR_HIP, data->sensors, 19);
 	FQuat stomachQuat = GetRotation(SENSOR_STOMACH, data->sensors, 19);

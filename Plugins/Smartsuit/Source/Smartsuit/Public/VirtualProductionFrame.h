@@ -197,8 +197,6 @@ struct FTracker {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Battery information."))
 	float battery;
 
-	//FTracker() {}
-
 	///**
 	//* Get sensor position in Unreal coordinate system.
 	//*

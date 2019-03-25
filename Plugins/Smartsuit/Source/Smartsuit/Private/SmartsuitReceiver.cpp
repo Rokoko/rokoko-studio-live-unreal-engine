@@ -37,13 +37,11 @@ void ASmartsuitReceiver::StartListener() {
 	UE_LOG(LogTemp, Warning, TEXT("Listening..."));
 	listener.Start(streamingDataPort);
 	VPlistener.Start(VPListenPort);
-	//commander.Start(commandListenPort);
 }
 
 void ASmartsuitReceiver::StopListener() {
 	listener.Stop();
 	VPlistener.Stop();
-	//commander.Stop();
 	UE_LOG(LogTemp, Warning, TEXT("Not listening..."));
 }
 
@@ -77,30 +75,6 @@ TArray<FString> ASmartsuitReceiver::GetAvailableSmartsuits() {
 		}
 	}
 	return result;
-}
-
-Body * ASmartsuitReceiver::CheckForBodyCommand(FString suitname)
-{
-	SuitData* suit = GetSmartsuit(suitname);
-	if (suit) {
-		for (int i = 0; i < 100; i++) {
-			//reset position.
-			if (commander.bodyResponses[i].valid && commander.bodyResponses[i].url == suit->url) {
-				commander.bodyResponses[i].valid = false;
-				return &(commander.bodyResponses[i].body);
-			}
-		}
-	}
-	return nullptr;
-}
-
-HubInfo* ASmartsuitReceiver::CheckForHubInfo(FString suitname)
-{
-	SuitData* suit = GetSmartsuit(suitname);
-	if (suit && commander.hubInfoResponses.Contains(suit->url)) {
-		return &(commander.hubInfoResponses[suit->url]);
-	}
-	return nullptr;
 }
 
 void ASmartsuitReceiver::SetSupportsWiFiAPI(FString suitname) {

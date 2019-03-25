@@ -78,6 +78,7 @@ void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtu
 	Client->PushSubjectSkeleton(SourceGuid, virtualProductionObject.name, skeletonRef);
 }
 	
+
 void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubject> subjects)
 {
 	for (int subjectIndex = 0; subjectIndex < subjects.Num(); subjectIndex++) {
