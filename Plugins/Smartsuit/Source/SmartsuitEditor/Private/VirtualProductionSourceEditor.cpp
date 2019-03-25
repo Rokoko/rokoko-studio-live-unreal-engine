@@ -106,17 +106,14 @@ void SVirtualProductionSourceEditor::Tick(const FGeometry& AllottedGeometry, con
 	{
 		FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString("Studio"), FString(""));
 		FProviderPollResultPtr *poll = new FProviderPollResultPtr(result);
-
-
-		PollData.Add(*poll);
+		PollData.Empty();
+		if (!FVirtualProductionSource::Get()) {
+			PollData.Add(*poll);
+		}
+		
 		ListView->RequestListRefresh();
 
 		CurrentPollRequest = FGuid::NewGuid();
-
-		//MessageEndpoint->Publish(new FLiveLinkPingMessage(CurrentPollRequest));
-		FText subject = LOCTEXT("Studio", "Studio");
-		//SLiveLinkClientPanel::HandleAddVirtualSubject(subject, ETextCommit::Type::Default);
-
 	}
 	LastTickTime = CurrentTickTime;
 }

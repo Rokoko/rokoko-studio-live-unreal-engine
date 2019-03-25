@@ -104,7 +104,6 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 
 		if (subjectIndex == subjects.Num() - 1) {
 			for (int i = 0; i < subjectNames.Num(); i++) {
-				//UE_LOG(LogTemp, Warning, TEXT("HEREEEE 1!!"));
 				bool subjectExists = false;
 				for (int j = 0; j < existingSubjects.Num(); j++) {
 					if (subjectNames[i] == existingSubjects[j].name) {
@@ -112,15 +111,12 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 					}
 				}
 				if (!subjectExists) {
-					UE_LOG(LogTemp, Warning, TEXT("HEREEEE 2!!"));
 					notExistingSubjects.Add(subjectNames[i]);
 				}
 			}
 
 			for (int i = 0; i < notExistingSubjects.Num(); i++) {
-				//UE_LOG(LogTemp, Warning, TEXT("HEREEEE 3!!"));
 				Client->ClearSubject(notExistingSubjects[i]);
-				//UE_LOG(LogTemp, Warning, TEXT("HEREEEE 4!!"));
 				subjectNames.RemoveSingle(notExistingSubjects[i]);
 				notExistingSubjects.RemoveAt(i);
 			}
