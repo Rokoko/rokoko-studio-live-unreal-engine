@@ -130,7 +130,8 @@ uint32 SmartsuitStreamingNetwork::Run()
 					sd.sensors[i].microseconds = def->sensors[i].microseconds;
 				}
 				//}
-
+				delete def;
+				def = nullptr;
 				//find suit...
 				int index = -1;
 				bool newSuit = false;
