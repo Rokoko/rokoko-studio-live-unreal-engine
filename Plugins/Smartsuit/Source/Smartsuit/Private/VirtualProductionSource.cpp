@@ -81,6 +81,8 @@ void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtu
 
 void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubject> subjects)
 {
+	existingSubjects.Empty();
+	notExistingSubjects.Empty();
 	for (int subjectIndex = 0; subjectIndex < subjects.Num(); subjectIndex++) {
 		FVirtualProductionSubject subject = subjects[subjectIndex];
 		
@@ -89,6 +91,7 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 		for (int subjectNameIndex = 0; subjectNameIndex < subjectNames.Num(); subjectNameIndex++) {
 			if (subject.name == subjectNames[subjectNameIndex]) {
 				nameExists = true;
+				existingSubjects.Add(subject);
 				break;
 			}
 		}
@@ -96,8 +99,31 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 		if (!nameExists) {
 			HandleSubjectData(subject);
 		}
+		/*if ((subjectIndex == subjects.Num() - 1) && (nameExists == false)) {
+			Client->ClearSubject(subject.name);
+		}*/
+
+		if (subjectIndex == subjects.Num() - 1) {
+			for (int i = 0; i < subjectNames.Num(); i++) {
+				bool subjectExists = false;
+				for (int j = 0; j < existingSubjects.Num(); j++) {
+					if (subjectNames[i] == existingSubjects[j].name) {
+						subjectExists = true;
+					}
+				}
+				if (!subjectExists) {
+					notExistingSubjects.Add(subjectNames[i]);
+				}
+			}
+
+			for (int i = 0; i < notExistingSubjects.Num(); i++) {
+				Client->ClearSubject(notExistingSubjects[i]);
+				subjectNames.RemoveSingle(notExistingSubjects[i]);
+				notExistingSubjects.RemoveAt(i);
+			}
+		}
 		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
-		
+
 
 		ConnectionLastActive = FPlatformTime::Seconds();
 		FTransform hardCodedTransform;

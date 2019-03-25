@@ -100,44 +100,49 @@ uint32 VPStreamingNetwork::Run()
 				}
 				//FGraphEventRef Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]()
 				//{
-					if (Stopping) break;
-					mtx.lock();
-					FVirtualProductionFrame VPFrame;
-					FString result = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
-					FJsonObjectConverter::JsonObjectStringToUStruct(result, &VPFrame, 0, 0);
-					if (!GlobalVPFrame) {
-						GlobalVPFrame = new FVirtualProductionFrame();
+				if (Stopping) break;
+				mtx.lock();
+				FVirtualProductionFrame VPFrame;
+				FString result = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
+				FJsonObjectConverter::JsonObjectStringToUStruct(result, &VPFrame, 0, 0);
+				
+				if (!GlobalVPFrame) {
+					GlobalVPFrame = new FVirtualProductionFrame();
+				}
+				GlobalVPFrame->version = VPFrame.version;
+				GlobalVPFrame->props.Empty();
+				GlobalVPFrame->trackers.Empty();
+
+				FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
+
+				if (livelink) {
+					UE_LOG(LogTemp, Warning, TEXT("I see livelink!!"));
+					subjects.Empty();
+					for (int i = 0; i < VPFrame.props.Num(); i++) {
+						GlobalVPFrame->props.Add(VPFrame.props[i]);
+						FVirtualProductionSubject subject = GlobalVPFrame->props[i].GetSubject();
+						subjects.Add(subject);
 					}
-					GlobalVPFrame->props.Empty();
-					GlobalVPFrame->trackers.Empty();
-					GlobalVPFrame->version = VPFrame.version;
+					for (int i = 0; i < VPFrame.trackers.Num(); i++) {
+						GlobalVPFrame->trackers.Add(VPFrame.trackers[i]);
+						FVirtualProductionSubject subject = GlobalVPFrame->trackers[i].GetSubject();
+						subjects.Add(subject);
+					}
+					SendToLiveLink(subjects);
+				}
+				else {
 					for (int i = 0; i < VPFrame.props.Num(); i++) {
 						GlobalVPFrame->props.Add(VPFrame.props[i]);
 					}
 					for (int i = 0; i < VPFrame.trackers.Num(); i++) {
 						GlobalVPFrame->trackers.Add(VPFrame.trackers[i]);
 					}
-					FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
-					if (livelink) {
-						propSubjects.Empty();
-						for (int i = 0; i < VPFrame.props.Num(); i++) {
-							FVirtualProductionSubject subject = GlobalVPFrame->props[i].GetSubject();
-							propSubjects.Add(subject);
-						}
-						trackerSubjects.Empty();
-						for (int i = 0; i < VPFrame.trackers.Num(); i++) {
-							FVirtualProductionSubject subject = GlobalVPFrame->trackers[i].GetSubject();
-							trackerSubjects.Add(subject);
-						}
-						SendToLiveLink(propSubjects);
-						SendToLiveLink(trackerSubjects);
+				}
+				mtx.unlock();
+				//}, TStatId(), NULL, ENamedThreads::GameThread);
 
-						//UE_LOG(LogTemp, Warning, TEXT("I see livelink!!"));
-					}
-					else {
-						//UE_LOG(LogTemp, Warning, TEXT("no livelink!!"));
-					}
-					mtx.unlock();
+				// If you want to wait for the code above to complete do this:
+				//FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
 
 			}
 		}
