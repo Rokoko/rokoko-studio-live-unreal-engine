@@ -104,34 +104,6 @@ void SVirtualProductionSourceEditor::Tick(const FGeometry& AllottedGeometry, con
 	const double CurrentTickTime = FPlatformTime::Seconds();
 	if (CurrentTickTime - LastTickTime > 1.f)
 	{
-		PollData.Reset();
-		//const FMessageAddress addr = FMessageAddress::NewAddress();
-		//FText sourceType = LOCTEXT("k1", "t1");
-		//FText machine = LOCTEXT("k2", "t2");
-		//FVirtualProductionSource *source = new FVirtualProductionSource(sourceType, machine, addr);
-		UE_LOG(LogTemp, Display, TEXT("EVERYTHING OK"));
-		//*VPFrame = *VPnet->GetVirtualProductionFrame();//VPStreamingNetwork::GetVirtualProductionFrame();
-		//VPnet->GetVirtualProductionFrame();
-		//VPFrame = &VPnet->GetVirtualProductionFrame();
-		TArray<FProp> props = ASmartsuitReceiver::GetAllProps();
-		//receiver->
-		UE_LOG(LogTemp, Display, TEXT("GlobalVPFrame versionnn %d"), props.Num());
-		//UE_LOG(LogTemp, Display, TEXT("GlobalVPFrame version %d"), VPFrame->version);
-		//GetVirtualProductionFrame
-		
-		/*for (int i = 0; i < props.Num(); i++) {
-			FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString(props[i].name), FString("Studio"));
-			FProviderPollResultPtr *poll = new FProviderPollResultPtr(result);
-
-
-			PollData.Add(*poll);
-			ListView->RequestListRefresh();
-
-			CurrentPollRequest = FGuid::NewGuid();
-
-			MessageEndpoint->Publish(new FLiveLinkPingMessage(CurrentPollRequest));
-		}*/
-
 		FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString("Studio"), FString(""));
 		FProviderPollResultPtr *poll = new FProviderPollResultPtr(result);
 

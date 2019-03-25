@@ -110,8 +110,7 @@ private:
 	FVirtualProductionSource *GetLiveLink() {
 		return FVirtualProductionSource::Get();
 	}
-	TArray<FVirtualProductionSubject> propSubjects;
-	TArray<FVirtualProductionSubject> trackerSubjects;
+	TArray<FVirtualProductionSubject> subjects;
 	void SendToLiveLink(TArray<FVirtualProductionSubject> subjects);
 };
 /// @endcond

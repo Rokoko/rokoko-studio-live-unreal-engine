@@ -52,6 +52,8 @@ private:
 	void HandleClearSubject(const FName subjectName);
 	void HandleSubjectData(FVirtualProductionSubject virtualProductionObject);
 	TArray<FName> subjectNames;
+	TArray<FVirtualProductionSubject> existingSubjects;
+	TArray<FName> notExistingSubjects;
 	// End Message bus message handlers
 
 	ILiveLinkClient* Client;

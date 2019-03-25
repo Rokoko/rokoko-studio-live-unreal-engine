@@ -43,7 +43,6 @@ TSharedPtr<ILiveLinkSource> UVirtualProductionSourceFactory::OnSourceCreationPan
 		if (Result.IsValid())
 		{
 			NewSource = MakeShared<FVirtualProductionSource>(FText::FromString(Result->Name), FText::FromString(Result->MachineName), Result->Address);
-			//UE_LOG(LogTemp, Display, TEXT("SourceType:: %s"), NewSource.Get()->GetSourceType());
 		}
 	}
 	ActiveSourceEditor = nullptr;
