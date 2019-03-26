@@ -152,7 +152,7 @@ struct FProp {
 	FVirtualProductionSubject GetSubject() {
 		FQuat quat = FQuat(rotation.Z, rotation.X, rotation.Y, rotation.W);
 		FVector pos = UPosition();
-		return FVirtualProductionSubject(pos, quat, FName(*(FString("prop:") + FString(name))));
+		return FVirtualProductionSubject(pos, quat, FName(*(FString("prop:") + FString(isLive ? "L:" : "P:") + FString(name))));
 	}
 };
 
@@ -219,7 +219,7 @@ struct FTracker {
 		FQuat quat = FQuat(rotation.Z, rotation.X, rotation.Y, rotation.W);
 		FVector pos = UPosition();
 
-		return FVirtualProductionSubject(pos, quat, FName(*(FString("tracker:") + FString(name))));
+		return FVirtualProductionSubject(pos, quat, FName(*(FString("tracker:") + FString(isLive ? "L:" : "P:") + FString(name))));
 	}
 
 };

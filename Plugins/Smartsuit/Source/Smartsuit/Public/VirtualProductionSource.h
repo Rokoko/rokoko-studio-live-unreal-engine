@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include "ILiveLinkClient.h"
 #include "ILiveLinkSource.h"
+#include "Runtime/RenderCore/Public/RenderCore.h"
 #include "MessageEndpoint.h"
-#include "IMessageContext.h"
-#include "HAL/ThreadSafeBool.h"
 #include "VirtualProductionFrame.h"
 
 class ILiveLinkClient;
@@ -28,11 +28,7 @@ public:
 	{}
 
 	virtual void ReceiveClient(ILiveLinkClient* InClient, FGuid InSourceGuid);
-
-	void Connect(FMessageAddress& Address);
-
 	virtual bool IsSourceStillValid();
-
 	virtual bool RequestSourceShutdown();
 
 	virtual FText GetSourceType() const { return SourceType; }
@@ -51,14 +47,11 @@ private:
 	TArray<FName> subjectNames;
 	TArray<FVirtualProductionSubject> existingSubjects;
 	TArray<FName> notExistingSubjects;
-	// End Message bus message handlers
 
 	ILiveLinkClient* Client;
 
 	// Our identifier in LiveLink
 	FGuid SourceGuid;
-
-	//TSharedPtr<FMessageEndpoint, ESPMode::ThreadSafe> MessageEndpoint;
 
 	FText SourceType;
 	FText SourceMachineName;

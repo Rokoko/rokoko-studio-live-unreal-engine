@@ -2,16 +2,6 @@
 
 #include "VirtualProductionSource.h"
 
-#include "LiveLinkMessages.h"
-#include "ILiveLinkClient.h"
-#include "Runtime/RenderCore/Public/RenderCore.h"
-//#include "LiveLinkMessageBusHeartbeatManager.h"
-
-#include "MessageEndpointBuilder.h"
-
-const double LL_CONNECTION_TIMEOUT = 15.0;
-const double LL_HALF_CONNECTION_TIMEOUT = LL_CONNECTION_TIMEOUT / 2.0;
-
 FVirtualProductionSource* FVirtualProductionSource::instance = 0;
 
 void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid InSourceGuid)
