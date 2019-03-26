@@ -116,7 +116,6 @@ uint32 VPStreamingNetwork::Run()
 				FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
 
 				if (livelink) {
-					UE_LOG(LogTemp, Warning, TEXT("I see livelink!!"));
 					subjects.Empty();
 					for (int i = 0; i < VPFrame.props.Num(); i++) {
 						GlobalVPFrame->props.Add(VPFrame.props[i]);

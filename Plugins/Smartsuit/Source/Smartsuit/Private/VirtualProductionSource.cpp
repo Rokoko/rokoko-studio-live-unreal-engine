@@ -19,7 +19,6 @@ void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid In
 	Client = InClient;
 	SourceGuid = InSourceGuid;
 	instance = this;
-	UE_LOG(LogTemp, Warning, TEXT(" - - - RECEIVE CLIENT!!!"));
 }
 
 bool FVirtualProductionSource::IsSourceStillValid()
@@ -33,7 +32,6 @@ void FVirtualProductionSource::HandleClearSubject(const FName subjectName)
 }
 
 void FVirtualProductionSource::ClearAllSubjects() {
-	UE_LOG(LogTemp, Warning, TEXT("ClearAllSubjects called"));
 	for (int i = 0; i < subjectNames.Num(); i++) {
 		HandleClearSubject(subjectNames[i]);
 	}
@@ -43,7 +41,6 @@ void FVirtualProductionSource::ClearAllSubjects() {
 
 bool FVirtualProductionSource::RequestSourceShutdown()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Shutting down"));
 	ClearAllSubjects();
 	instance = nullptr;
 	return true;
@@ -51,8 +48,6 @@ bool FVirtualProductionSource::RequestSourceShutdown()
 
 void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtualProductionObject)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Handle Subject Data!!"));
-	UE_LOG(LogTemp, Warning, TEXT("SUBJECT!! %s"), &virtualProductionObject.name);
 	//UE_LOG(LogTemp, Warning, TEXT("SKELETON!! "), skeleton);
 	subjectNames.Add(virtualProductionObject.name);
 	FLiveLinkRefSkeleton skeletonRef;
