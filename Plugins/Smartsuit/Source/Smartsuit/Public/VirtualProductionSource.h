@@ -22,11 +22,9 @@ class SMARTSUIT_API FVirtualProductionSource : public ILiveLinkSource
 {
 public:
 	FVirtualProductionSource(const FText& InSourceType, const FText& InSourceMachineName, const FMessageAddress& InConnectionAddress)
-		: ConnectionAddress(InConnectionAddress)
-		, SourceType(InSourceType)
+		: SourceType(InSourceType)
 		, SourceMachineName(InSourceMachineName)
-		, HeartbeatLastSent(0.0)
-		, ConnectionLastActive(0.0)
+		
 	{}
 
 	virtual void ReceiveClient(ILiveLinkClient* InClient, FGuid InSourceGuid);
@@ -62,20 +60,10 @@ private:
 
 	//TSharedPtr<FMessageEndpoint, ESPMode::ThreadSafe> MessageEndpoint;
 
-	FMessageAddress ConnectionAddress;
-
 	FText SourceType;
 	FText SourceMachineName;
 	FText SourceStatus;
 
-	// Time we last sent connection heartbeat
-	double HeartbeatLastSent;
-
-	// Time we last recieved anything 
-	double ConnectionLastActive;
-
-	// Current Validity of Source
-	FThreadSafeBool bIsValid;
 	//singleton instance
 	static FVirtualProductionSource *instance;
 

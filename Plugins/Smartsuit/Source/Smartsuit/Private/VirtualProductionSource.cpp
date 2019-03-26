@@ -20,50 +20,37 @@ void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid In
 	SourceGuid = InSourceGuid;
 	instance = this;
 	UE_LOG(LogTemp, Warning, TEXT(" - - - RECEIVE CLIENT!!!"));
-	//MessageEndpoint = FMessageEndpoint::Builder(TEXT("VirtualProductionSource"))
-	//	.Handling<FLiveLinkSubjectDataMessage>(this, &FVirtualProductionSource::HandleSubjectData)
-	//	.Handling<FLiveLinkSubjectFrameMessage>(this, &FVirtualProductionSource::HandleSubjectFrame)
-	//	.Handling<FLiveLinkHeartbeatMessage>(this, &FVirtualProductionSource::HandleHeartbeat)
-	//	.Handling<FLiveLinkClearSubject>(this, &FVirtualProductionSource::HandleClearSubject);
-
-
-	//MessageEndpoint->Send(new FLiveLinkConnectMessage(), ConnectionAddress);
-
-	// Register for heartbeats
-	bIsValid = true;
 }
 
 bool FVirtualProductionSource::IsSourceStillValid()
 {
-	return bIsValid;
+	return true;
 }
 
 void FVirtualProductionSource::HandleClearSubject(const FName subjectName)
 {
-	ConnectionLastActive = FPlatformTime::Seconds();
 	Client->ClearSubject(subjectName);
 }
 
 void FVirtualProductionSource::ClearAllSubjects() {
 	UE_LOG(LogTemp, Warning, TEXT("ClearAllSubjects called"));
-	RequestSourceShutdown();
+	for (int i = 0; i < subjectNames.Num(); i++) {
+		HandleClearSubject(subjectNames[i]);
+	}
+	subjectNames.Empty();
+
 }
 
 bool FVirtualProductionSource::RequestSourceShutdown()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Shutting down"));
-	//HandleClearSubject(FLiveLinkClearSubject("Studio"));
-	for (int i = 0; i < subjectNames.Num(); i++) {
-		HandleClearSubject(subjectNames[i]);
-	}
-	subjectNames.Empty();
+	ClearAllSubjects();
 	instance = nullptr;
 	return true;
 }
 
 void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtualProductionObject)
 {
-	ConnectionLastActive = FPlatformTime::Seconds();
 	UE_LOG(LogTemp, Warning, TEXT("Handle Subject Data!!"));
 	UE_LOG(LogTemp, Warning, TEXT("SUBJECT!! %s"), &virtualProductionObject.name);
 	//UE_LOG(LogTemp, Warning, TEXT("SKELETON!! "), skeleton);
@@ -99,10 +86,7 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 		if (!nameExists) {
 			HandleSubjectData(subject);
 		}
-		/*if ((subjectIndex == subjects.Num() - 1) && (nameExists == false)) {
-			Client->ClearSubject(subject.name);
-		}*/
-
+		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
 		if (subjectIndex == subjects.Num() - 1) {
 			for (int i = 0; i < subjectNames.Num(); i++) {
 				bool subjectExists = false;
@@ -122,10 +106,8 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 				notExistingSubjects.RemoveAt(i);
 			}
 		}
-		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
 
 
-		ConnectionLastActive = FPlatformTime::Seconds();
 		FTransform hardCodedTransform;
 		hardCodedTransform.SetTranslation(subject.position);
 		hardCodedTransform.SetRotation(subject.rotation);
