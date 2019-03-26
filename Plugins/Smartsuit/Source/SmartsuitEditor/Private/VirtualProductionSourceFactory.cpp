@@ -11,12 +11,12 @@
 
 FText UVirtualProductionSourceFactory::GetSourceDisplayName() const
 {
-	return LOCTEXT("SourceDisplayName", "Rokoko Virtual Production Source");
+	return LOCTEXT("SourceDisplayName", "Rokoko Studio Source");
 }
 
 FText UVirtualProductionSourceFactory::GetSourceTooltip() const
 {
-	return LOCTEXT("SourceTooltip", "Creates a connection to a Rokoko Virtual Production Source");
+	return LOCTEXT("SourceTooltip", "Creates a connection to a Rokoko Studio Source");
 }
 
 TSharedPtr<SWidget> UVirtualProductionSourceFactory::CreateSourceCreationPanel()

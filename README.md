@@ -64,6 +64,24 @@ You can add this component to any Actor in the level through the Add Component m
 <img src="Images/VirtualProductionTrackerComponent.PNG">
 
 
+### Live Link and Virtual Camera support
+
+Virtual production props can be used with Unreal's Live Link and Virtual Camera plugins. To connect VP data into Live Link, open the live link panel and select Rokoko Studio Source -> Studio. You can only add this source once.
+
+<img src="Images/LiveLinkStudio_1.PNG">
+
+The source subjects (props and trackers) will appear in Play mode and they will be updated to reflect the data forwarded from Studio. When the play mode ends, the subjects are removed. That is because the plugin only receives data from Studio in play mode.
+
+The names of the subjects have the following patterns:
+- for live props -> prop:L:propname
+- for playback props -> prop:P:propname
+- for live trackers -> tracker:L:X
+- for playback trackers -> tracker:P:X
+
+<img src="Images/LiveLinkStudio_2.PNG">
+
+Having the Live Link plugin enabled we can now use a prop to control Unreal's virtual camera by setting the Live Link Target to the subject name of interest and Input Source to "Live Link"
+
 ### Blueprints
 
 #### Character animation blueprint example
