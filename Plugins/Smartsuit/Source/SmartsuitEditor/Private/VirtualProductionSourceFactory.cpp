@@ -21,7 +21,6 @@ FText UVirtualProductionSourceFactory::GetSourceTooltip() const
 
 TSharedPtr<SWidget> UVirtualProductionSourceFactory::CreateSourceCreationPanel()
 {
-	UE_LOG(LogTemp, Display, TEXT("CreateSourceCreationPanel %d"), ActiveSourceEditor.IsValid());
 	if (!ActiveSourceEditor.IsValid())
 	{
 		SAssignNew(ActiveSourceEditor, SVirtualProductionSourceEditor);
@@ -34,12 +33,10 @@ TSharedPtr<ILiveLinkSource> UVirtualProductionSourceFactory::OnSourceCreationPan
 {
 	//Clean up
 	TSharedPtr<FVirtualProductionSource> NewSource = nullptr;
-	UE_LOG(LogTemp, Display, TEXT("OnSourceCreationPanelClosed %d %d"), bMakeSource, ActiveSourceEditor.IsValid());
 
 	if (bMakeSource && ActiveSourceEditor.IsValid())
 	{
 		FProviderPollResultPtr Result = ActiveSourceEditor->GetSelectedSource();
-		UE_LOG(LogTemp, Display, TEXT("OnSourceCreationPanelClosed result %d"), Result.IsValid());
 		if (Result.IsValid())
 		{
 			NewSource = MakeShared<FVirtualProductionSource>(FText::FromString(Result->Name), FText::FromString(Result->MachineName), Result->Address);
