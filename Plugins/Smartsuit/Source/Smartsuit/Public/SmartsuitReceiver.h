@@ -69,12 +69,6 @@ public:
 		int streamingDataPort = 14041;
 
 	/**
-	* The port number used to listen for commands from Smartsuits.
-	*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Smartsuit)
-		int commandListenPort = 5000;
-
-	/**
 	* The port number used to listen for trackers and props data.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
