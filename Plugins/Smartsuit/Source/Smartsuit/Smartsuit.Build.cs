@@ -27,7 +27,7 @@ public class Smartsuit : ModuleRules
         PublicIncludePaths.AddRange(
             new string[] {
                 "Smartsuit/Public",
-                "C:/Program Files/Epic Games/UE_4.21/Engine/Plugins/Animation/LiveLink/Source/LiveLink/Public/",
+                "LiveLink/Public",
 				// ... add public include paths required here ...
 			}
             );
@@ -37,7 +37,6 @@ public class Smartsuit : ModuleRules
             new string[] {
                 "Smartsuit/Private",
                 "LiveLink/Private",
-                "C:/Program Files/Epic Games/UE_4.21/Engine/Plugins/Animation/LiveLink/Source/LiveLink/Private/"
 
 				// ... add other private include paths required here ...
 			}
