@@ -1,9 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "VirtualProductionSourceFactory.h"
 #include "VirtualProductionSource.h"
-//#include "LiveLinkMessageBusSource.h"
-//#include "C:/Program Files/Epic Games/UE_4.21/Engine/Plugins/Animation/LiveLink/Source/LiveLinkEditor/Private/LiveLinkMessageBusSourceEditor.h"
 #include "VirtualProductionSourceEditor.h"
 #include "LiveLinkMessageBusFinder.h"
 
