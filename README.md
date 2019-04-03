@@ -82,6 +82,8 @@ The names of the subjects have the following patterns:
 
 Having the Live Link plugin enabled we can now use a prop to control Unreal's virtual camera by setting the Live Link Target to the subject name of interest and Input Source to "Live Link"
 
+For more information of how to setup Virtual Camera refer to Unreal's guide: https://docs.unrealengine.com/en-us/Engine/Plugins/VirtualCameraPlugin
+
 ### Blueprints
 
 #### Character animation blueprint example
