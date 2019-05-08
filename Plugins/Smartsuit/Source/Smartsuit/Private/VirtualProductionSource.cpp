@@ -41,7 +41,7 @@ bool FVirtualProductionSource::RequestSourceShutdown()
 }
 
 void FVirtualProductionSource::HandleFaceData(FFace face) {
-	UE_LOG(LogTemp, Warning, TEXT("Creating a new face %s - %f"), *face.GetSubjectName().ToString(), face.jawOpen);
+	//UE_LOG(LogTemp, Warning, TEXT("Creating a new face %s - %f"), *face.GetSubjectName().ToString(), face.jawOpen);
 	faceNames.Add(face.GetSubjectName());
 	FLiveLinkRefSkeleton skeletonRef;
 	Client->PushSubjectSkeleton(SourceGuid, face.GetSubjectName(), skeletonRef);
