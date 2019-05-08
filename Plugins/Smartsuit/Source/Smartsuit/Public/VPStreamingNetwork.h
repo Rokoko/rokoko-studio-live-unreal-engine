@@ -103,6 +103,7 @@ private:
 	}
 	TArray<FVirtualProductionSubject> subjects;
 	void SendToLiveLink(TArray<FVirtualProductionSubject> subjects);
+	void SendFacesToLivelink(TArray<FFace> subjects);
 };
 /// @endcond
 
