@@ -1,7 +1,7 @@
 {
     "FileVersion": 3,
     "Version": 3,
-    "VersionName": "1.3.0",
+    "VersionName": "1.4.0",
     "FriendlyName": "Smartsuit Live",
     "Description": "Now you can use your Smartsuit Pro natively in Unreal! With Smartsuit Live you are able to stream and visualize Smartsuit Pro data inside Unreal Engine.",
     "Category": "Animation",
