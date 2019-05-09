@@ -263,7 +263,7 @@ void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp
 				TPose.startPos = FVector::ZeroVector;
 			}
 			//use always Z from the smartsuit.
-			TPose.startPos.Z = 0;
+			//TPose.startPos.Z = 0;
 		}
 		else {
 			TPose.startPos = FVector::ZeroVector;

@@ -79,6 +79,14 @@ void VPStreamingNetwork::SendToLiveLink(TArray<FVirtualProductionSubject> subjec
 	}
 }
 
+void VPStreamingNetwork::SendFacesToLivelink(TArray<FFace> subjects) {
+	FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
+	if (livelink) {
+		livelink->HandleFace(subjects);
+	}
+}
+
+
 uint32 VPStreamingNetwork::Run()
 {
 	bool added = false;
@@ -104,6 +112,7 @@ uint32 VPStreamingNetwork::Run()
 				mtx.lock();
 				FVirtualProductionFrame VPFrame;
 				FString result = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
+				//UE_LOG(LogTemp, Warning, TEXT("received: %s"), *result);
 				FJsonObjectConverter::JsonObjectStringToUStruct(result, &VPFrame, 0, 0);
 				
 				if (!GlobalVPFrame) {
@@ -112,6 +121,7 @@ uint32 VPStreamingNetwork::Run()
 				GlobalVPFrame->version = VPFrame.version;
 				GlobalVPFrame->props.Empty();
 				GlobalVPFrame->trackers.Empty();
+				GlobalVPFrame->faces.Empty();
 
 				FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
 
@@ -127,7 +137,11 @@ uint32 VPStreamingNetwork::Run()
 						FVirtualProductionSubject subject = GlobalVPFrame->trackers[i].GetSubject();
 						subjects.Add(subject);
 					}
+					for (int i = 0; i < VPFrame.faces.Num(); i++) {
+						GlobalVPFrame->faces.Add(VPFrame.faces[i]);
+					}
 					SendToLiveLink(subjects);
+					SendFacesToLivelink(GlobalVPFrame->faces);
 				}
 				else {
 					for (int i = 0; i < VPFrame.props.Num(); i++) {
@@ -136,7 +150,12 @@ uint32 VPStreamingNetwork::Run()
 					for (int i = 0; i < VPFrame.trackers.Num(); i++) {
 						GlobalVPFrame->trackers.Add(VPFrame.trackers[i]);
 					}
+					for (int i = 0; i < VPFrame.faces.Num(); i++) {
+						//UE_LOG(LogTemp, Warning, TEXT("face: %d - %s - %f"), VPFrame.faces[i].version, *VPFrame.faces[i].provider, VPFrame.faces[i].jawOpen);
+						GlobalVPFrame->faces.Add(VPFrame.faces[i]);
+					}
 				}
+				//UE_LOG(LogTemp, Warning, TEXT("Faces... %i"), GlobalVPFrame->faces.Num());
 				mtx.unlock();
 				//}, TStatId(), NULL, ENamedThreads::GameThread);
 

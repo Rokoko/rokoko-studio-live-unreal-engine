@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #pragma once
 
@@ -39,13 +39,17 @@ public:
 	}
 
 	void HandleSubjectFrame(TArray<FVirtualProductionSubject> virtualProductionObject);
+	void HandleFace(TArray<FFace> faces);
 	void ClearAllSubjects();
 
 private:
 	void HandleClearSubject(const FName subjectName);
 	void HandleSubjectData(FVirtualProductionSubject virtualProductionObject);
+	void HandleFaceData(FFace face);
 	TArray<FName> subjectNames;
+	TArray<FName> faceNames;
 	TArray<FVirtualProductionSubject> existingSubjects;
+	TArray<FFace> existingFaces;
 	TArray<FName> notExistingSubjects;
 
 	ILiveLinkClient* Client;
