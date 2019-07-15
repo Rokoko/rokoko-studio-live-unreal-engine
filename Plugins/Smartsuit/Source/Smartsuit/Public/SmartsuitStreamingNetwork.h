@@ -8,9 +8,22 @@
 #include "Runtime/Networking/Public/Common/UdpSocketBuilder.h"
 #include "Runtime/Core/Public/HAL/Runnable.h"
 #include "Runtime/Core/Public/HAL/RunnableThread.h"
+#include "VirtualProductionSource.h"
+#include "VirtualProductionFrame.h"
+
 #include "SmartsuitDefinitions.h"
 // Default endpoint for the server
 #define DEFAULT_ENDPOINT FIPv4Endpoint(FIPv4Address(127, 0, 0, 1), 5005)
+class ILiveLinkClient;
+struct FLiveLinkPongMessage;
+struct FLiveLinkSubjectDataMessage;
+struct FLiveLinkSubjectFrameMessage;
+struct FLiveLinkHeartbeatMessage;
+struct FLiveLinkClearSubject;
+
+
+struct FLiveLinkSubjectDataMessage;
+struct FLiveLinkClearSubject;
 
 
 
@@ -75,5 +88,7 @@ private:
 
 	/** Connection thread, used to not block the editor when waiting for connections */
 	FRunnableThread* Thread = NULL;
+	void SendSuitsToLiveLink();
+	int suitCount;
 };
 /// @endcond

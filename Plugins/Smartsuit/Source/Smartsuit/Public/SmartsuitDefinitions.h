@@ -182,6 +182,10 @@ struct SuitData {
 		}
 		return nullptr;
 	}
+
+	FName GetSubjectName() {
+		return FName(*FString(ANSI_TO_TCHAR(suitname)));
+	}
 };
 
 

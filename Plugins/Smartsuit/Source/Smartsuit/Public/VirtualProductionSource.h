@@ -7,6 +7,7 @@
 #include "Runtime/RenderCore/Public/RenderCore.h"
 #include "MessageEndpoint.h"
 #include "VirtualProductionFrame.h"
+#include "SmartsuitDefinitions.h"
 
 class ILiveLinkClient;
 struct FLiveLinkPongMessage;
@@ -40,16 +41,23 @@ public:
 
 	void HandleSubjectFrame(TArray<FVirtualProductionSubject> virtualProductionObject);
 	void HandleFace(TArray<FFace> faces);
+	void HandleSuits(TArray<SuitData> suits);
 	void ClearAllSubjects();
 
 private:
 	void HandleClearSubject(const FName subjectName);
 	void HandleSubjectData(FVirtualProductionSubject virtualProductionObject);
 	void HandleFaceData(FFace face);
+	void HandleSuitData(SuitData suit);
+
 	TArray<FName> subjectNames;
 	TArray<FName> faceNames;
+	TArray<FName> suitNames;
+
 	TArray<FVirtualProductionSubject> existingSubjects;
 	TArray<FFace> existingFaces;
+	TArray<SuitData> existingSuits;
+
 	TArray<FName> notExistingSubjects;
 
 	ILiveLinkClient* Client;

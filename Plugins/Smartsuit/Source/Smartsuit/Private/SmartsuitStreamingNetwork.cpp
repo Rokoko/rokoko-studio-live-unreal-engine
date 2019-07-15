@@ -8,6 +8,7 @@
 SmartsuitStreamingNetwork::SmartsuitStreamingNetwork()
 {
 	//we support maximum 10 suits.
+	suitCount = 0;
 	suits = new SuitData[10];
 	for (int i = 0; i < 10; i++) {
 #if PLATFORM_WINDOWS
@@ -124,7 +125,6 @@ uint32 SmartsuitStreamingNetwork::Run()
 					sd.sensors[i].position.Z = def->sensors[i].position[2];//Z
 					sd.sensors[i].microseconds = def->sensors[i].microseconds;
 				}
-				//}
 				delete def;
 				def = nullptr;
 				//find suit...
@@ -145,6 +145,7 @@ uint32 SmartsuitStreamingNetwork::Run()
 
 				if (index != -1) {
 					if (newSuit) {
+						suitCount++;
 						sd.lastFPSSecond = seconds;
 						sd.fps = 0;
 						sd.currFPSCount = 1;
@@ -156,8 +157,24 @@ uint32 SmartsuitStreamingNetwork::Run()
 					}
 					memcpy(&(suits[index]), &sd, sizeof(SuitData));
 				}
+
+				FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
+				if (livelink) {
+					SendSuitsToLiveLink();
+				}
 			}
 		}
 	}
 	return 0;
+}
+
+void SmartsuitStreamingNetwork::SendSuitsToLiveLink() {
+	TArray<SuitData> suitArray;
+	for (int i = 0; i < suitCount; i++) {
+		suitArray.Add(suits[i]);
+	}
+	FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
+	if (livelink) {
+		livelink->HandleSuits(suitArray);
+	}
 }

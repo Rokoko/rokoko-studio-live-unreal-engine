@@ -365,3 +365,7 @@ struct FVirtualProductionFrame {
 	TArray<FFace> faces;
 	//FVirtualProductionFrame (){}
 };
+
+struct LiveLinkSuit {
+
+};
