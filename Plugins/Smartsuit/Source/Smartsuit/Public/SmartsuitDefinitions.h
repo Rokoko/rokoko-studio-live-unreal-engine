@@ -175,8 +175,12 @@ struct SuitData {
 	* @return The Sensor information that corresponds to hip, if no sensor is found, it returns nullptr.
 	*/
 	Sensor* Hip() {
+		return GetSensor(SENSOR_HIP);
+	}
+
+	Sensor* GetSensor(uint16_t address) {
 		for (int i = 0; i < 19; i++) {
-			if (sensors[i].addr == SENSOR_HIP) {
+			if (sensors[i].addr == address) {
 				return &(sensors[i]);
 			}
 		}

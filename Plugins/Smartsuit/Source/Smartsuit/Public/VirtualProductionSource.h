@@ -49,7 +49,7 @@ private:
 	void HandleSubjectData(FVirtualProductionSubject virtualProductionObject);
 	void HandleFaceData(FFace face);
 	void HandleSuitData(SuitData suit);
-
+	void CreateJoint(TArray<FTransform>& transforms, int32 index, Sensor* parent, Sensor* sensor);
 	TArray<FName> subjectNames;
 	TArray<FName> faceNames;
 	TArray<FName> suitNames;

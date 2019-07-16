@@ -28,9 +28,13 @@ void FVirtualProductionSource::ClearAllSubjects() {
 	for (int i = 0; i < faceNames.Num(); i++) {
 		HandleClearSubject(faceNames[i]);
 	}
+	for (int i = 0; i < suitNames.Num(); i++) {
+		HandleClearSubject(suitNames[i]);
+	}
 
 	subjectNames.Empty();
 	faceNames.Empty();
+	suitNames.Empty();
 }
 
 bool FVirtualProductionSource::RequestSourceShutdown()
@@ -64,7 +68,123 @@ void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtu
 void FVirtualProductionSource::HandleSuitData(SuitData suit) {
 	suitNames.Add(suit.GetSubjectName());
 	FLiveLinkRefSkeleton skeletonRef;
+	TArray<FName> boneNames;
+	boneNames.Add("Base");
+	boneNames.Add("Hips");
+	boneNames.Add("Spine");
+	boneNames.Add("Spine2");
+	boneNames.Add("Neck");
+	boneNames.Add("Head");
+
+	boneNames.Add("LeftShoulder");
+	boneNames.Add("LeftArm");
+	boneNames.Add("LeftForeArm");
+	boneNames.Add("LeftHand");
+	
+	boneNames.Add("RightShoulder");
+	boneNames.Add("RightArm");
+	boneNames.Add("RightForeArm");
+	boneNames.Add("RightHand");
+
+	boneNames.Add("LeftUpLeg");
+	boneNames.Add("LeftLeg");
+	boneNames.Add("LeftFoot");
+
+	boneNames.Add("RightUpLeg");
+	boneNames.Add("RightLeg");
+	boneNames.Add("RightFoot");
+
+
+	TArray<int32> boneParents;
+	boneParents.Add(0); //0 - root
+	boneParents.Add(0); //1 - hip
+	boneParents.Add(1); //2 - spine
+	boneParents.Add(2); //3 - spine2
+	boneParents.Add(3); //4 - neck
+	boneParents.Add(4); //5 - head
+
+	boneParents.Add(3); //6 - LeftShoulder
+	boneParents.Add(6); //7 - LeftArm
+	boneParents.Add(7); //8 - LeftForearm
+	boneParents.Add(8); //9 - LeftHand
+
+	boneParents.Add(3); //10 - RightShoulder
+	boneParents.Add(10); //11 - RightArm
+	boneParents.Add(11); //12 - RightForearm
+	boneParents.Add(12); //13 - RightHand
+
+	boneParents.Add(1); //14 - LeftUpLeg
+	boneParents.Add(14); //15 - LeftLeg
+	boneParents.Add(15); //16 - LeftFoot
+
+	boneParents.Add(1); //17 - RightUpLeg
+	boneParents.Add(17); //18 - RightLeg
+	boneParents.Add(18); //19 - RightFoot
+
+	skeletonRef.SetBoneNames(boneNames);
+	skeletonRef.SetBoneParents(boneParents);
 	Client->PushSubjectSkeleton(SourceGuid, suit.GetSubjectName(), skeletonRef);
+}
+
+void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32 index, Sensor* parent, Sensor* sensor) {
+	
+	int32 transformIndex = transforms.AddUninitialized(1);
+	if (!sensor) {
+		transforms[transformIndex].SetLocation(FVector(0, 0, 0));
+		transforms[transformIndex].SetRotation(FQuat::Identity);
+		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
+	} else if (parent) {
+		FQuat parentRealRotation;
+		if (index == -1) {
+			parentRealRotation = parent->Uquaternion() * FQuat::MakeFromEuler(FVector(0, 0, 180));
+		}
+		else {
+			parentRealRotation = parent->Uquaternion();
+		}
+
+		//FVector realSensorPosition;
+		//float chestOffset = 20;
+		//if (sensor->addr == SENSOR_NECK) {
+		//	realSensorPosition 
+		//	
+		//} else if (sensor->addr == SENSOR_LEFT_SHOULDER || sensor->addr == SENSOR_RIGHT_SHOULDER) {
+		//	FVector direction = sensor->UPosition();
+		//	direction.Normalize();
+		//	realSensorPosition = sensor->UPosition() + (direction * (-chestOffset));
+		//}
+		//else {
+		//	realSensorPosition = sensor->UPosition();
+		//}
+
+		
+		//FVector realParentPosition;
+		//if (parent->addr == SENSOR_CHEST) {
+
+		//}
+		//else {
+		//	realParentPosition = parent->UPosition();
+		//}
+		if (sensor->addr == SENSOR_NECK) {
+			transforms[transformIndex].SetLocation(FVector(0, 20.150345, 0));
+		}
+		else if (sensor->addr == SENSOR_RIGHT_SHOULDER) {
+			transforms[transformIndex].SetLocation(FVector(7, 12.368073, 1.90378));
+		}
+		else if (sensor->addr == SENSOR_LEFT_SHOULDER) {
+			transforms[transformIndex].SetLocation(FVector(-7, 12.368073, 1.90378));
+		}
+		else {
+			transforms[transformIndex].SetLocation(parentRealRotation.Inverse() * (sensor->UPosition() - parent->UPosition()));
+		}
+		transforms[transformIndex].SetRotation(parentRealRotation.Inverse() * sensor->Uquaternion());
+		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
+	}
+	else {
+		FQuat modifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
+		transforms[transformIndex].SetLocation(sensor->UPosition());
+		transforms[transformIndex].SetRotation(sensor->Uquaternion() * modifier);
+		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
+	}
 }
 
 void FVirtualProductionSource::HandleSuits(TArray<SuitData> suits) {
@@ -114,218 +234,38 @@ void FVirtualProductionSource::HandleSuits(TArray<SuitData> suits) {
 		FLiveLinkFrameData FrameData;
 		FTimer timer;
 		FrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
-		TArray<FLiveLinkCurveElement>& BlendShapes = FrameData.CurveElements;
-		BlendShapes.Reset(52);
+		TArray<FTransform>& transforms = FrameData.Transforms;
+		transforms.Reset(20);
+		int32 transformIndex = transforms.AddUninitialized(1);
+		
+		transforms[transformIndex].SetLocation(FVector(0, 0, 0));
+		transforms[transformIndex].SetRotation(FQuat::Identity);
+		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
 
-		//int32 blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "browDownLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.browDownLeft;
+		CreateJoint(transforms, 0, nullptr, subject.Hip());
+		CreateJoint(transforms, -1, subject.Hip(), subject.GetSensor(SENSOR_STOMACH));
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_STOMACH), subject.GetSensor(SENSOR_CHEST));
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_CHEST), subject.GetSensor(SENSOR_NECK));
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_NECK), subject.GetSensor(SENSOR_HEAD));
 
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "browDownRight";
-		//BlendShapes[blendIndex].CurveValue = subject.browDownRight;
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_CHEST), subject.GetSensor(SENSOR_LEFT_SHOULDER));
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_LEFT_SHOULDER), subject.GetSensor(SENSOR_LEFT_UPPER_ARM));
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_LEFT_UPPER_ARM), subject.GetSensor(SENSOR_LEFT_LOWER_ARM));
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_LEFT_LOWER_ARM), subject.GetSensor(SENSOR_LEFT_HAND));
 
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "browInnerUp";
-		//BlendShapes[blendIndex].CurveValue = subject.browInnerUp;
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_CHEST), subject.GetSensor(SENSOR_RIGHT_SHOULDER));
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_SHOULDER), subject.GetSensor(SENSOR_RIGHT_UPPER_ARM));
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_UPPER_ARM), subject.GetSensor(SENSOR_RIGHT_LOWER_ARM));
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_LOWER_ARM), subject.GetSensor(SENSOR_RIGHT_HAND));
 
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "browOuterUpLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.browOuterUpLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "browOuterUpRight";
-		//BlendShapes[blendIndex].CurveValue = subject.browOuterUpRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "cheekPuff";
-		//BlendShapes[blendIndex].CurveValue = subject.cheekPuff;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "cheekSquintLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.cheekSquintLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "cheekSquintRight";
-		//BlendShapes[blendIndex].CurveValue = subject.cheekSquintRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeBlinkLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeBlinkLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeBlinkRight";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeBlinkRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeLookDownLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeLookDownLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeLookDownRight";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeLookDownRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeLookInLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeLookInLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeLookInRight";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeLookInRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeLookOutLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeLookOutLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeLookOutRight";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeLookOutRight;
-
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeLookUpLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeLookUpLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeLookUpRight";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeLookUpRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeSquintLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeSquintLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeSquintRight";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeSquintRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeWideLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeWideLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "eyeWideRight";
-		//BlendShapes[blendIndex].CurveValue = subject.eyeWideRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "jawOpen";
-		//BlendShapes[blendIndex].CurveValue = subject.jawOpen;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "jawForward";
-		//BlendShapes[blendIndex].CurveValue = subject.jawForward;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "jawLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.jawLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "jawRight";
-		//BlendShapes[blendIndex].CurveValue = subject.jawRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthClose";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthClose;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthDimpleLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthDimpleLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthDimpleRight";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthDimpleRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthFrownLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthFrownLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthFrownRight";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthFrownRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthFunnel";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthFunnel;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthLowerDownLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthLowerDownLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthLowerDownRight";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthLowerDownRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthPressLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthPressLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthPressRight";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthPressRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthPucker";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthPucker;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthRight";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthRollLower";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthRollLower;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthRollUpper";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthRollUpper;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthShrugLower";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthShrugLower;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthShrugUpper";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthShrugUpper;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthSmileLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthSmileLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthSmileRight";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthSmileRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthStretchLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthStretchLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthStretchRight";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthStretchRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthUpperUpLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthUpperUpLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "mouthUpperUpRight";
-		//BlendShapes[blendIndex].CurveValue = subject.mouthUpperUpRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "noseSneerLeft";
-		//BlendShapes[blendIndex].CurveValue = subject.noseSneerLeft;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "noseSneerRight";
-		//BlendShapes[blendIndex].CurveValue = faces[subjectIndex].noseSneerRight;
-
-		//blendIndex = BlendShapes.AddUninitialized(1);
-		//BlendShapes[blendIndex].CurveName = "tongueOut";
-		//BlendShapes[blendIndex].CurveValue = faces[subjectIndex].tongueOut;
-
+		CreateJoint(transforms, -1, subject.GetSensor(SENSOR_HIP), subject.GetSensor(SENSOR_LEFT_UPPER_LEG));
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_LEFT_UPPER_LEG), subject.GetSensor(SENSOR_LEFT_LOWER_LEG));
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_LEFT_LOWER_LEG), subject.GetSensor(SENSOR_LEFT_FOOT));
+		
+		CreateJoint(transforms, -1, subject.GetSensor(SENSOR_HIP), subject.GetSensor(SENSOR_RIGHT_UPPER_LEG));
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_UPPER_LEG), subject.GetSensor(SENSOR_RIGHT_LOWER_LEG));
+		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_LOWER_LEG), subject.GetSensor(SENSOR_RIGHT_FOOT));
+		
 		Client->PushSubjectData(SourceGuid, subject.GetSubjectName(), FrameData);
 	}
 }
