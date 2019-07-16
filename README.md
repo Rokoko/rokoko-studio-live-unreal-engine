@@ -84,6 +84,55 @@ Having the Live Link plugin enabled we can now use a prop to control Unreal's vi
 
 For more information of how to setup Virtual Camera refer to Unreal's guide: https://docs.unrealengine.com/en-us/Engine/Plugins/VirtualCameraPlugin
 
+### Live Link and Smartsuit Pro support
+
+Smartsuit Pro data can be used with Live Link. With the Studio source enabled in LiveLink, when you have live Smartsuits Pro, you will see them by their IDs, (E46 in the picture).
+
+<img src="Images/LiveLinkSmartsuit.png">
+
+The data coming from the Smartsuit Pro subjects, can be applied directly to our character located in our plugin (Smartsuit Content/Mesh/Newton/newtonalpha) using the Live Link Pose animation node and  the Retarget Asset NewtonAlphaLiveLinkRemap.
+
+<img src="Images/LiveLinkSmartsuit_anim_1.png">
+<img src="Images/LiveLinkSmartsuit_anim_2.png">
+
+You can in play mode now see the character animated through Studio and Live Link.
+<img src="Images/LiveLinkSmartsuit_anim_3.png">
+
+The skeleton hierarchy is setup in the following way:
+
+ - Base
+ - - Hips
+ - - - Spine
+ - - - - Spine2
+ - - - - - Neck
+ - - - - - - Head
+ - - - - - LeftShoulder
+ - - - - - - LeftArm
+ - - - - - - - LeftForeArm
+ - - - - - - - - LeftHand
+ - - - - - RightShoulder
+ - - - - - - RightArm
+ - - - - - - - RightForeArm
+ - - - - - - - - RightHand
+ - - - LeftUpLeg
+ - - - - -LeftLeg
+ - - - - - - LeftFoot
+ - - - RightUpLeg
+ - - - - RightLeg
+ - - - - - RightFoot
+
+The NewtonAlphaLiveLinkRemap asset, remaps the following bone names:
+
+Spine2 → Spine4
+
+LeftUpLeg → LeftThigh
+
+LeftLeg → LeftShin
+
+RightUpLeg → RightThigh
+
+RightLeg → RightShin
+
 ### Blueprints
 
 #### Character animation blueprint example
