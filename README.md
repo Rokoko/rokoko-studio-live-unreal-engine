@@ -92,11 +92,11 @@ Smartsuit Pro data can be used with Live Link. With the Studio source enabled in
 
 The data coming from the Smartsuit Pro subjects, can be applied directly to our character located in our plugin (Smartsuit Content/Mesh/Newton/newtonalpha) using the Live Link Pose animation node and  the Retarget Asset NewtonAlphaLiveLinkRemap.
 
-<img src="Images/LiveLinkSmartsuit_anim_1.png">
-<img src="Images/LiveLinkSmartsuit_anim_2.png">
+<img src="Images/LiveLinkSmartsuit_anim_1.PNG">
+<img src="Images/LiveLinkSmartsuit_anim_2.PNG">
 
 You can in play mode now see the character animated through Studio and Live Link.
-<img src="Images/LiveLinkSmartsuit_anim_3.png">
+<img src="Images/LiveLinkSmartsuit_anim_3.PNG">
 
 The skeleton hierarchy is setup in the following way:
 
