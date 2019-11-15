@@ -65,6 +65,7 @@ SVirtualProductionSourceEditor::~SVirtualProductionSourceEditor()
 
 void SVirtualProductionSourceEditor::Construct(const FArguments& Args)
 {
+	OnSourceSelected = Args._OnSourceSelected;
 	LastTickTime = 0.0;
 
 	ChildSlot
@@ -119,6 +120,7 @@ TSharedRef<ITableRow> SVirtualProductionSourceEditor::MakeSourceListViewWidget(F
 void SVirtualProductionSourceEditor::OnSourceListSelectionChanged(FProviderPollResultPtr PollResult, ESelectInfo::Type SelectionType)
 {
 	SelectedResult = PollResult;
+	OnSourceSelected.ExecuteIfBound(SelectedResult);
 }
 
 #undef LOCTEXT_NAMESPACE

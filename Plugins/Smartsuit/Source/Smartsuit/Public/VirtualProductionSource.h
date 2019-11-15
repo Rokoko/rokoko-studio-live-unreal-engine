@@ -29,7 +29,7 @@ public:
 	{}
 
 	virtual void ReceiveClient(ILiveLinkClient* InClient, FGuid InSourceGuid);
-	virtual bool IsSourceStillValid();
+	virtual bool IsSourceStillValid() const override;
 	virtual bool RequestSourceShutdown();
 
 	virtual FText GetSourceType() const { return SourceType; }

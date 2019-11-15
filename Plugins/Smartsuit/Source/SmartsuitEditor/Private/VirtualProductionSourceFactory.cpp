@@ -4,6 +4,7 @@
 #include "VirtualProductionSource.h"
 #include "VirtualProductionSourceEditor.h"
 #include "LiveLinkMessageBusFinder.h"
+#include "Features/IModularFeatures.h"
 
 #define LOCTEXT_NAMESPACE "VirtualProductionSourceFactory"
 
@@ -17,31 +18,58 @@ FText UVirtualProductionSourceFactory::GetSourceTooltip() const
 	return LOCTEXT("SourceTooltip", "Creates a connection to a Rokoko Studio Source");
 }
 
-TSharedPtr<SWidget> UVirtualProductionSourceFactory::CreateSourceCreationPanel()
+TSharedPtr<SWidget> UVirtualProductionSourceFactory::BuildCreationPanel(FOnLiveLinkSourceCreated OnLiveLinkSourceCreated) const
 {
-	if (!ActiveSourceEditor.IsValid())
-	{
-		SAssignNew(ActiveSourceEditor, SVirtualProductionSourceEditor);
-	}
-	return ActiveSourceEditor;
+	return SNew(SVirtualProductionSourceEditor)
+		.OnSourceSelected(FOnVirtualProductionSourceSelected::CreateUObject(this, &UVirtualProductionSourceFactory::OnSourceSelected, OnLiveLinkSourceCreated));
 }
 
-
-TSharedPtr<ILiveLinkSource> UVirtualProductionSourceFactory::OnSourceCreationPanelClosed(bool bMakeSource)
+UVirtualProductionSourceFactory::EMenuType UVirtualProductionSourceFactory::GetMenuType() const
 {
-	//Clean up
-	TSharedPtr<FVirtualProductionSource> NewSource = nullptr;
-
-	if (bMakeSource && ActiveSourceEditor.IsValid())
+	if (IModularFeatures::Get().IsModularFeatureAvailable(ILiveLinkClient::ModularFeatureName))
 	{
-		FProviderPollResultPtr Result = ActiveSourceEditor->GetSelectedSource();
-		if (Result.IsValid())
+		ILiveLinkClient& LiveLinkClient = IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
+		auto livelink = FVirtualProductionSource::Get();
+		if (livelink && !livelink->IsSourceStillValid() || !LiveLinkClient.HasSourceBeenAdded(MakeShareable(livelink)))
 		{
-			NewSource = MakeShared<FVirtualProductionSource>(FText::FromString(Result->Name), FText::FromString(Result->MachineName), Result->Address);
+			return EMenuType::SubPanel;
 		}
 	}
-	ActiveSourceEditor = nullptr;
-	return NewSource;
+	return EMenuType::Disabled;
+}
+
+void UVirtualProductionSourceFactory::OnSourceSelected(FProviderPollResultPtr SelectedSource, FOnLiveLinkSourceCreated InOnLiveLinkSourceCreated) const
+{
+	if (SelectedSource.IsValid())
+	{
+#if WITH_EDITOR
+		bool bDoesAlreadyExist = false;
+		{
+			ILiveLinkClient& LiveLinkClient = IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
+			TArray<FGuid> Sources = LiveLinkClient.GetSources();
+			for (FGuid SourceGuid : Sources)
+			{
+				if (LiveLinkClient.GetSourceType(SourceGuid).ToString() == SelectedSource->Name)
+				{
+					bDoesAlreadyExist = true;
+					break;
+				}
+			}
+		}
+
+		if (bDoesAlreadyExist)
+		{
+			if (EAppReturnType::No == FMessageDialog::Open(EAppMsgType::YesNo, EAppReturnType::Yes, LOCTEXT("AddSourceWithSameName", "This provider name already exist. Are you sure you want to add a new one?")))
+			{
+				return;
+			}
+		}
+#endif
+
+		TSharedPtr<FVirtualProductionSource> SharedPtr = MakeShared<FVirtualProductionSource>(FText::FromString(SelectedSource->Name), FText::FromString(SelectedSource->MachineName), SelectedSource->Address);
+		FString ConnectionString = FString::Printf(TEXT("Name=\"%s\""), *SelectedSource->Name);
+		InOnLiveLinkSourceCreated.ExecuteIfBound(SharedPtr, MoveTemp(ConnectionString));
+	}
 }
 
 #undef LOCTEXT_NAMESPACE
