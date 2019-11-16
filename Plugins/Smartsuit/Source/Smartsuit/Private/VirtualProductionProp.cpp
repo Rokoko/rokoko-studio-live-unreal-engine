@@ -51,7 +51,6 @@ void UVirtualProductionProp::TickComponent(float DeltaTime, ELevelTick TickType,
 	}
 
 	parent->SetActorLocation(prop->UPosition());
-	FRotator rotator = prop->FQuatToRotator();
-	parent->SetActorRotation(rotator);
+	parent->SetActorRotation(prop->FQuatToRotator());
 }
 

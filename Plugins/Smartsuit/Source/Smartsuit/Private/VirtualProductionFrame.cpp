@@ -16,6 +16,7 @@ FProp::FProp(TSharedPtr<FJsonObject> jsonObject)
 	name = jsonObject->GetStringField("name");
 	id = jsonObject->GetStringField("id");
 	position = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField("position"));
+	rotation = USmartsuitBlueprintLibrary::GetQuaternionField(jsonObject->GetObjectField("rotation"));
 	isLive = jsonObject->GetBoolField("isLive");
 	profile = FProfile(jsonObject->GetObjectField("profile"));
 }
