@@ -1,5 +1,4 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -25,13 +24,21 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	/**
 	* The port number used to listen for trackers and props data.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
-		FString name = "Default";
+	FString name;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
-		bool isLive = false;
+	bool isLive;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
+	bool useLocalSpace;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
+	float scalePosition;
 		
 	FVector CurrentLocation;
 	AActor* parent;
