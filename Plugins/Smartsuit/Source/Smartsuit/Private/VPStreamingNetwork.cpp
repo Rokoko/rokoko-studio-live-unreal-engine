@@ -113,7 +113,39 @@ uint32 VPStreamingNetwork::Run()
 				FVirtualProductionFrame VPFrame;
 				FString result = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
 				//UE_LOG(LogTemp, Warning, TEXT("received: %s"), *result);
-				FJsonObjectConverter::JsonObjectStringToUStruct(result, &VPFrame, 0, 0);
+				//FJsonObjectConverter::JsonObjectStringToUStruct(result, &VPFrame, 0, 0);
+
+				TSharedPtr<FJsonObject> JsonObject;
+				TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(result);
+				if (FJsonSerializer::Deserialize(Reader, JsonObject))
+				{
+
+					VPFrame.version = JsonObject->GetIntegerField("version");
+					//VPFrame.timestamp = JsonObject->GetNumberField("timestamp");
+					//VPFrame.playbackTimestamp = JsonObject->GetNumberField("");
+
+					TArray<TSharedPtr<FJsonValue>> propsarray = JsonObject->GetArrayField("props");
+
+					for (auto& currentprop : propsarray)
+					{
+						VPFrame.props.Add(FProp(currentprop->AsObject()));
+					}
+
+					TArray<TSharedPtr<FJsonValue>> trackersarray = JsonObject->GetArrayField("trackers");
+
+					for (auto& currenttracker : trackersarray)
+					{
+						VPFrame.trackers.Add(FTracker(currenttracker->AsObject()));
+					}
+
+					TArray<TSharedPtr<FJsonValue>> facesarray = JsonObject->GetArrayField("faces");
+
+					for (auto& currentface : facesarray)
+					{
+						VPFrame.faces.Add(FFace(currentface->AsObject()));
+					}
+				}
+
 				
 				if (!GlobalVPFrame) {
 					GlobalVPFrame = new FVirtualProductionFrame();

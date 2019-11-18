@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "LiveLinkSourceFactory.h"
+#include "LiveLinkMessageBusFinder.h"
 #include "VirtualProductionSourceFactory.generated.h"
 
 class SVirtualProductionSourceEditor;
-//class SLiveLinkMessageBusSourceEditor;
 
 UCLASS()
 class UVirtualProductionSourceFactory : public ULiveLinkSourceFactory
@@ -17,8 +17,9 @@ class UVirtualProductionSourceFactory : public ULiveLinkSourceFactory
 	virtual FText GetSourceDisplayName() const;
 	virtual FText GetSourceTooltip() const;
 
-	virtual TSharedPtr<SWidget> CreateSourceCreationPanel();
-	virtual TSharedPtr<ILiveLinkSource> OnSourceCreationPanelClosed(bool bMakeSource);
+	virtual TSharedPtr<SWidget> BuildCreationPanel(FOnLiveLinkSourceCreated OnLiveLinkSourceCreated) const override;
+	virtual EMenuType GetMenuType() const override;
 
-	TSharedPtr<SVirtualProductionSourceEditor> ActiveSourceEditor;
+private:
+	void OnSourceSelected(FProviderPollResultPtr SelectedSource, FOnLiveLinkSourceCreated OnLiveLinkSourceCreated) const;
 };

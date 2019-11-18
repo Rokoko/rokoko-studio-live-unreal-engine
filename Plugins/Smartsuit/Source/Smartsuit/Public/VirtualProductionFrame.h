@@ -3,6 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "JsonValue.h"
+#include "JsonObject.h"
+//#include "SmartsuitBlueprintLibrary.h"
 #include "VirtualProductionFrame.generated.h"
 
 
@@ -32,7 +35,8 @@ struct FRadiusReferencePoint {
 	/**Holds information about the rotation during the last frame.*/
 	FQuat rotation;
 
-	//FRadiusReferencePoint() {}
+	FRadiusReferencePoint() {}
+	FRadiusReferencePoint(TSharedPtr<FJsonObject> jsonObject);
 };
 
 USTRUCT(BlueprintType, meta = (ToolTip = "Contains all information about the pivot."))
@@ -48,7 +52,8 @@ struct FReferencePoint {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Pivot rotation."))
 	FQuat rotation;
 
-	//FReferencePoint() {}
+	FReferencePoint() {}
+	FReferencePoint(TSharedPtr<FJsonObject> jsonObject);
 };
 
 USTRUCT(BlueprintType, meta = (ToolTip = "Contains all information about a prop's profile."))
@@ -88,7 +93,9 @@ struct FProfile {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Profile's prop type."))
 	int propType;
 
-	//FProfile() {}
+	FProfile() {}
+
+	FProfile(TSharedPtr<FJsonObject> jsonObject);
 };
 
 struct FVirtualProductionSubject {
@@ -132,7 +139,9 @@ struct FProp {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Information about prop's profile."))
 	FProfile profile;
 
-	//FProp() {}
+	FProp() {}
+
+	FProp(TSharedPtr<FJsonObject> jsonObject);
 
 	///**
 	//* Get sensor position in Unreal coordinate system.
@@ -162,6 +171,9 @@ USTRUCT(BlueprintType, meta = (ToolTip = "Contains all information about a track
 struct FTracker {
 
 	GENERATED_USTRUCT_BODY()
+
+	FTracker() {}
+	FTracker(TSharedPtr<FJsonObject> jsonObject);
 
 	/** Name of the tracker. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Tracker's name."))
@@ -228,6 +240,9 @@ USTRUCT(BlueprintType, meta = (ToolTip = "Contains all the information for face.
 struct FFace
 {
 	GENERATED_USTRUCT_BODY()
+
+	FFace() {}
+	FFace(TSharedPtr<FJsonObject> jsonObject);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's version."))
 	int version;

@@ -22,6 +22,7 @@ public:
 #include "SmartsuitReceiver.h"
 #include "VirtualProductionFrame.h"
 #include "Misc/Guid.h"
+#include "LiveLink/Public/LiveLinkMessageBusFinder.h"
 
 //struct FLiveLinkPongMessage;
 struct FMessageAddress;
@@ -29,14 +30,14 @@ struct FProviderPollResult;
 class ITableRow;
 class STableViewBase;
 
-typedef TSharedPtr<FProviderPollResult> FProviderPollResultPtr;
+//typedef TSharedPtr<FProviderPollResult> FProviderPollResultPtr;
+
+DECLARE_DELEGATE_OneParam(FOnVirtualProductionSourceSelected, FProviderPollResultPtr);
 
 class SVirtualProductionSourceEditor : public SCompoundWidget
 {
-	SLATE_BEGIN_ARGS(SVirtualProductionSourceEditor)
-	{
-	}
-
+	SLATE_BEGIN_ARGS(SVirtualProductionSourceEditor){}
+		SLATE_EVENT(FOnVirtualProductionSourceSelected, OnSourceSelected)
 	SLATE_END_ARGS()
 
 		~SVirtualProductionSourceEditor();
@@ -64,6 +65,8 @@ private:
 	TArray<FProviderPollResultPtr> PollData;
 
 	FProviderPollResultPtr SelectedResult;
+
+	FOnVirtualProductionSourceSelected OnSourceSelected;
 
 	//TSharedPtr<FMessageEndpoint, ESPMode::ThreadSafe> MessageEndpoint;
 

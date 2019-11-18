@@ -11,7 +11,7 @@ void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid In
 	instance = this;
 }
 
-bool FVirtualProductionSource::IsSourceStillValid()
+bool FVirtualProductionSource::IsSourceStillValid() const
 {
 	return true;
 }

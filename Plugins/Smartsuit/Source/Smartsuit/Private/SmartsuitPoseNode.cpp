@@ -15,6 +15,10 @@ FSmartsuitPoseNode::FSmartsuitPoseNode()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Smartsuit Pose Node: Initializing..."));
 	//TPose = new SmartsuitTPose();
+
+	Controller = nullptr;
+	RelativeToStart = false;
+	ScaleBones = false;
 }
 
 FSmartsuitPoseNode::~FSmartsuitPoseNode()
@@ -254,12 +258,16 @@ void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp
 		return;
 	}
 
-	if (!TPose.StoredTPose) {
-		if (RelativeToStart) {
-			if (data->Hip()) {
-				TPose.startPos = FVector(OriginalTransform(BoneMap.hip, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases).GetTranslation()) - data->Hip()->UPosition();
+	if (!TPose.StoredTPose) 
+	{
+		if (RelativeToStart) 
+		{
+			if (data->Hip()) 
+			{
+				TPose.startPos = SkelComp->GetComponentLocation();//FVector(OriginalTransform(BoneMap.hip, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases).GetTranslation()) - data->Hip()->UPosition();
 			}
-			else {
+			else 
+			{
 				TPose.startPos = FVector::ZeroVector;
 			}
 			//use always Z from the smartsuit.

@@ -1,0 +1,50 @@
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/ObjectMacros.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
+#include "Styling/SlateBrush.h"
+#include "SmartsuitController.h"
+#include "JsonValue.h"
+#include "JsonObject.h"
+
+#include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
+
+#include "SmartsuitBlueprintLibrary.generated.h"
+
+/**
+ *
+ */
+UCLASS(meta = (ScriptName = "SmartsuitLibrary"))
+class USmartsuitBlueprintLibrary : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+
+public:
+	/*! \brief Returns a SmartsuitController by the name.
+	*
+	* @param name The name of the Smartsuit to look for.
+	* @return A SmartsuitController that has the specified Smartsuit name, if non found, it will return nullptr.
+	*/
+	UFUNCTION(BlueprintPure, Category = "Smartsuit", meta = (BlueprintThreadSafe, ToolTip = "Returns the SmartsuitController given the Smartsuit name."))
+	static ASmartsuitController* GetSmartsuitControllerByName(FString name);
+
+	/*! \brief Returns a SmartsuitController from its index ID.
+	*
+	* @param id The index id that will look up for.
+	* @return A SmartsuitController that has the specified index id, if non found, it will return nullptr.
+	*/
+	UFUNCTION(BlueprintPure, Category = "Smartsuit", meta = (BlueprintThreadSafe, ToolTip = "Returns a SmartsuitController given it's Index ID. The Index ID is specified in the SmartsuitController details."))
+	static ASmartsuitController* GetSmartsuitController(int id);
+
+	UFUNCTION(BlueprintCallable)
+	static void JSONTest();
+
+	static FVector GetVectorField(TSharedPtr<FJsonObject> jsonObject);
+
+	static FColor GetFColorField(TSharedPtr<FJsonObject> jsonObject);
+
+	static FQuat GetQuaternionField(TSharedPtr<FJsonObject> jsonObject);
+};

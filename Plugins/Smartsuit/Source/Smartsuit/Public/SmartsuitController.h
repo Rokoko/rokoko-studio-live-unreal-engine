@@ -232,74 +232,76 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Smartsuit", meta = (ToolTip = "Tests"))
 		void DoTests();
 		
-	/*! \brief Returns a SmartsuitController by the name.
-	*
-	* @param name The name of the Smartsuit to look for.
-	* @return A SmartsuitController that has the specified Smartsuit name, if non found, it will return nullptr.
-	*/
-	UFUNCTION(BlueprintPure, Category = "Smartsuit", meta = (ToolTip = "Returns the SmartsuitController given the Smartsuit name."))
-	static ASmartsuitController* GetSmartsuitControllerByName(FString name) {
-		ASmartsuitController * actor = nullptr;
-		// Find UObjects by type
-		//UE_LOG(LogTemp, Warning, TEXT("Looking for actors...%s"), *name);
+	///*! \brief Returns a SmartsuitController by the name.
+	//*
+	//* @param name The name of the Smartsuit to look for.
+	//* @return A SmartsuitController that has the specified Smartsuit name, if non found, it will return nullptr.
+	//*/
+	//UFUNCTION(BlueprintPure, Category = "Smartsuit", meta = (BlueprintThreadSafe, ToolTip = "Returns the SmartsuitController given the Smartsuit name."))
+	//static ASmartsuitController* GetSmartsuitControllerByName(FString name){
+	//	ASmartsuitController * actor = nullptr;
+	//	// Find UObjects by type
+	//	//UE_LOG(LogTemp, Warning, TEXT("Looking for actors...%s"), *name);
 
-		for (TObjectIterator<ASmartsuitController> It; It; ++It)
-		{
-			if (It->realLife) {
-				ASmartsuitController* curActor = *It;
-				FString mySuitName = curActor->suitname;
-				//UE_LOG(LogTemp, Warning, TEXT("Looking for actor.. %s == %s"), *mySuitName, *name);
-				if (name.Compare(mySuitName) == 0) {
-					//UE_LOG(LogTemp, Warning, TEXT("Actors match!!"));
-					actor = curActor;
-					break;
-				}
-			}
-			//else {
-			//	UE_LOG(LogTemp, Warning, TEXT("Actors no match.."));
-			//}
-			// ...
-		}
-
-
-		return actor;
-	}
-	
-	/*! \brief Returns a SmartsuitController from its index ID.
-	*
-	* @param id The index id that will look up for.
-	* @return A SmartsuitController that has the specified index id, if non found, it will return nullptr.
-	*/
-	UFUNCTION(BlueprintPure, Category = "Smartsuit", meta = (ToolTip = "Returns a SmartsuitController given it's Index ID. The Index ID is specified in the SmartsuitController details."))
-	static ASmartsuitController* GetSmartsuitController(int id) {
-		ASmartsuitController * actor = nullptr;
-		// Find UObjects by type
-		//UE_LOG(LogTemp, Warning, TEXT("Looking for actors...%s"), *name);
-
-		for (TObjectIterator<ASmartsuitController> It; It; ++It)
-		{
-			if (It->realLife) {
-				ASmartsuitController* curActor = *It;
-				//UE_LOG(LogTemp, Warning, TEXT("Looking for actor.. %s == %s"), *mySuitName, *name);
-				if (id == curActor->IndexID) {
-					//UE_LOG(LogTemp, Warning, TEXT("Actors match!!"));
-					actor = curActor;
-					break;
-				}
-			}
-			//else {
-			//	UE_LOG(LogTemp, Warning, TEXT("Actors no match.."));
-			//}
-			// ...
-		}
+	//	for (TObjectIterator<ASmartsuitController> It; It; ++It)
+	//	{
+	//		if (It->realLife) {
+	//			ASmartsuitController* curActor = *It;
+	//			FString mySuitName = curActor->suitname;
+	//			//UE_LOG(LogTemp, Warning, TEXT("Looking for actor.. %s == %s"), *mySuitName, *name);
+	//			if (name.Compare(mySuitName) == 0) {
+	//				//UE_LOG(LogTemp, Warning, TEXT("Actors match!!"));
+	//				actor = curActor;
+	//				break;
+	//			}
+	//		}
+	//		//else {
+	//		//	UE_LOG(LogTemp, Warning, TEXT("Actors no match.."));
+	//		//}
+	//		// ...
+	//	}
 
 
-		return actor;
-	}
+	//	return actor;
+	//}
+	//
+	///*! \brief Returns a SmartsuitController from its index ID.
+	//*
+	//* @param id The index id that will look up for.
+	//* @return A SmartsuitController that has the specified index id, if non found, it will return nullptr.
+	//*/
+	//UFUNCTION(BlueprintPure, Category = "Smartsuit", meta = (BlueprintThreadSafe, ToolTip = "Returns a SmartsuitController given it's Index ID. The Index ID is specified in the SmartsuitController details."))
+	//static ASmartsuitController* GetSmartsuitController(int id){
+	//	ASmartsuitController * actor = nullptr;
+	//	// Find UObjects by type
+	//	//UE_LOG(LogTemp, Warning, TEXT("Looking for actors...%s"), *name);
+
+	//	for (TObjectIterator<ASmartsuitController> It; It; ++It)
+	//	{
+	//		if (It->realLife) {
+	//			ASmartsuitController* curActor = *It;
+	//			//UE_LOG(LogTemp, Warning, TEXT("Looking for actor.. %s == %s"), *mySuitName, *name);
+	//			if (id == curActor->IndexID) {
+	//				//UE_LOG(LogTemp, Warning, TEXT("Actors match!!"));
+	//				actor = curActor;
+	//				break;
+	//			}
+	//		}
+	//		//else {
+	//		//	UE_LOG(LogTemp, Warning, TEXT("Actors no match.."));
+	//		//}
+	//		// ...
+	//	}
+
+
+	//	return actor;
+	//}
 
 	/// @cond no_doc
 	bool SupportsWiFi();
 	/// @endcond
+
+	bool IsRealLife() { return realLife; }
 private:
 	ASmartsuitReceiver* GetReceiver();
 	uint32 GetLocalIP();
