@@ -3,58 +3,66 @@
 #include "VirtualProductionTracker.h"
 
 
-// Sets default values for this component's properties
 UVirtualProductionTracker::UVirtualProductionTracker()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	name = "Default";
+	isLive = false;
+	useLocalSpace = false;
+	scalePosition = 1.f;
 }
 
-
-// Called when the game starts
 void UVirtualProductionTracker::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
 	
 	parent = GetOwner();
-	parent->GetActorLocation();
 	CurrentLocation = parent->GetActorLocation();
 }
 
-ASmartsuitReceiver* UVirtualProductionTracker::GetReceiver() {
-	ASmartsuitReceiver * listener = nullptr;
-	// Find UObjects by type
+ASmartsuitReceiver* UVirtualProductionTracker::GetReceiver() 
+{
+	ASmartsuitReceiver* listener = nullptr;
+
 	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
 	{
-		if (It->enabled) {
+		if (It->enabled) 
+		{
 			listener = *It;
 			break;
 		}
-		// ...
 	}
 	return listener;
 }
 
-// Called every frame
 void UVirtualProductionTracker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	ASmartsuitReceiver * listener = GetReceiver();
-	if (!listener) {
+	ASmartsuitReceiver* listener = GetReceiver();
+	if (!listener) 
+	{
 		return;
 	}
 
 	FTracker* tracker = listener->GetTrackerByNameFromVP(name, isLive);
-	if (!tracker) {
+	if (!tracker) 
+	{
 		return;
 	}
 
-	parent->SetActorLocation(tracker->UPosition());
-	parent->SetActorRotation(tracker->FQuatToRotator());
+	//parent->SetActorLocation(tracker->UPosition() * scalePosition);
+	//parent->SetActorRotation(tracker->FQuatToRotator());
+
+	if (useLocalSpace)
+	{
+		parent->SetActorRelativeLocation(tracker->UPosition() * scalePosition);
+		parent->SetActorRelativeRotation(tracker->FQuatToRotator());
+	}
+	else
+	{
+		parent->SetActorLocation(tracker->UPosition() * scalePosition);
+		parent->SetActorRotation(tracker->FQuatToRotator());
+	}
 }

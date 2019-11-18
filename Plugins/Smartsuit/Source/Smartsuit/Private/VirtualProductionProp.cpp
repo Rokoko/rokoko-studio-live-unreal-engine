@@ -3,54 +3,77 @@
 #include "VirtualProductionProp.h"
 
 
-// Sets default values for this component's properties
 UVirtualProductionProp::UVirtualProductionProp()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+
+	name = "Default";
+	isLive = false;
+	useLocalSpace = false;
+	scalePosition = 1.f;
 }
 
-
-// Called when the game starts
 void UVirtualProductionProp::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
 	parent = GetOwner();
-	parent->GetActorLocation();
 	CurrentLocation = parent->GetActorLocation();
-	FVector a = parent->GetActorLocation();
 }
 
-ASmartsuitReceiver* UVirtualProductionProp::GetReceiver() {
-	ASmartsuitReceiver * listener = nullptr;
-	// Find UObjects by type
+ASmartsuitReceiver* UVirtualProductionProp::GetReceiver() 
+{
+	ASmartsuitReceiver* listener = nullptr;
+	
 	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
 	{
-		if (It->enabled) {
+		if (It->enabled) 
+		{
 			listener = *It;
 			break;
 		}
-		// ...
 	}
 	return listener;
 }
 
-// Called every frame
 void UVirtualProductionProp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	ASmartsuitReceiver * listener = GetReceiver();
-	if (!listener) {
+
+	ASmartsuitReceiver* listener = GetReceiver();
+	if (!listener) 
+	{
 		return;
 	}
 
 	FProp* prop = listener->GetPropByNameFromVP(name, isLive);
-	if (!prop) {
+	if (!prop) 
+	{
 		return;
 	}
 
-	parent->SetActorLocation(prop->UPosition());
-	parent->SetActorRotation(prop->FQuatToRotator());
-}
+	//FVector LocalOffset(10.f, 10.f, 0.f);
 
+	//FTransform TestTransform(prop->FQuatToRotator(), prop->UPosition(), FVector(scalePosition, scalePosition, scalePosition));
+
+	//if (useLocalSpace)
+	//{
+	//	TestTransform.TransformPosition(LocalOffset);
+	//}
+
+	//parent->SetActorLocation(TestTransform.GetLocation());
+	//parent->SetActorRotation(TestTransform.GetRotation());
+
+	if (useLocalSpace)
+	{
+		parent->SetActorRelativeLocation(prop->UPosition() * scalePosition);
+		parent->SetActorRelativeRotation(prop->FQuatToRotator());
+	}
+	else
+	{
+		parent->SetActorLocation(prop->UPosition() * scalePosition);
+		parent->SetActorRotation(prop->FQuatToRotator());
+	}
+
+	//parent->SetActorRotation(prop->FQuatToRotator());
+}

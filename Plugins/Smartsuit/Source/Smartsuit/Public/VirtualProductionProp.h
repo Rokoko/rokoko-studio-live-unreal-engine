@@ -29,12 +29,20 @@ public:
 	* The port number used to listen for trackers and props data.
 	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
-	FString name = "Default";
+	FString name;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
-	bool isLive = false;
+	bool isLive;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
+	bool useLocalSpace;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
+	float scalePosition;
 
 	FVector CurrentLocation;
 	AActor* parent;
+
 private:
 	ASmartsuitReceiver* GetReceiver();
 };
