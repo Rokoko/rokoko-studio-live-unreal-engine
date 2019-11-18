@@ -258,6 +258,8 @@ void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp
 		return;
 	}
 
+	EBoneControlSpace TestBoneControlSpace = BCS_ComponentSpace;
+
 	if (!TPose.StoredTPose) 
 	{
 		if (RelativeToStart) 
@@ -277,25 +279,25 @@ void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp
 			TPose.startPos = FVector::ZeroVector;
 		}
 
-		TPose.Pose.hip = FTransform(OriginalTransform(BoneMap.hip, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.stomach = FTransform(OriginalTransform(BoneMap.stomach, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.chest = FTransform(OriginalTransform(BoneMap.chest, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.neck = FTransform(OriginalTransform(BoneMap.neck, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.head = FTransform(OriginalTransform(BoneMap.head, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.leftShoulder = FTransform(OriginalTransform(BoneMap.leftShoulder, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.leftArm = FTransform(OriginalTransform(BoneMap.leftArm, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.leftForearm = FTransform(OriginalTransform(BoneMap.leftForearm, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.leftHand = FTransform(OriginalTransform(BoneMap.leftHand, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.rightShoulder = FTransform(OriginalTransform(BoneMap.rightShoulder, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.rightArm = FTransform(OriginalTransform(BoneMap.rightArm, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.rightForearm = FTransform(OriginalTransform(BoneMap.rightForearm, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.rightHand = FTransform(OriginalTransform(BoneMap.rightHand, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.leftUpLeg = FTransform(OriginalTransform(BoneMap.leftUpleg, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.leftLeg = FTransform(OriginalTransform(BoneMap.leftLeg, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.leftFoot = FTransform(OriginalTransform(BoneMap.leftFoot, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.rightUpLeg = FTransform(OriginalTransform(BoneMap.rightUpleg, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.rightLeg = FTransform(OriginalTransform(BoneMap.rightLeg, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
-		TPose.Pose.rightFoot = FTransform(OriginalTransform(BoneMap.rightFoot, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases));
+		TPose.Pose.hip = FTransform(OriginalTransform(BoneMap.hip, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.stomach = FTransform(OriginalTransform(BoneMap.stomach, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.chest = FTransform(OriginalTransform(BoneMap.chest, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.neck = FTransform(OriginalTransform(BoneMap.neck, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.head = FTransform(OriginalTransform(BoneMap.head, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.leftShoulder = FTransform(OriginalTransform(BoneMap.leftShoulder, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.leftArm = FTransform(OriginalTransform(BoneMap.leftArm, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.leftForearm = FTransform(OriginalTransform(BoneMap.leftForearm, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.leftHand = FTransform(OriginalTransform(BoneMap.leftHand, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.rightShoulder = FTransform(OriginalTransform(BoneMap.rightShoulder, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.rightArm = FTransform(OriginalTransform(BoneMap.rightArm, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.rightForearm = FTransform(OriginalTransform(BoneMap.rightForearm, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.rightHand = FTransform(OriginalTransform(BoneMap.rightHand, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.leftUpLeg = FTransform(OriginalTransform(BoneMap.leftUpleg, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.leftLeg = FTransform(OriginalTransform(BoneMap.leftLeg, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.leftFoot = FTransform(OriginalTransform(BoneMap.leftFoot, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.rightUpLeg = FTransform(OriginalTransform(BoneMap.rightUpleg, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.rightLeg = FTransform(OriginalTransform(BoneMap.rightLeg, TestBoneControlSpace, SkelComp, MeshBases));
+		TPose.Pose.rightFoot = FTransform(OriginalTransform(BoneMap.rightFoot, TestBoneControlSpace, SkelComp, MeshBases));
 		TPose.StoredTPose = true;
 		return;
 	}
@@ -348,29 +350,29 @@ void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp
 	FQuat rightFootExpected = SMARTSUIT_TPOSE_RIGHT_FOOT.Inverse() * TPose.Pose.rightFoot.GetRotation();
 
 	if (RelativeToStart) {
-		ApplySmartsuitTransform(BoneMap.hip, hipQuat*hipExpected, hipPosition + TPose.startPos, FVector(1, 1, 1), EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
+		ApplySmartsuitTransform(BoneMap.hip, hipQuat*hipExpected, hipPosition + TPose.startPos, FVector(1, 1, 1), TestBoneControlSpace, SkelComp, MeshBases);
 	}
 	else {
-		ApplySmartsuitTransform(BoneMap.hip, hipQuat*hipExpected, hipPosition, FVector(1, 1, 1), EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
+		ApplySmartsuitTransform(BoneMap.hip, hipQuat*hipExpected, hipPosition, FVector(1, 1, 1), TestBoneControlSpace, SkelComp, MeshBases);
 	}
-	ApplySmartsuitRotation(BoneMap.stomach, stomachQuat * stomachExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.chest, chestQuat * chestExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.neck, neckQuat * neckExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.head, headQuat * headExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftShoulder, leftShoulderQuat * leftShoulderExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftArm, leftArmQuat * leftArmExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftForearm, leftForearmQuat * leftForearmExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftHand, leftHandQuat * leftHandExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightShoulder, rightShoulderQuat * rightShoulderExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightArm, rightArmQuat * rightArmExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightForearm, rightForearmQuat * rightForearmExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightHand, rightHandQuat * rightHandExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftUpleg, leftUpLegQuat * leftUpLegExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftLeg, leftLegQuat * leftLegExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftFoot, leftFootQuat * leftFootExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightUpleg, rightUpLegQuat * rightUpLegExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightLeg, rightLegQuat * rightLegExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightFoot, rightFootQuat * rightFootExpected, hipQuat, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.stomach, stomachQuat * stomachExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.chest, chestQuat * chestExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.neck, neckQuat * neckExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.head, headQuat * headExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftShoulder, leftShoulderQuat * leftShoulderExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftArm, leftArmQuat * leftArmExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftForearm, leftForearmQuat * leftForearmExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftHand, leftHandQuat * leftHandExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightShoulder, rightShoulderQuat * rightShoulderExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightArm, rightArmQuat * rightArmExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightForearm, rightForearmQuat * rightForearmExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightHand, rightHandQuat * rightHandExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftUpleg, leftUpLegQuat * leftUpLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftLeg, leftLegQuat * leftLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftFoot, leftFootQuat * leftFootExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightUpleg, rightUpLegQuat * rightUpLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightLeg, rightLegQuat * rightLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightFoot, rightFootQuat * rightFootExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 
 
 	if (ScaleBones) {
@@ -378,26 +380,26 @@ void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp
 
 		TArray<FTransform> relativePositions = GetAllBoneTransforms(BoneMap.hip, BCS_ParentBoneSpace, SkelComp, MeshBases);
 		//base body
-		float hipScale = ScaleBonesToDistance(BoneMap.hip, BoneMap.hip, BoneMap.stomach, body._hip * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float stomachScale = ScaleBonesToDistance(BoneMap.stomach, BoneMap.stomach, BoneMap.chest, body._low_back * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float chestScale = ScaleBonesToDistance(BoneMap.chest, BoneMap.chest, BoneMap.neck, body._middle_back * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float neckScale =  ScaleBonesToDistance(BoneMap.neck, BoneMap.neck, BoneMap.head, body._neck * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float headScale = ScaleBonesToDistance(BoneMap.head, BoneMap.head, BoneMap.headTop, body._head * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
+		float hipScale = ScaleBonesToDistance(BoneMap.hip, BoneMap.hip, BoneMap.stomach, body._hip * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float stomachScale = ScaleBonesToDistance(BoneMap.stomach, BoneMap.stomach, BoneMap.chest, body._low_back * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float chestScale = ScaleBonesToDistance(BoneMap.chest, BoneMap.chest, BoneMap.neck, body._middle_back * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float neckScale =  ScaleBonesToDistance(BoneMap.neck, BoneMap.neck, BoneMap.head, body._neck * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float headScale = ScaleBonesToDistance(BoneMap.head, BoneMap.head, BoneMap.headTop, body._head * 100, TestBoneControlSpace, SkelComp, MeshBases);
 		//arms
-		float leftShoulderScale = ScaleBonesToDistance(BoneMap.leftShoulder, BoneMap.leftShoulder, BoneMap.leftArm, body._shoulder_blade * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float leftArmScale = ScaleBonesToDistance(BoneMap.leftArm, BoneMap.leftArm, BoneMap.leftForearm, body._upper_arm * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float leftForearmScale = ScaleBonesToDistance(BoneMap.leftForearm, BoneMap.leftForearm, BoneMap.leftHand, body._forearm * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float leftHandScale = ScaleBonesToDistance(BoneMap.leftHand, BoneMap.leftHand, BoneMap.leftFingerTip, body._hand * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float rightShoulderScale = ScaleBonesToDistance(BoneMap.rightShoulder, BoneMap.rightShoulder, BoneMap.rightArm, body._shoulder_blade * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float rightArmScale = ScaleBonesToDistance(BoneMap.rightArm, BoneMap.rightArm, BoneMap.rightForearm, body._upper_arm * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float rightForearmScale = ScaleBonesToDistance(BoneMap.rightForearm, BoneMap.rightForearm, BoneMap.rightHand, body._forearm * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float rightHandScale = ScaleBonesToDistance(BoneMap.rightHand, BoneMap.rightHand, BoneMap.rightFingerTip, body._hand * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
+		float leftShoulderScale = ScaleBonesToDistance(BoneMap.leftShoulder, BoneMap.leftShoulder, BoneMap.leftArm, body._shoulder_blade * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float leftArmScale = ScaleBonesToDistance(BoneMap.leftArm, BoneMap.leftArm, BoneMap.leftForearm, body._upper_arm * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float leftForearmScale = ScaleBonesToDistance(BoneMap.leftForearm, BoneMap.leftForearm, BoneMap.leftHand, body._forearm * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float leftHandScale = ScaleBonesToDistance(BoneMap.leftHand, BoneMap.leftHand, BoneMap.leftFingerTip, body._hand * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float rightShoulderScale = ScaleBonesToDistance(BoneMap.rightShoulder, BoneMap.rightShoulder, BoneMap.rightArm, body._shoulder_blade * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float rightArmScale = ScaleBonesToDistance(BoneMap.rightArm, BoneMap.rightArm, BoneMap.rightForearm, body._upper_arm * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float rightForearmScale = ScaleBonesToDistance(BoneMap.rightForearm, BoneMap.rightForearm, BoneMap.rightHand, body._forearm * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float rightHandScale = ScaleBonesToDistance(BoneMap.rightHand, BoneMap.rightHand, BoneMap.rightFingerTip, body._hand * 100, TestBoneControlSpace, SkelComp, MeshBases);
 		//legs
-		float leftUpLegScale = ScaleBonesToDistance(BoneMap.leftUpleg, BoneMap.leftUpleg, BoneMap.leftLeg, body._thigh * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float leftLegScale = ScaleBonesToDistance(BoneMap.leftLeg, BoneMap.leftLeg, BoneMap.leftFoot, body._leg * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float leftFootScale = ScaleBonesToDistance(BoneMap.leftFoot, BoneMap.leftFoot, BoneMap.leftToe, (body._foot_length - body._foot_heel_offset) * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float rightUpLegScale = ScaleBonesToDistance(BoneMap.rightUpleg, BoneMap.rightUpleg, BoneMap.rightLeg, body._thigh * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
-		float rightLegScale = ScaleBonesToDistance(BoneMap.rightLeg, BoneMap.rightLeg, BoneMap.rightFoot, body._leg * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
+		float leftUpLegScale = ScaleBonesToDistance(BoneMap.leftUpleg, BoneMap.leftUpleg, BoneMap.leftLeg, body._thigh * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float leftLegScale = ScaleBonesToDistance(BoneMap.leftLeg, BoneMap.leftLeg, BoneMap.leftFoot, body._leg * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float leftFootScale = ScaleBonesToDistance(BoneMap.leftFoot, BoneMap.leftFoot, BoneMap.leftToe, (body._foot_length - body._foot_heel_offset) * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float rightUpLegScale = ScaleBonesToDistance(BoneMap.rightUpleg, BoneMap.rightUpleg, BoneMap.rightLeg, body._thigh * 100, TestBoneControlSpace, SkelComp, MeshBases);
+		float rightLegScale = ScaleBonesToDistance(BoneMap.rightLeg, BoneMap.rightLeg, BoneMap.rightFoot, body._leg * 100, TestBoneControlSpace, SkelComp, MeshBases);
 		float rightFootScale = ScaleBonesToDistance(BoneMap.rightFoot, BoneMap.rightFoot, BoneMap.rightToe, (body._foot_length - body._foot_heel_offset) * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
 
 		ApplyAllBonePositions(BoneMap.hip, body._hip_width * 100, relativePositions, BCS_ParentBoneSpace, SkelComp, MeshBases);
