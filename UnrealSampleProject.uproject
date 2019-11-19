@@ -10,7 +10,7 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"LiveLinkInterface"
-			]
+			],
 			"LoadingPhase": "Default"
 		}
 	],
