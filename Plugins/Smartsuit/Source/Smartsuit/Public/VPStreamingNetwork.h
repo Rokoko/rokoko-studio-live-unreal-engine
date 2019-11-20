@@ -102,8 +102,8 @@ private:
 		return FVirtualProductionSource::Get();
 	}
 	TArray<FVirtualProductionSubject> subjects;
-	void SendToLiveLink(TArray<FVirtualProductionSubject> subjects);
-	void SendFacesToLivelink(TArray<FFace> subjects);
+	void SendToLiveLink(TArray<FVirtualProductionSubject> Subjects);
+	void SendFacesToLivelink(TArray<FFace> Subjects);
 };
 /// @endcond
 

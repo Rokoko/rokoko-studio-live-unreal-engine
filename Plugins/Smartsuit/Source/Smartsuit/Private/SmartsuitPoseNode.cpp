@@ -4,6 +4,7 @@
 #include "Smartsuit.h"
 #include "AnimationRuntime.h"
 #include "SmartsuitDefinitions.h"
+#include "Animation/AnimInstanceProxy.h"
 
 
 
@@ -239,8 +240,11 @@ FVector GetPosition(uint8 sensor, Sensor *sensors, int numOfSensors) {
 	return FVector::ZeroVector;
 }
 
-void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases, TArray<FBoneTransform>& OutBoneTransforms)
+void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseContext& Output, TArray<FBoneTransform>& OutBoneTransforms)
 {
+	USkeletalMeshComponent* SkelComp = Output.AnimInstanceProxy->GetSkelMeshComponent();
+	FCSPose<FCompactPose>& MeshBases = Output.Pose;
+
 	check(OutBoneTransforms.Num() == 0);
 	if (!Controller/* || !Controller->SupportsWiFi()*/) {
 		return;

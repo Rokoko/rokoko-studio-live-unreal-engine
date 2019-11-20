@@ -1,6 +1,7 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 using UnrealBuildTool;
+using System.IO;
 /// @cond doc_hidden
 public class SmartsuitEditor : ModuleRules
 {
@@ -10,20 +11,22 @@ public class SmartsuitEditor : ModuleRules
         bFasterWithoutUnity = true;
 
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        PublicIncludePaths.AddRange(
-            new string[] {
-                "SmartsuitEditor/Public",
-				// ... add public include paths required here ...
-			}
-            );
+        PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
+        PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Private"));
+        //     PublicIncludePaths.AddRange(
+        //         new string[] {
+        //             "SmartsuitEditor/Public",
+        //	// ... add public include paths required here ...
+        //}
+        //         );
 
 
-        PrivateIncludePaths.AddRange(
-            new string[] {
-                "SmartsuitEditor/Private",
-                // ... add other private include paths required here ...
-			}
-            );
+   //     PrivateIncludePaths.AddRange(
+   //         new string[] {
+   //             "SmartsuitEditor/Private",
+   //             // ... add other private include paths required here ...
+			//}
+   //         );
 
 
         PublicDependencyModuleNames.AddRange(

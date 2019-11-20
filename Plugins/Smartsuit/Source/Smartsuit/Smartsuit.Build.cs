@@ -24,23 +24,25 @@ public class Smartsuit : ModuleRules
         //bFasterWithoutUnity = true;
 
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        PublicIncludePaths.AddRange(
-            new string[] {
-                "Smartsuit/Public",
-                "LiveLink/Public",
-				// ... add public include paths required here ...
-			}
-            );
+        PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
+        PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Private"));
+        //     PublicIncludePaths.AddRange(
+        //         new string[] {
+        //             "Smartsuit/Public",
+        //             "LiveLink/Public",
+        //	// ... add public include paths required here ...
+        //}
+        //         );
 
 
-        PrivateIncludePaths.AddRange(
-            new string[] {
-                "Smartsuit/Private",
-                "LiveLink/Private",
+   //     PrivateIncludePaths.AddRange(
+   //         new string[] {
+   //             "Smartsuit/Private",
+   //             "LiveLink/Private",
 
-				// ... add other private include paths required here ...
-			}
-            );
+			//	// ... add other private include paths required here ...
+			//}
+   //         );
 
 
         PublicDependencyModuleNames.AddRange(
