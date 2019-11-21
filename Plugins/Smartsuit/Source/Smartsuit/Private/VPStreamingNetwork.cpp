@@ -181,7 +181,7 @@ uint32 VPStreamingNetwork::Run()
 					{
 						GlobalVPFrame->trackers.Add(VPFrame.trackers[i]);
 						FVirtualProductionSubject subject = GlobalVPFrame->trackers[i].GetSubject();
-						//subjects.Add(subject);
+						subjects.Add(subject);
 					}
 					for (int i = 0; i < VPFrame.faces.Num(); i++) 
 					{
