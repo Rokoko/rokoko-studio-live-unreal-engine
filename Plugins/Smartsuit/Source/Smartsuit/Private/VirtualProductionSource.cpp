@@ -529,8 +529,8 @@ void FVirtualProductionSource::HandleFace(TArray<FFace> faces)
 		AnimFrameData.PropertyValues.Add(subject.mouthUpperUpLeft);
 		AnimFrameData.PropertyValues.Add(subject.mouthUpperUpRight);
 		AnimFrameData.PropertyValues.Add(subject.noseSneerLeft);
-		AnimFrameData.PropertyValues.Add(faces[subjectIndex].noseSneerRight);
-		AnimFrameData.PropertyValues.Add(faces[subjectIndex].tongueOut);
+		AnimFrameData.PropertyValues.Add(subject.noseSneerRight);
+		AnimFrameData.PropertyValues.Add(subject.tongueOut);
 
 		Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData));
 	}
