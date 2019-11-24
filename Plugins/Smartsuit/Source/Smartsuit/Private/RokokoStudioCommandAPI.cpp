@@ -5,7 +5,15 @@
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
 
-void URokokoStudioCommandAPI::Calibrate(const FString& SmartSuitName, int32 CountdownDelay)
+URokokoStudioCommandAPI::URokokoStudioCommandAPI()
+{
+	Default_SmartSuitName = "H23";
+	Default_IPInfo.IPAddress = "127.0.0.1";
+	Default_IPInfo.Port = "14053";
+	Default_IPInfo.APIKey = "1234";
+}
+
+void URokokoStudioCommandAPI::Calibrate(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitName, int32 CountdownDelay)
 {
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 	JsonObject->SetStringField("smartsuit_name", SmartSuitName);
@@ -14,10 +22,7 @@ void URokokoStudioCommandAPI::Calibrate(const FString& SmartSuitName, int32 Coun
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
-	FString IPAddress = "127.0.0.1";
-	FString Port = "14053";
-	FString APIKey = "1234";
-	FString URLPath = "http://" + IPAddress + ":" + Port + "/v1/" + APIKey + "/calibrate";
+	FString URLPath = "http://" + IPInfo.IPAddress + ":" + IPInfo.Port + "/v1/" + IPInfo.APIKey + "/calibrate";
 
 	FString TrimmedUrl = URLPath;
 	TrimmedUrl.Trim();
@@ -32,7 +37,7 @@ void URokokoStudioCommandAPI::Calibrate(const FString& SmartSuitName, int32 Coun
 	HttpRequest->ProcessRequest();
 }
 
-void URokokoStudioCommandAPI::StartRecording(const FString& FileName)
+void URokokoStudioCommandAPI::StartRecording(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& FileName)
 {
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 	JsonObject->SetStringField("filename", FileName);
@@ -40,10 +45,7 @@ void URokokoStudioCommandAPI::StartRecording(const FString& FileName)
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
-	FString IPAddress = "127.0.0.1";
-	FString Port = "14053";
-	FString APIKey = "1234";
-	FString URLPath = "http://" + IPAddress + ":" + Port + "/v1/" + APIKey + "/recording/start";
+	FString URLPath = "http://" + IPInfo.IPAddress + ":" + IPInfo.Port + "/v1/" + IPInfo.APIKey + "/recording/start";
 
 	FString TrimmedUrl = URLPath;
 	TrimmedUrl.Trim();
@@ -58,12 +60,9 @@ void URokokoStudioCommandAPI::StartRecording(const FString& FileName)
 	HttpRequest->ProcessRequest();
 }
 
-void URokokoStudioCommandAPI::StopRecording()
+void URokokoStudioCommandAPI::StopRecording(const FRokokoCommandAPI_IPInfo& IPInfo)
 {
-	FString IPAddress = "127.0.0.1";
-	FString Port = "14053";
-	FString APIKey = "1234";
-	FString URLPath = "http://" + IPAddress + ":" + Port + "/v1/" + APIKey + "/recording/stop";
+	FString URLPath = "http://" + IPInfo.IPAddress + ":" + IPInfo.Port + "/v1/" + IPInfo.APIKey + "/recording/stop";
 
 	FString TrimmedUrl = URLPath;
 	TrimmedUrl.Trim();
@@ -76,6 +75,15 @@ void URokokoStudioCommandAPI::StopRecording()
 	HttpRequest->OnProcessRequestComplete().BindUObject(this, &URokokoStudioCommandAPI::OnProcessRequestComplete);
 	HttpRequest->ProcessRequest();
 }
+
+PRAGMA_DISABLE_OPTIMIZATION
+void URokokoStudioCommandAPI::SaveConfigFile(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitname)
+{
+	Default_IPInfo = IPInfo;
+	Default_SmartSuitName = SmartSuitname;
+	SaveConfig();
+}
+PRAGMA_ENABLE_OPTIMIZATION
 
 void URokokoStudioCommandAPI::OnProcessRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
 {
