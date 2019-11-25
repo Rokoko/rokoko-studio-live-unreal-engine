@@ -404,7 +404,7 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 		float leftFootScale = ScaleBonesToDistance(BoneMap.leftFoot, BoneMap.leftFoot, BoneMap.leftToe, (body._foot_length - body._foot_heel_offset) * 100, TestBoneControlSpace, SkelComp, MeshBases);
 		float rightUpLegScale = ScaleBonesToDistance(BoneMap.rightUpleg, BoneMap.rightUpleg, BoneMap.rightLeg, body._thigh * 100, TestBoneControlSpace, SkelComp, MeshBases);
 		float rightLegScale = ScaleBonesToDistance(BoneMap.rightLeg, BoneMap.rightLeg, BoneMap.rightFoot, body._leg * 100, TestBoneControlSpace, SkelComp, MeshBases);
-		float rightFootScale = ScaleBonesToDistance(BoneMap.rightFoot, BoneMap.rightFoot, BoneMap.rightToe, (body._foot_length - body._foot_heel_offset) * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
+		float rightFootScale = ScaleBonesToDistance(BoneMap.rightFoot, BoneMap.rightFoot, BoneMap.rightToe, (body._foot_length - body._foot_heel_offset) * 100, TestBoneControlSpace, SkelComp, MeshBases);
 
 		ApplyAllBonePositions(BoneMap.hip, body._hip_width * 100, relativePositions, BCS_ParentBoneSpace, SkelComp, MeshBases);
 	}
