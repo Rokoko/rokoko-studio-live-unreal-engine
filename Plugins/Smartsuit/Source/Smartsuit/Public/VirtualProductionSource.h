@@ -28,6 +28,9 @@ public:
 		
 	{}
 
+
+	virtual ~FVirtualProductionSource();
+
 	virtual void ReceiveClient(ILiveLinkClient* InClient, FGuid InSourceGuid);
 	virtual bool IsSourceStillValid() const override;
 	virtual bool RequestSourceShutdown();

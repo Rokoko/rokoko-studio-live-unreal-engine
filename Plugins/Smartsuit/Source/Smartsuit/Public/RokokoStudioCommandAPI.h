@@ -37,6 +37,9 @@ public:
 	URokokoStudioCommandAPI();
 
 	UFUNCTION(BlueprintCallable)
+	void Restart(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitName);
+
+	UFUNCTION(BlueprintCallable)
 	void Calibrate(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitName, int32 CountdownDelay=3);
 
 	UFUNCTION(BlueprintCallable)

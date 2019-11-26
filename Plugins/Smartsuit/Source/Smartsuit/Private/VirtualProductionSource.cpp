@@ -11,6 +11,11 @@
 
 FVirtualProductionSource* FVirtualProductionSource::instance = 0;
 
+FVirtualProductionSource::~FVirtualProductionSource()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Destroying Virtual production source!!!"));
+}
+
 void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid InSourceGuid)
 {
 	Client = InClient;

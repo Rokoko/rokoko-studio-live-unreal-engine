@@ -72,4 +72,15 @@ void UVirtualProductionSourceFactory::OnSourceSelected(FProviderPollResultPtr Se
 	}
 }
 
+TSharedPtr<ILiveLinkSource> UVirtualProductionSourceFactory::CreateSource(const FString& ConnectionString) const
+{
+	FString Name;
+	if (!FParse::Value(*ConnectionString, TEXT("Name="), Name))
+	{
+		return TSharedPtr<ILiveLinkSource>();
+	}
+
+	return MakeShared<FVirtualProductionSource>(FText::FromString(Name), FText::GetEmpty(), FMessageAddress());
+}
+
 #undef LOCTEXT_NAMESPACE

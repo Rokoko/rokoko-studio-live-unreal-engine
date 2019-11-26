@@ -13,6 +13,28 @@ URokokoStudioCommandAPI::URokokoStudioCommandAPI()
 	Default_IPInfo.APIKey = "1234";
 }
 
+void URokokoStudioCommandAPI::Restart(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitName)
+{
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+	JsonObject->SetStringField("smartsuit_name", SmartSuitName);
+	FString JsonString;
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
+	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+
+	FString URLPath = "http://" + IPInfo.IPAddress + ":" + IPInfo.Port + "/v1/" + IPInfo.APIKey + "/restart";
+
+	FString TrimmedUrl = URLPath;
+	TrimmedUrl.TrimStartAndEndInline();
+
+	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+	HttpRequest->SetURL(TrimmedUrl);
+	HttpRequest->SetVerb(TEXT("POST"));
+	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
+	HttpRequest->SetContentAsString(JsonString);
+	HttpRequest->OnProcessRequestComplete().BindUObject(this, &URokokoStudioCommandAPI::OnProcessRequestComplete);
+	HttpRequest->ProcessRequest();
+}
+
 void URokokoStudioCommandAPI::Calibrate(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitName, int32 CountdownDelay)
 {
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
@@ -25,8 +47,7 @@ void URokokoStudioCommandAPI::Calibrate(const FRokokoCommandAPI_IPInfo& IPInfo, 
 	FString URLPath = "http://" + IPInfo.IPAddress + ":" + IPInfo.Port + "/v1/" + IPInfo.APIKey + "/calibrate";
 
 	FString TrimmedUrl = URLPath;
-	TrimmedUrl.Trim();
-	TrimmedUrl.TrimTrailing();
+	TrimmedUrl.TrimStartAndEndInline();
 
 	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
 	HttpRequest->SetURL(TrimmedUrl);
@@ -48,8 +69,7 @@ void URokokoStudioCommandAPI::StartRecording(const FRokokoCommandAPI_IPInfo& IPI
 	FString URLPath = "http://" + IPInfo.IPAddress + ":" + IPInfo.Port + "/v1/" + IPInfo.APIKey + "/recording/start";
 
 	FString TrimmedUrl = URLPath;
-	TrimmedUrl.Trim();
-	TrimmedUrl.TrimTrailing();
+	TrimmedUrl.TrimStartAndEndInline();
 
 	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
 	HttpRequest->SetURL(TrimmedUrl);
@@ -65,8 +85,7 @@ void URokokoStudioCommandAPI::StopRecording(const FRokokoCommandAPI_IPInfo& IPIn
 	FString URLPath = "http://" + IPInfo.IPAddress + ":" + IPInfo.Port + "/v1/" + IPInfo.APIKey + "/recording/stop";
 
 	FString TrimmedUrl = URLPath;
-	TrimmedUrl.Trim();
-	TrimmedUrl.TrimTrailing();
+	TrimmedUrl.TrimStartAndEndInline();
 
 	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
 	HttpRequest->SetURL(TrimmedUrl);
