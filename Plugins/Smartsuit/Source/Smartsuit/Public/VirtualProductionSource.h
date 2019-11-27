@@ -38,15 +38,14 @@ public:
 	virtual FText GetSourceType() const { return SourceType; }
 	virtual FText GetSourceMachineName() const { return SourceMachineName; }
 	virtual FText GetSourceStatus() const { return SourceStatus; }
-	static FVirtualProductionSource* Get() {
-		return instance;
-	}
+	static TSharedPtr<FVirtualProductionSource> Get() { return instance; }
 
 	void HandleSubjectFrame(TArray<FVirtualProductionSubject> virtualProductionObject);
 	void HandleFace(TArray<FFace> faces);
 	void HandleSuits(TArray<SuitData> suits);
 	void ClearAllSubjects();
 
+	static void SetInstance(TSharedPtr<FVirtualProductionSource> NewInstance) { instance = NewInstance; }
 private:
 	void HandleClearSubject(const FName subjectName);
 	void HandleSubjectData(FVirtualProductionSubject virtualProductionObject);
@@ -73,6 +72,7 @@ private:
 	FText SourceStatus;
 
 	//singleton instance
-	static FVirtualProductionSource *instance;
+	//static FVirtualProductionSource *instance;
+	static TSharedPtr<FVirtualProductionSource> instance;
 
 };

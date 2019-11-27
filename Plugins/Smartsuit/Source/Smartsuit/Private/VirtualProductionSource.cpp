@@ -9,7 +9,7 @@
 #include "Roles/LiveLinkLightTypes.h"
 
 
-FVirtualProductionSource* FVirtualProductionSource::instance = 0;
+TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::instance = nullptr;
 
 FVirtualProductionSource::~FVirtualProductionSource()
 {
@@ -19,13 +19,14 @@ FVirtualProductionSource::~FVirtualProductionSource()
 void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid InSourceGuid)
 {
 	Client = InClient;
+	
 	SourceGuid = InSourceGuid;
-	instance = this;
+	//instance = this;
 }
 
 bool FVirtualProductionSource::IsSourceStillValid() const
 {
-	return true;
+	return Client != nullptr;
 }
 
 void FVirtualProductionSource::HandleClearSubject(const FName subjectName)

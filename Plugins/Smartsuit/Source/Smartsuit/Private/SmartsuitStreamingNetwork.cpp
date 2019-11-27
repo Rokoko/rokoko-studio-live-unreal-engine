@@ -158,8 +158,8 @@ uint32 SmartsuitStreamingNetwork::Run()
 					memcpy(&(suits[index]), &sd, sizeof(SuitData));
 				}
 
-				FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
-				if (livelink) 
+				auto livelink = FVirtualProductionSource::Get();
+				if (livelink.IsValid()) 
 				{
 					SendSuitsToLiveLink();
 				}
@@ -176,8 +176,8 @@ void SmartsuitStreamingNetwork::SendSuitsToLiveLink()
 	{
 		suitArray.Add(suits[i]);
 	}
-	FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
-	if (livelink) 
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid()) 
 	{
 		livelink->HandleSuits(suitArray);
 	}

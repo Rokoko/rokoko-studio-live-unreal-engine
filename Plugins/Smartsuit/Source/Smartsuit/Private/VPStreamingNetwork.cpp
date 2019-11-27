@@ -17,8 +17,8 @@ VPStreamingNetwork::~VPStreamingNetwork()
 {
 	// Stop the runnable
 	Stop();
-	FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
-	if (livelink) 
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid()) 
 	{
 		livelink->ClearAllSubjects();
 	}
@@ -78,8 +78,8 @@ FString BytesToStringFixed(const uint8 *In, int32 Count)
 
 void VPStreamingNetwork::SendToLiveLink(TArray<FVirtualProductionSubject> Subjects) 
 {
-	FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
-	if (livelink) 
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid()) 
 	{
 		livelink->HandleSubjectFrame(Subjects);
 	}
@@ -87,8 +87,8 @@ void VPStreamingNetwork::SendToLiveLink(TArray<FVirtualProductionSubject> Subjec
 
 void VPStreamingNetwork::SendFacesToLivelink(TArray<FFace> Subjects) 
 {
-	FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
-	if (livelink) 
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid()) 
 	{
 		livelink->HandleFace(Subjects);
 	}
@@ -166,9 +166,9 @@ uint32 VPStreamingNetwork::Run()
 				GlobalVPFrame->trackers.Empty();
 				GlobalVPFrame->faces.Empty();
 
-				FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
+				auto livelink = FVirtualProductionSource::Get();
 
-				if (livelink) 
+				if (livelink.IsValid()) 
 				{
 					subjects.Empty();
 					for (int i = 0; i < VPFrame.props.Num(); i++) 
