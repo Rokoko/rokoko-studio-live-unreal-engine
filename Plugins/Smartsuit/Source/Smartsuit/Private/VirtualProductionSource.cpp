@@ -7,6 +7,8 @@
 #include "Roles/LiveLinkCameraRole.h"
 #include "Roles/LiveLinkLightRole.h"
 #include "Roles/LiveLinkLightTypes.h"
+#include "Features/IModularFeatures.h"
+
 
 
 TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::instance = nullptr;
@@ -653,5 +655,50 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 
 			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.name), MoveTemp(FrameData1));
 		}
+	}
+}
+
+TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::CreateLiveLinkSource()
+{
+	IModularFeatures& ModularFeatures = IModularFeatures::Get();
+
+	if (ModularFeatures.IsModularFeatureAvailable(ILiveLinkClient::ModularFeatureName))
+	{
+		bool bDoesAlreadyExist = false;
+		{
+			ILiveLinkClient& LiveLinkClient = IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
+			TArray<FGuid> Sources = LiveLinkClient.GetSources();
+			for (FGuid SourceGuid : Sources)
+			{
+				if (LiveLinkClient.GetSourceType(SourceGuid).ToString() == "Studio")
+				{
+					UE_LOG(LogTemp, Warning, TEXT("you can't add more than one instance of FVirtualProductionSource!!"));
+					bDoesAlreadyExist = true;
+					break;
+				}
+			}
+		}
+
+		if (!bDoesAlreadyExist)
+		{
+			ILiveLinkClient* LiveLinkClient = &IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
+			TSharedPtr<FVirtualProductionSource> Source = MakeShared<FVirtualProductionSource>(FText::FromString("Studio"), FText::FromString(""), FMessageAddress::NewAddress());
+			FVirtualProductionSource::SetInstance(Source);
+			LiveLinkClient->AddSource(Source);
+			return Source;
+		}
+	}
+	return TSharedPtr<FVirtualProductionSource>();
+}
+
+void FVirtualProductionSource::RemoveLiveLinkSource(TSharedPtr<FVirtualProductionSource> InSource)
+{
+	IModularFeatures& ModularFeatures = IModularFeatures::Get();
+
+	if (ModularFeatures.IsModularFeatureAvailable(ILiveLinkClient::ModularFeatureName))
+	{
+		ILiveLinkClient* LiveLinkClient = &IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
+
+		LiveLinkClient->RemoveSource(InSource);
 	}
 }

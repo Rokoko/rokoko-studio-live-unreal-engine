@@ -49,8 +49,8 @@ public class Smartsuit : ModuleRules
             new string[]
             {
                 //"Core",
-                //"Core", "AnimGraph", "BlueprintGraph", "AnimGraphRuntime", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking",
-                "Core", "CoreUObject", "Engine", "Sockets", "Http", "Networking", "AnimGraphRuntime", "Json", "JsonUtilities", "LiveLink", "RenderCore"/*, "LiveLinkInterface"*/
+                //"Core", "AnimGraph", "BlueprintGraph", "AnimGraphRuntime", "CoreUObject", "Engine", "Sockets", "Networking",
+                "Core", "CoreUObject", "Engine", "Sockets", "Http", "Networking", "AnimGraphRuntime", "Json", "JsonUtilities", "LiveLink", "RenderCore", "InputCore"/*, "LiveLinkInterface"*/
 				// ... add other public dependencies that you statically link with here ...
 			}
             );
@@ -72,11 +72,11 @@ public class Smartsuit : ModuleRules
                 "LiveLinkInterface",
                 "LiveLinkMessageBusFramework",
                 "HeadMountedDisplay",
-                "TimeManagement"
+                "TimeManagement",
+                "SlateCore",
+                "Slate"
                 //"CoreUObject",
                 //"Engine",
-                //"Slate",
-                //"SlateCore",
                 //"InputCore",
                 //"AnimGraph",
                 //"BlueprintGraph",

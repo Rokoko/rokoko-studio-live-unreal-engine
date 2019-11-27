@@ -14,6 +14,8 @@
 
 #include "SmartsuitBlueprintLibrary.generated.h"
 
+class FVirtualProductionSource;
+
 /**
  *
  */
@@ -47,4 +49,7 @@ public:
 	static FColor GetFColorField(TSharedPtr<FJsonObject> jsonObject);
 
 	static FQuat GetQuaternionField(TSharedPtr<FJsonObject> jsonObject);
+
+	UFUNCTION(BlueprintCallable)
+	static void CreateVirtualProductionSource();
 };

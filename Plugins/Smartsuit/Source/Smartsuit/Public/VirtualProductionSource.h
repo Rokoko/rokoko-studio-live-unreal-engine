@@ -28,6 +28,7 @@ public:
 		
 	{}
 
+	FVirtualProductionSource(){}
 
 	virtual ~FVirtualProductionSource();
 
@@ -46,6 +47,9 @@ public:
 	void ClearAllSubjects();
 
 	static void SetInstance(TSharedPtr<FVirtualProductionSource> NewInstance) { instance = NewInstance; }
+
+	static TSharedPtr<FVirtualProductionSource> CreateLiveLinkSource();
+	static void RemoveLiveLinkSource(TSharedPtr<FVirtualProductionSource> InSource);
 private:
 	void HandleClearSubject(const FName subjectName);
 	void HandleSubjectData(FVirtualProductionSubject virtualProductionObject);

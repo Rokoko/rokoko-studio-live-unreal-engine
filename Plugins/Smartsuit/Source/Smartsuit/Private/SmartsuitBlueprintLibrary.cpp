@@ -1,12 +1,11 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "SmartsuitBlueprintLibrary.h"
+#include "VirtualProductionSource.h"
 
 ASmartsuitController* USmartsuitBlueprintLibrary::GetSmartsuitControllerByName(FString name)
 {
 	ASmartsuitController* actor = nullptr;
-	// Find UObjects by type
-	//UE_LOG(LogTemp, Warning, TEXT("Looking for actors...%s"), *name);
 
 	for (TObjectIterator<ASmartsuitController> It; It; ++It)
 	{
@@ -14,18 +13,12 @@ ASmartsuitController* USmartsuitBlueprintLibrary::GetSmartsuitControllerByName(F
 		{
 				ASmartsuitController* curActor = *It;
 				FString mySuitName = curActor->suitname;
-				//UE_LOG(LogTemp, Warning, TEXT("Looking for actor.. %s == %s"), *mySuitName, *name);
 				if (name.Compare(mySuitName) == 0) 
 				{
-					//UE_LOG(LogTemp, Warning, TEXT("Actors match!!"));
 					actor = curActor;
 					break;
 				}
 		}
-		//else {
-		//	UE_LOG(LogTemp, Warning, TEXT("Actors no match.."));
-		//}
-		// ...
 	}
 	return actor;
 }
@@ -33,24 +26,18 @@ ASmartsuitController* USmartsuitBlueprintLibrary::GetSmartsuitControllerByName(F
 ASmartsuitController* USmartsuitBlueprintLibrary::GetSmartsuitController(int id)
 {
 	ASmartsuitController* actor = nullptr;
-	// Find UObjects by type
-	//UE_LOG(LogTemp, Warning, TEXT("Looking for actors...%s"), *name);
 
 	for (TObjectIterator<ASmartsuitController> It; It; ++It)
 	{
 		if (It->IsRealLife())
 		{
 			ASmartsuitController* curActor = *It;
-			//UE_LOG(LogTemp, Warning, TEXT("Looking for actor.. %s == %s"), *mySuitName, *name);
+
 			if (id == curActor->IndexID)
 			{
 				actor = curActor;
 				break;
 			}
-			//else {
-			//	UE_LOG(LogTemp, Warning, TEXT("Actors no match.."));
-			//}
-			// ...
 		}
 	}
 	return actor;
@@ -91,4 +78,9 @@ FQuat USmartsuitBlueprintLibrary::GetQuaternionField(TSharedPtr<FJsonObject> jso
 	ReturnVal.Z = jsonObject->GetNumberField("z");
 	ReturnVal.W = jsonObject->GetNumberField("w");
 	return ReturnVal;
+}
+
+void USmartsuitBlueprintLibrary::CreateVirtualProductionSource()
+{
+	FVirtualProductionSource::CreateLiveLinkSource();
 }
