@@ -24,31 +24,33 @@ public class Smartsuit : ModuleRules
         //bFasterWithoutUnity = true;
 
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        PublicIncludePaths.AddRange(
-            new string[] {
-                "Smartsuit/Public",
-                "LiveLink/Public",
-				// ... add public include paths required here ...
-			}
-            );
+        PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
+        PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Private"));
+        //     PublicIncludePaths.AddRange(
+        //         new string[] {
+        //             "Smartsuit/Public",
+        //             "LiveLink/Public",
+        //	// ... add public include paths required here ...
+        //}
+        //         );
 
 
-        PrivateIncludePaths.AddRange(
-            new string[] {
-                "Smartsuit/Private",
-                "LiveLink/Private",
+   //     PrivateIncludePaths.AddRange(
+   //         new string[] {
+   //             "Smartsuit/Private",
+   //             "LiveLink/Private",
 
-				// ... add other private include paths required here ...
-			}
-            );
+			//	// ... add other private include paths required here ...
+			//}
+   //         );
 
 
         PublicDependencyModuleNames.AddRange(
             new string[]
             {
                 //"Core",
-                //"Core", "AnimGraph", "BlueprintGraph", "AnimGraphRuntime", "CoreUObject", "Engine", "InputCore", "Sockets", "Networking",
-                "Core", "CoreUObject", "Engine", "Sockets", "Networking","AnimGraphRuntime","Json", "JsonUtilities", "LiveLink", "RenderCore"/*, "LiveLinkInterface"*/
+                //"Core", "AnimGraph", "BlueprintGraph", "AnimGraphRuntime", "CoreUObject", "Engine", "Sockets", "Networking",
+                "Core", "CoreUObject", "Engine", "Sockets", "Http", "Networking", "AnimGraphRuntime", "Json", "JsonUtilities", "LiveLink", "RenderCore", "InputCore"/*, "LiveLinkInterface"*/
 				// ... add other public dependencies that you statically link with here ...
 			}
             );
@@ -70,11 +72,11 @@ public class Smartsuit : ModuleRules
                 "LiveLinkInterface",
                 "LiveLinkMessageBusFramework",
                 "HeadMountedDisplay",
-                "TimeManagement"
+                "TimeManagement",
+                "SlateCore",
+                "Slate"
                 //"CoreUObject",
                 //"Engine",
-                //"Slate",
-                //"SlateCore",
                 //"InputCore",
                 //"AnimGraph",
                 //"BlueprintGraph",

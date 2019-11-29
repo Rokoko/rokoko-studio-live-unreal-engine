@@ -158,8 +158,9 @@ uint32 SmartsuitStreamingNetwork::Run()
 					memcpy(&(suits[index]), &sd, sizeof(SuitData));
 				}
 
-				FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
-				if (livelink) {
+				auto livelink = FVirtualProductionSource::Get();
+				if (livelink.IsValid()) 
+				{
 					SendSuitsToLiveLink();
 				}
 			}
@@ -168,13 +169,16 @@ uint32 SmartsuitStreamingNetwork::Run()
 	return 0;
 }
 
-void SmartsuitStreamingNetwork::SendSuitsToLiveLink() {
+void SmartsuitStreamingNetwork::SendSuitsToLiveLink() 
+{
 	TArray<SuitData> suitArray;
-	for (int i = 0; i < suitCount; i++) {
+	for (int i = 0; i < suitCount; i++) 
+	{
 		suitArray.Add(suits[i]);
 	}
-	FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
-	if (livelink) {
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid()) 
+	{
 		livelink->HandleSuits(suitArray);
 	}
 }

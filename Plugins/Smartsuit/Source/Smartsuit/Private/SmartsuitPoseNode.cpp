@@ -4,6 +4,7 @@
 #include "Smartsuit.h"
 #include "AnimationRuntime.h"
 #include "SmartsuitDefinitions.h"
+#include "Animation/AnimInstanceProxy.h"
 
 
 
@@ -239,21 +240,26 @@ FVector GetPosition(uint8 sensor, Sensor *sensors, int numOfSensors) {
 	return FVector::ZeroVector;
 }
 
-void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases, TArray<FBoneTransform>& OutBoneTransforms)
+void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseContext& Output, TArray<FBoneTransform>& OutBoneTransforms)
 {
+	USkeletalMeshComponent* SkelComp = Output.AnimInstanceProxy->GetSkelMeshComponent();
+	FCSPose<FCompactPose>& MeshBases = Output.Pose;
+
 	check(OutBoneTransforms.Num() == 0);
-	if (!Controller/* || !Controller->SupportsWiFi()*/) {
+	if (!Controller/* || !Controller->SupportsWiFi()*/) 
+	{
 		return;
 	}
 
 	ASmartsuitReceiver *receiver = GetReceiver();
-	if (!receiver) {
+	if (!receiver) 
+	{
 		//UE_LOG(LogTemp, Warning, TEXT("No receiver"));
-
 		return;
 	}
 	SuitData* data = receiver->GetSmartsuit(Controller->suitname);
-	if (!data) {
+	if (!data) 
+	{
 		//UE_LOG(LogTemp, Warning, TEXT("No data for %s"), *Controller->suitname);
 		return;
 	}
@@ -264,18 +270,19 @@ void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp
 	{
 		if (RelativeToStart) 
 		{
-			if (data->Hip()) 
-			{
-				TPose.startPos = SkelComp->GetComponentLocation();//FVector(OriginalTransform(BoneMap.hip, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases).GetTranslation()) - data->Hip()->UPosition();
-			}
-			else 
+			//if (data->Hip()) 
+			//{
+			//	TPose.startPos = SkelComp->GetComponentLocation();//FVector(OriginalTransform(BoneMap.hip, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases).GetTranslation()) - data->Hip()->UPosition();
+			//}
+			//else 
 			{
 				TPose.startPos = FVector::ZeroVector;
 			}
 			//use always Z from the smartsuit.
 			//TPose.startPos.Z = 0;
 		}
-		else {
+		else 
+		{
 			TPose.startPos = FVector::ZeroVector;
 		}
 
@@ -301,7 +308,8 @@ void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp
 		TPose.StoredTPose = true;
 		return;
 	}
-	if (!TPose.StoredTPose) {
+	if (!TPose.StoredTPose) 
+	{
 		//UE_LOG(LogTemp, Warning, TEXT("No tpose"));
 		return;
 	}
@@ -349,10 +357,12 @@ void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp
 	FQuat rightLegExpected = SMARTSUIT_TPOSE_RIGHT_LEG.Inverse() * TPose.Pose.rightLeg.GetRotation();
 	FQuat rightFootExpected = SMARTSUIT_TPOSE_RIGHT_FOOT.Inverse() * TPose.Pose.rightFoot.GetRotation();
 
-	if (RelativeToStart) {
+	if (RelativeToStart) 
+	{
 		ApplySmartsuitTransform(BoneMap.hip, hipQuat*hipExpected, hipPosition + TPose.startPos, FVector(1, 1, 1), TestBoneControlSpace, SkelComp, MeshBases);
 	}
-	else {
+	else 
+	{
 		ApplySmartsuitTransform(BoneMap.hip, hipQuat*hipExpected, hipPosition, FVector(1, 1, 1), TestBoneControlSpace, SkelComp, MeshBases);
 	}
 	ApplySmartsuitRotation(BoneMap.stomach, stomachQuat * stomachExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
@@ -375,7 +385,8 @@ void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp
 	ApplySmartsuitRotation(BoneMap.rightFoot, rightFootQuat * rightFootExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 
 
-	if (ScaleBones) {
+	if (ScaleBones) 
+	{
 		Body body = Controller->bodyModel.GetBody();
 
 		TArray<FTransform> relativePositions = GetAllBoneTransforms(BoneMap.hip, BCS_ParentBoneSpace, SkelComp, MeshBases);
@@ -400,7 +411,7 @@ void FSmartsuitPoseNode::EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp
 		float leftFootScale = ScaleBonesToDistance(BoneMap.leftFoot, BoneMap.leftFoot, BoneMap.leftToe, (body._foot_length - body._foot_heel_offset) * 100, TestBoneControlSpace, SkelComp, MeshBases);
 		float rightUpLegScale = ScaleBonesToDistance(BoneMap.rightUpleg, BoneMap.rightUpleg, BoneMap.rightLeg, body._thigh * 100, TestBoneControlSpace, SkelComp, MeshBases);
 		float rightLegScale = ScaleBonesToDistance(BoneMap.rightLeg, BoneMap.rightLeg, BoneMap.rightFoot, body._leg * 100, TestBoneControlSpace, SkelComp, MeshBases);
-		float rightFootScale = ScaleBonesToDistance(BoneMap.rightFoot, BoneMap.rightFoot, BoneMap.rightToe, (body._foot_length - body._foot_heel_offset) * 100, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases);
+		float rightFootScale = ScaleBonesToDistance(BoneMap.rightFoot, BoneMap.rightFoot, BoneMap.rightToe, (body._foot_length - body._foot_heel_offset) * 100, TestBoneControlSpace, SkelComp, MeshBases);
 
 		ApplyAllBonePositions(BoneMap.hip, body._hip_width * 100, relativePositions, BCS_ParentBoneSpace, SkelComp, MeshBases);
 	}

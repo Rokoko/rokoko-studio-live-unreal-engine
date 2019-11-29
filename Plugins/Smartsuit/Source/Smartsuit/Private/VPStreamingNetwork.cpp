@@ -4,7 +4,7 @@
 #include "VirtualProductionFrame.h"
 #include "Smartsuit.h"
 #include "Runtime/Core/Public/Containers/UnrealString.h"
-#include "Engine.h"
+//#include "Engine.h"
 #include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
 
 
@@ -17,13 +17,15 @@ VPStreamingNetwork::~VPStreamingNetwork()
 {
 	// Stop the runnable
 	Stop();
-	FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
-	if (livelink) {
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid()) 
+	{
 		livelink->ClearAllSubjects();
 	}
 	//livelink->HandleClearSubject(FLiveLinkClearSubject(FString("subjectNames")));
 
-	if (Socket) {
+	if (Socket) 
+	{
 		Socket->Close();
 	}
 
@@ -36,10 +38,12 @@ VPStreamingNetwork::~VPStreamingNetwork()
 }
 
 
-void VPStreamingNetwork::Start(int port) {
+void VPStreamingNetwork::Start(int port) 
+{
 	streaming_port = port;
 	FString ThreadName(FString::Printf(TEXT("VPStreamingNetwork%ld"), (long)(FDateTime::UtcNow().ToUnixTimestamp())));
-	if (streaming_port) {
+	if (streaming_port) 
+	{
 		UE_LOG(LogTemp, Warning, TEXT("VP port... %i"), streaming_port);
 	}
 	Thread = FRunnableThread::Create(this, *ThreadName, 8 * 1024, TPri_Normal);
@@ -72,20 +76,23 @@ FString BytesToStringFixed(const uint8 *In, int32 Count)
 	return Fixed;
 }
 
-void VPStreamingNetwork::SendToLiveLink(TArray<FVirtualProductionSubject> subjects) {
-	FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
-	if (livelink) {
-		livelink->HandleSubjectFrame(subjects);
+void VPStreamingNetwork::SendToLiveLink(TArray<FVirtualProductionSubject> Subjects) 
+{
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid()) 
+	{
+		livelink->HandleSubjectFrame(Subjects);
 	}
 }
 
-void VPStreamingNetwork::SendFacesToLivelink(TArray<FFace> subjects) {
-	FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
-	if (livelink) {
-		livelink->HandleFace(subjects);
+void VPStreamingNetwork::SendFacesToLivelink(TArray<FFace> Subjects) 
+{
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid()) 
+	{
+		livelink->HandleFace(Subjects);
 	}
 }
-
 
 uint32 VPStreamingNetwork::Run()
 {
@@ -101,9 +108,12 @@ uint32 VPStreamingNetwork::Run()
 
 		FDateTime time = FDateTime::UtcNow();
 		int seconds = time.ToUnixTimestamp();
-		if (Socket) {
-			if (Socket->RecvFrom(data, sizeof(data), bytes_read, *addr_in)) {
-				if (bytes_read == 0) {
+		if (Socket) 
+		{
+			if (Socket->RecvFrom(data, sizeof(data), bytes_read, *addr_in)) 
+			{
+				if (bytes_read == 0) 
+				{
 					continue;
 				}
 				//FGraphEventRef Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]()
@@ -147,7 +157,8 @@ uint32 VPStreamingNetwork::Run()
 				}
 
 				
-				if (!GlobalVPFrame) {
+				if (!GlobalVPFrame) 
+				{
 					GlobalVPFrame = new FVirtualProductionFrame();
 				}
 				GlobalVPFrame->version = VPFrame.version;
@@ -155,34 +166,42 @@ uint32 VPStreamingNetwork::Run()
 				GlobalVPFrame->trackers.Empty();
 				GlobalVPFrame->faces.Empty();
 
-				FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
+				auto livelink = FVirtualProductionSource::Get();
 
-				if (livelink) {
+				if (livelink.IsValid()) 
+				{
 					subjects.Empty();
-					for (int i = 0; i < VPFrame.props.Num(); i++) {
+					for (int i = 0; i < VPFrame.props.Num(); i++) 
+					{
 						GlobalVPFrame->props.Add(VPFrame.props[i]);
 						FVirtualProductionSubject subject = GlobalVPFrame->props[i].GetSubject();
 						subjects.Add(subject);
 					}
-					for (int i = 0; i < VPFrame.trackers.Num(); i++) {
+					for (int i = 0; i < VPFrame.trackers.Num(); i++) 
+					{
 						GlobalVPFrame->trackers.Add(VPFrame.trackers[i]);
 						FVirtualProductionSubject subject = GlobalVPFrame->trackers[i].GetSubject();
 						subjects.Add(subject);
 					}
-					for (int i = 0; i < VPFrame.faces.Num(); i++) {
+					for (int i = 0; i < VPFrame.faces.Num(); i++) 
+					{
 						GlobalVPFrame->faces.Add(VPFrame.faces[i]);
 					}
 					SendToLiveLink(subjects);
 					SendFacesToLivelink(GlobalVPFrame->faces);
 				}
-				else {
-					for (int i = 0; i < VPFrame.props.Num(); i++) {
+				else 
+				{
+					for (int i = 0; i < VPFrame.props.Num(); i++) 
+					{
 						GlobalVPFrame->props.Add(VPFrame.props[i]);
 					}
-					for (int i = 0; i < VPFrame.trackers.Num(); i++) {
+					for (int i = 0; i < VPFrame.trackers.Num(); i++) 
+					{
 						GlobalVPFrame->trackers.Add(VPFrame.trackers[i]);
 					}
-					for (int i = 0; i < VPFrame.faces.Num(); i++) {
+					for (int i = 0; i < VPFrame.faces.Num(); i++) 
+					{
 						//UE_LOG(LogTemp, Warning, TEXT("face: %d - %s - %f"), VPFrame.faces[i].version, *VPFrame.faces[i].provider, VPFrame.faces[i].jawOpen);
 						GlobalVPFrame->faces.Add(VPFrame.faces[i]);
 					}
@@ -204,8 +223,10 @@ FProp* VPStreamingNetwork::GetPropByName(FString name, bool isLive)
 {
 	FProp *result = nullptr;
 	mtx.lock();
-	if (GlobalVPFrame) {
-		for (int i = 0; i < GlobalVPFrame->props.Num(); i++) {
+	if (GlobalVPFrame) 
+	{
+		for (int i = 0; i < GlobalVPFrame->props.Num(); i++) 
+		{
 			if (name == GlobalVPFrame->props[i].name && GlobalVPFrame->props[i].isLive == isLive)
 			{
 				result = &GlobalVPFrame->props[i];
@@ -220,8 +241,10 @@ FTracker* VPStreamingNetwork::GetTrackerByName(FString name, bool isLive)
 {
 	FTracker *result = nullptr;
 	mtx.lock();
-	if (GlobalVPFrame) {
-		for (int i = 0; i < GlobalVPFrame->trackers.Num(); i++) {
+	if (GlobalVPFrame) 
+	{
+		for (int i = 0; i < GlobalVPFrame->trackers.Num(); i++) 
+		{
 			if (name == GlobalVPFrame->trackers[i].name && GlobalVPFrame->trackers[i].isLive == isLive)
 			{
 				result = &GlobalVPFrame->trackers[i];

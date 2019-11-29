@@ -98,12 +98,10 @@ private:
 	/** Connection thread, used to not block the editor when waiting for connections */
 	FRunnableThread* Thread = NULL;
 	FVirtualProductionFrame *GlobalVPFrame;
-	FVirtualProductionSource *GetLiveLink() {
-		return FVirtualProductionSource::Get();
-	}
+	TSharedPtr<FVirtualProductionSource> GetLiveLink() { return FVirtualProductionSource::Get(); }
 	TArray<FVirtualProductionSubject> subjects;
-	void SendToLiveLink(TArray<FVirtualProductionSubject> subjects);
-	void SendFacesToLivelink(TArray<FFace> subjects);
+	void SendToLiveLink(TArray<FVirtualProductionSubject> Subjects);
+	void SendFacesToLivelink(TArray<FFace> Subjects);
 };
 /// @endcond
 

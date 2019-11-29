@@ -2,7 +2,6 @@
 
 #include "VirtualProductionSourceEditor.h"
 #include "LiveLinkMessageBusFinder.h"
-#include "LiveLinkEditor/Private/LiveLinkClientPanel.h"
 #include "Widgets/Layout/SBox.h"
 
 #include "MessageEndpointBuilder.h"

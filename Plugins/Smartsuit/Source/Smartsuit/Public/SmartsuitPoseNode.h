@@ -130,9 +130,8 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 	/// @private
 	virtual void GatherDebugData(FNodeDebugData& DebugData) override;
 	
-	// TODO: Change to EvaluateSkeletalControl_AnyThread to fix C4996 Warning (see FAnimNode_SkeletalControlBase::EvaluateSkeletalControl_AnyThread)
 	/// @private
-	virtual void EvaluateBoneTransforms(USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases, TArray<FBoneTransform>& OutBoneTransforms) override;
+	virtual void EvaluateSkeletalControl_AnyThread(FComponentSpacePoseContext& Output, TArray<FBoneTransform>& OutBoneTransforms) override;
 	
 	/// @private
 	virtual bool IsValidToEvaluate(const USkeleton* Skeleton, const FBoneContainer& RequiredBones) override;

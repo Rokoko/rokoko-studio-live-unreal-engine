@@ -30,7 +30,8 @@ UVirtualProductionSourceFactory::EMenuType UVirtualProductionSourceFactory::GetM
 	{
 		ILiveLinkClient& LiveLinkClient = IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
 		auto livelink = FVirtualProductionSource::Get();
-		if (livelink && !livelink->IsSourceStillValid() || !LiveLinkClient.HasSourceBeenAdded(MakeShareable(livelink)))
+		
+		if (livelink && !livelink.IsValid() || !LiveLinkClient.HasSourceBeenAdded(livelink))
 		{
 			return EMenuType::SubPanel;
 		}
@@ -67,9 +68,21 @@ void UVirtualProductionSourceFactory::OnSourceSelected(FProviderPollResultPtr Se
 #endif
 
 		TSharedPtr<FVirtualProductionSource> SharedPtr = MakeShared<FVirtualProductionSource>(FText::FromString(SelectedSource->Name), FText::FromString(SelectedSource->MachineName), SelectedSource->Address);
+		FVirtualProductionSource::SetInstance(SharedPtr);
 		FString ConnectionString = FString::Printf(TEXT("Name=\"%s\""), *SelectedSource->Name);
 		InOnLiveLinkSourceCreated.ExecuteIfBound(SharedPtr, MoveTemp(ConnectionString));
 	}
+}
+
+TSharedPtr<ILiveLinkSource> UVirtualProductionSourceFactory::CreateSource(const FString& ConnectionString) const
+{
+	FString Name;
+	if (!FParse::Value(*ConnectionString, TEXT("Name="), Name))
+	{
+		return TSharedPtr<ILiveLinkSource>();
+	}
+
+	return MakeShared<FVirtualProductionSource>(FText::FromString(Name), FText::GetEmpty(), FMessageAddress());
 }
 
 #undef LOCTEXT_NAMESPACE

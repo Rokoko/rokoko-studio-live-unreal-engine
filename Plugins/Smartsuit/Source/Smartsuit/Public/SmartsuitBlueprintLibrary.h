@@ -1,4 +1,4 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+// Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #pragma once
 
@@ -7,12 +7,14 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Styling/SlateBrush.h"
 #include "SmartsuitController.h"
-#include "JsonValue.h"
-#include "JsonObject.h"
+#include "Dom/JsonValue.h"
+#include "Dom/JsonObject.h"
 
 #include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
 
 #include "SmartsuitBlueprintLibrary.generated.h"
+
+class FVirtualProductionSource;
 
 /**
  *
@@ -39,7 +41,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Smartsuit", meta = (BlueprintThreadSafe, ToolTip = "Returns a SmartsuitController given it's Index ID. The Index ID is specified in the SmartsuitController details."))
 	static ASmartsuitController* GetSmartsuitController(int id);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category=Test)
 	static void JSONTest();
 
 	static FVector GetVectorField(TSharedPtr<FJsonObject> jsonObject);
@@ -47,4 +49,7 @@ public:
 	static FColor GetFColorField(TSharedPtr<FJsonObject> jsonObject);
 
 	static FQuat GetQuaternionField(TSharedPtr<FJsonObject> jsonObject);
+
+	UFUNCTION(BlueprintCallable, Category = "Smartsuit")
+	static void CreateVirtualProductionSource();
 };

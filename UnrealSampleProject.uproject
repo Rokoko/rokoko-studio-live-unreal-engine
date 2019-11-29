@@ -9,9 +9,9 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
-				"LiveLinkInterface"
-			],
-			"LoadingPhase": "Default"
+				"LiveLinkInterface",
+				"CoreUObject"
+			]
 		}
 	],
 	"Plugins": [

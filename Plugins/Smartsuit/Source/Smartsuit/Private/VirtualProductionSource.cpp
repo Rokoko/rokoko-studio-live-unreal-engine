@@ -1,34 +1,54 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "VirtualProductionSource.h"
+#include "Roles/LiveLinkAnimationRole.h"
+#include "Roles/LiveLinkAnimationTypes.h"
+#include "Roles/LiveLinkCameraTypes.h"
+#include "Roles/LiveLinkCameraRole.h"
+#include "Roles/LiveLinkLightRole.h"
+#include "Roles/LiveLinkLightTypes.h"
+#include "Features/IModularFeatures.h"
 
-FVirtualProductionSource* FVirtualProductionSource::instance = 0;
+
+
+TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::instance = nullptr;
+
+FVirtualProductionSource::~FVirtualProductionSource()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Destroying Virtual production source!!!"));
+}
 
 void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid InSourceGuid)
 {
 	Client = InClient;
+	
 	SourceGuid = InSourceGuid;
-	instance = this;
+	//instance = this;
 }
 
 bool FVirtualProductionSource::IsSourceStillValid() const
 {
-	return true;
+	return Client != nullptr;
 }
 
 void FVirtualProductionSource::HandleClearSubject(const FName subjectName)
 {
-	Client->ClearSubject(subjectName);
+	//Client->ClearSubject(subjectName);
+	Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid,subjectName));
 }
 
-void FVirtualProductionSource::ClearAllSubjects() {
-	for (int i = 0; i < subjectNames.Num(); i++) {
+void FVirtualProductionSource::ClearAllSubjects() 
+{
+	for (int i = 0; i < subjectNames.Num(); i++) 
+	{
 		HandleClearSubject(subjectNames[i]);
 	}
-	for (int i = 0; i < faceNames.Num(); i++) {
+	for (int i = 0; i < faceNames.Num(); i++) 
+	{
 		HandleClearSubject(faceNames[i]);
 	}
-	for (int i = 0; i < suitNames.Num(); i++) {
+	for (int i = 0; i < suitNames.Num(); i++) 
+	{
 		HandleClearSubject(suitNames[i]);
 	}
 
@@ -44,30 +64,140 @@ bool FVirtualProductionSource::RequestSourceShutdown()
 	return true;
 }
 
-void FVirtualProductionSource::HandleFaceData(FFace face) {
+void FVirtualProductionSource::HandleFaceData(FFace face) 
+{
 	//UE_LOG(LogTemp, Warning, TEXT("Creating a new face %s - %f"), *face.GetSubjectName().ToString(), face.jawOpen);
 	faceNames.Add(face.GetSubjectName());
-	FLiveLinkRefSkeleton skeletonRef;
-	Client->PushSubjectSkeleton(SourceGuid, face.GetSubjectName(), skeletonRef);
+
+	FLiveLinkSubjectKey Key = FLiveLinkSubjectKey(SourceGuid, face.GetSubjectName());
+
+	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
+	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
+
+	
+	SkeletonData->PropertyNames.Add("browDownLeft");
+	SkeletonData->PropertyNames.Add("browDownRight");
+	SkeletonData->PropertyNames.Add("browInnerUp");
+	SkeletonData->PropertyNames.Add("browOuterUpLeft");
+	SkeletonData->PropertyNames.Add("browOuterUpRight");
+	SkeletonData->PropertyNames.Add("cheekPuff");
+	SkeletonData->PropertyNames.Add("cheekSquintLeft");
+	SkeletonData->PropertyNames.Add("cheekSquintRight");
+	SkeletonData->PropertyNames.Add("eyeBlinkLeft");
+	SkeletonData->PropertyNames.Add("eyeBlinkRight");
+	SkeletonData->PropertyNames.Add("eyeLookDownLeft");
+	SkeletonData->PropertyNames.Add("eyeLookDownRight");
+	SkeletonData->PropertyNames.Add("eyeLookInLeft");
+	SkeletonData->PropertyNames.Add("eyeLookInRight");
+	SkeletonData->PropertyNames.Add("eyeLookOutLeft");
+	SkeletonData->PropertyNames.Add("eyeLookOutRight");
+	SkeletonData->PropertyNames.Add("eyeLookUpLeft");
+	SkeletonData->PropertyNames.Add("eyeLookUpRight");
+	SkeletonData->PropertyNames.Add("eyeSquintLeft");
+	SkeletonData->PropertyNames.Add("eyeSquintRight");
+	SkeletonData->PropertyNames.Add("eyeWideLeft");
+	SkeletonData->PropertyNames.Add("eyeWideRight");
+	SkeletonData->PropertyNames.Add("jawOpen");
+	SkeletonData->PropertyNames.Add("jawForward");
+	SkeletonData->PropertyNames.Add("jawLeft");
+	SkeletonData->PropertyNames.Add("jawRight");
+	SkeletonData->PropertyNames.Add("mouthClose");
+	SkeletonData->PropertyNames.Add("mouthDimpleLeft");
+	SkeletonData->PropertyNames.Add("mouthDimpleRight");
+	SkeletonData->PropertyNames.Add("mouthFrownLeft");
+	SkeletonData->PropertyNames.Add("mouthFrownRight");
+	SkeletonData->PropertyNames.Add("mouthFunnel");
+	SkeletonData->PropertyNames.Add("mouthLeft");
+	SkeletonData->PropertyNames.Add("mouthLowerDownLeft");
+	SkeletonData->PropertyNames.Add("mouthLowerDownRight");
+	SkeletonData->PropertyNames.Add("mouthPressLeft");
+	SkeletonData->PropertyNames.Add("mouthPressRight");
+	SkeletonData->PropertyNames.Add("mouthPucker");
+	SkeletonData->PropertyNames.Add("mouthRight");
+	SkeletonData->PropertyNames.Add("mouthRollLower");
+	SkeletonData->PropertyNames.Add("mouthRollUpper");
+	SkeletonData->PropertyNames.Add("mouthShrugLower");
+	SkeletonData->PropertyNames.Add("mouthShrugUpper");
+	SkeletonData->PropertyNames.Add("mouthSmileLeft");
+	SkeletonData->PropertyNames.Add("mouthSmileRight");
+	SkeletonData->PropertyNames.Add("mouthStretchLeft");
+	SkeletonData->PropertyNames.Add("mouthStretchRight");
+	SkeletonData->PropertyNames.Add("mouthUpperUpLeft");
+	SkeletonData->PropertyNames.Add("mouthUpperUpRight");
+	SkeletonData->PropertyNames.Add("noseSneerLeft");
+	SkeletonData->PropertyNames.Add("noseSneerRight");
+	SkeletonData->PropertyNames.Add("tongueOut");
+
+	Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
 }
 
 void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtualProductionObject)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("SKELETON!! "), skeleton);
 	subjectNames.Add(virtualProductionObject.name);
-	FLiveLinkRefSkeleton skeletonRef;
-	TArray<FName> boneNames;
-	boneNames.Add("Root");
-	skeletonRef.SetBoneNames(boneNames);
-	TArray<int32> boneParents;
-	boneParents.Add(0);
-	skeletonRef.SetBoneParents(boneParents);
-	Client->PushSubjectSkeleton(SourceGuid, virtualProductionObject.name, skeletonRef);
+
+	FLiveLinkSubjectKey Key = FLiveLinkSubjectKey(SourceGuid, virtualProductionObject.name);
+	Client->RemoveSubject_AnyThread(Key);
+
+	if (virtualProductionObject.name.ToString().StartsWith("prop"))
+	{
+		FString subjectname = virtualProductionObject.name.ToString();
+		int32 indexlastchar = -1;
+		subjectname.FindLastChar(':', indexlastchar);
+		FString testval = subjectname.RightChop(indexlastchar + 1);
+
+		if (testval.StartsWith("Camera"))
+		{
+			FLiveLinkStaticDataStruct CameraData(FLiveLinkCameraStaticData::StaticStruct());
+			FLiveLinkCameraStaticData& CameraStaticData = *CameraData.Cast<FLiveLinkCameraStaticData>();
+			CameraStaticData.bIsFieldOfViewSupported = true;
+			CameraStaticData.bIsAspectRatioSupported = true;
+
+			Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkCameraRole::StaticClass(), MoveTemp(CameraData));
+		}
+		else
+		if (testval.StartsWith("Light"))
+		{
+			FLiveLinkStaticDataStruct LightData(FLiveLinkCameraStaticData::StaticStruct());
+			FLiveLinkLightStaticData& LightStaticData = *LightData.Cast<FLiveLinkLightStaticData>();
+
+			Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkLightRole::StaticClass(), MoveTemp(LightData));
+		}
+		else
+		{
+			TArray<FName> boneNames;
+			boneNames.Add("Root");
+			TArray<int32> boneParents;
+			boneParents.Add(0);
+
+			FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
+			FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
+			SkeletonData->SetBoneNames(boneNames);
+			SkeletonData->SetBoneParents(boneParents);
+			Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
+		}
+	}
+	else
+	{
+		TArray<FName> boneNames;
+		boneNames.Add("Root");
+		TArray<int32> boneParents;
+		boneParents.Add(0);
+
+		FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
+		FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
+		SkeletonData->SetBoneNames(boneNames);
+		SkeletonData->SetBoneParents(boneParents);
+		Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
+	}
+	//UE_LOG(LogTemp, Warning, TEXT("SKELETON!! "), skeleton);
 }
 	
-void FVirtualProductionSource::HandleSuitData(SuitData suit) {
+void FVirtualProductionSource::HandleSuitData(SuitData suit) 
+{
 	suitNames.Add(suit.GetSubjectName());
-	FLiveLinkRefSkeleton skeletonRef;
+
+	FLiveLinkSubjectKey Key = FLiveLinkSubjectKey(SourceGuid, suit.GetSubjectName());
+
 	TArray<FName> boneNames;
 	boneNames.Add("Base");
 	boneNames.Add("Hips");
@@ -121,24 +251,31 @@ void FVirtualProductionSource::HandleSuitData(SuitData suit) {
 	boneParents.Add(17); //18 - RightLeg
 	boneParents.Add(18); //19 - RightFoot
 
-	skeletonRef.SetBoneNames(boneNames);
-	skeletonRef.SetBoneParents(boneParents);
-	Client->PushSubjectSkeleton(SourceGuid, suit.GetSubjectName(), skeletonRef);
+	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
+	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
+	SkeletonData->SetBoneNames(boneNames);
+	SkeletonData->SetBoneParents(boneParents);
+	Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
 }
 
 void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32 index, Sensor* parent, Sensor* sensor) {
 	
 	int32 transformIndex = transforms.AddUninitialized(1);
-	if (!sensor) {
+	if (!sensor) 
+	{
 		transforms[transformIndex].SetLocation(FVector(0, 0, 0));
 		transforms[transformIndex].SetRotation(FQuat::Identity);
 		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
-	} else if (parent) {
+	} 
+	else if (parent) 
+	{
 		FQuat parentRealRotation;
-		if (index == -1) {
+		if (index == -1) 
+		{
 			parentRealRotation = parent->Uquaternion() * FQuat::MakeFromEuler(FVector(0, 0, 180));
 		}
-		else {
+		else 
+		{
 			parentRealRotation = parent->Uquaternion();
 		}
 
@@ -164,22 +301,27 @@ void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32
 		//else {
 		//	realParentPosition = parent->UPosition();
 		//}
-		if (sensor->addr == SENSOR_NECK) {
+		if (sensor->addr == SENSOR_NECK) 
+		{
 			transforms[transformIndex].SetLocation(FVector(0, 20.150345, 0));
 		}
-		else if (sensor->addr == SENSOR_RIGHT_SHOULDER) {
+		else if (sensor->addr == SENSOR_RIGHT_SHOULDER) 
+		{
 			transforms[transformIndex].SetLocation(FVector(7, 12.368073, 1.90378));
 		}
-		else if (sensor->addr == SENSOR_LEFT_SHOULDER) {
+		else if (sensor->addr == SENSOR_LEFT_SHOULDER) 
+		{
 			transforms[transformIndex].SetLocation(FVector(-7, 12.368073, 1.90378));
 		}
-		else {
+		else 
+		{
 			transforms[transformIndex].SetLocation(parentRealRotation.Inverse() * (sensor->UPosition() - parent->UPosition()));
 		}
 		transforms[transformIndex].SetRotation(parentRealRotation.Inverse() * sensor->Uquaternion());
 		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
 	}
-	else {
+	else 
+	{
 		FQuat modifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
 		transforms[transformIndex].SetLocation(sensor->UPosition());
 		transforms[transformIndex].SetRotation(sensor->Uquaternion() * modifier);
@@ -187,54 +329,66 @@ void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32
 	}
 }
 
-void FVirtualProductionSource::HandleSuits(TArray<SuitData> suits) {
+void FVirtualProductionSource::HandleSuits(TArray<SuitData> suits) 
+{
 	//UE_LOG(LogTemp, Warning, TEXT("Handling faces %d"), faces.Num());
 	existingSuits.Empty();
 	notExistingSubjects.Empty();
-	for (int subjectIndex = 0; subjectIndex < suits.Num(); subjectIndex++) {
+	for (int subjectIndex = 0; subjectIndex < suits.Num(); subjectIndex++) 
+	{
 		SuitData subject = suits[subjectIndex];
 
 		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
 		bool nameExists = false;
-		for (int suitNameIndex = 0; suitNameIndex < suitNames.Num(); suitNameIndex++) {
-			if (subject.GetSubjectName() == suitNames[suitNameIndex]) {
+		for (int suitNameIndex = 0; suitNameIndex < suitNames.Num(); suitNameIndex++) 
+		{
+			if (subject.GetSubjectName() == suitNames[suitNameIndex]) 
+			{
 				nameExists = true;
 				existingSuits.Add(subject);
 				break;
 			}
 		}
 
-		if (!nameExists) {
+		if (!nameExists) 
+		{
 			existingSuits.Add(subject);
 			HandleSuitData(subject);
 		}
 		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
-		if (subjectIndex == suits.Num() - 1) {
-			for (int i = 0; i < suitNames.Num(); i++) {
+		if (subjectIndex == suits.Num() - 1) 
+		{
+			for (int i = 0; i < suitNames.Num(); i++) 
+			{
 				bool subjectExists = false;
-				for (int j = 0; j < existingSuits.Num(); j++) {
-					if (suitNames[i] == existingSuits[j].GetSubjectName()) {
+				for (int j = 0; j < existingSuits.Num(); j++) 
+				{
+					if (suitNames[i] == existingSuits[j].GetSubjectName()) 
+					{
 						subjectExists = true;
 					}
 				}
-				if (!subjectExists) {
+				if (!subjectExists) 
+				{
 					notExistingSubjects.Add(suitNames[i]);
 				}
 			}
 
-			for (int i = 0; i < notExistingSubjects.Num(); i++) {
+			for (int i = 0; i < notExistingSubjects.Num(); i++) 
+			{
 				//UE_LOG(LogTemp, Warning, TEXT("Removing face"));
-				Client->ClearSubject(notExistingSubjects[i]);
+				Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, notExistingSubjects[i]));
 				suitNames.RemoveSingle(notExistingSubjects[i]);
 				notExistingSubjects.RemoveAt(i);
 			}
 		}
 
-
-		FLiveLinkFrameData FrameData;
 		FTimer timer;
-		FrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
-		TArray<FTransform>& transforms = FrameData.Transforms;
+		FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
+		FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
+		AnimFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+
+		TArray<FTransform> transforms;
 		transforms.Reset(20);
 		int32 transformIndex = transforms.AddUninitialized(1);
 		
@@ -266,270 +420,127 @@ void FVirtualProductionSource::HandleSuits(TArray<SuitData> suits) {
 		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_UPPER_LEG), subject.GetSensor(SENSOR_RIGHT_LOWER_LEG));
 		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_LOWER_LEG), subject.GetSensor(SENSOR_RIGHT_FOOT));
 		
-		Client->PushSubjectData(SourceGuid, subject.GetSubjectName(), FrameData);
+		AnimFrameData.Transforms.Append(transforms);
+
+		Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData1));
 	}
 }
 
-void FVirtualProductionSource::HandleFace(TArray<FFace> faces) {
+void FVirtualProductionSource::HandleFace(TArray<FFace> faces) 
+{
 	//UE_LOG(LogTemp, Warning, TEXT("Handling faces %d"), faces.Num());
 	existingFaces.Empty();
 	notExistingSubjects.Empty();
-	for (int subjectIndex = 0; subjectIndex < faces.Num(); subjectIndex++) {
+	for (int subjectIndex = 0; subjectIndex < faces.Num(); subjectIndex++) 
+	{
 		FFace subject = faces[subjectIndex];
 
 		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
 		bool nameExists = false;
-		for (int faceNameIndex = 0; faceNameIndex < faceNames.Num(); faceNameIndex++) {
-			if (subject.GetSubjectName() == faceNames[faceNameIndex]) {
+		for (int faceNameIndex = 0; faceNameIndex < faceNames.Num(); faceNameIndex++) 
+		{
+			if (subject.GetSubjectName() == faceNames[faceNameIndex]) 
+			{
 				nameExists = true;
 				existingFaces.Add(subject);
 				break;
 			}
 		}
 
-		if (!nameExists) {
+		if (!nameExists) 
+		{
 			existingFaces.Add(subject);
 			HandleFaceData(subject);
 		}
 		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
-		if (subjectIndex == faces.Num() - 1) {
-			for (int i = 0; i < faceNames.Num(); i++) {
+		if (subjectIndex == faces.Num() - 1) 
+		{
+			for (int i = 0; i < faceNames.Num(); i++) 
+			{
 				bool subjectExists = false;
-				for (int j = 0; j < existingFaces.Num(); j++) {
-					if (faceNames[i] == existingFaces[j].GetSubjectName()) {
+				for (int j = 0; j < existingFaces.Num(); j++) 
+				{
+					if (faceNames[i] == existingFaces[j].GetSubjectName()) 
+					{
 						subjectExists = true;
 					}
 				}
-				if (!subjectExists) {
+				if (!subjectExists) 
+				{
 					notExistingSubjects.Add(faceNames[i]);
 				}
 			}
 
-			for (int i = 0; i < notExistingSubjects.Num(); i++) {
+			for (int i = 0; i < notExistingSubjects.Num(); i++) 
+			{
 				//UE_LOG(LogTemp, Warning, TEXT("Removing face"));
-				Client->ClearSubject(notExistingSubjects[i]);
+				Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, notExistingSubjects[i]));
 				faceNames.RemoveSingle(notExistingSubjects[i]);
 				notExistingSubjects.RemoveAt(i);
 			}
 		}
 
-
-		FLiveLinkFrameData FrameData;
 		FTimer timer;
-		FrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
-		TArray<FLiveLinkCurveElement>& BlendShapes = FrameData.CurveElements;
-		BlendShapes.Reset(52);
-		
-		int32 blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "browDownLeft";
-		BlendShapes[blendIndex].CurveValue = subject.browDownLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "browDownRight";
-		BlendShapes[blendIndex].CurveValue = subject.browDownRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "browInnerUp";
-		BlendShapes[blendIndex].CurveValue = subject.browInnerUp;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "browOuterUpLeft";
-		BlendShapes[blendIndex].CurveValue = subject.browOuterUpLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "browOuterUpRight";
-		BlendShapes[blendIndex].CurveValue = subject.browOuterUpRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "cheekPuff";
-		BlendShapes[blendIndex].CurveValue = subject.cheekPuff;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "cheekSquintLeft";
-		BlendShapes[blendIndex].CurveValue = subject.cheekSquintLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "cheekSquintRight";
-		BlendShapes[blendIndex].CurveValue = subject.cheekSquintRight;
-		
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeBlinkLeft";
-		BlendShapes[blendIndex].CurveValue = subject.eyeBlinkLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeBlinkRight";
-		BlendShapes[blendIndex].CurveValue = subject.eyeBlinkRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeLookDownLeft";
-		BlendShapes[blendIndex].CurveValue = subject.eyeLookDownLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeLookDownRight";
-		BlendShapes[blendIndex].CurveValue = subject.eyeLookDownRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeLookInLeft";
-		BlendShapes[blendIndex].CurveValue = subject.eyeLookInLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeLookInRight";
-		BlendShapes[blendIndex].CurveValue = subject.eyeLookInRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeLookOutLeft";
-		BlendShapes[blendIndex].CurveValue = subject.eyeLookOutLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeLookOutRight";
-		BlendShapes[blendIndex].CurveValue = subject.eyeLookOutRight;
+		FLiveLinkFrameDataStruct FrameData(FLiveLinkAnimationFrameData::StaticStruct());
+		FLiveLinkAnimationFrameData& AnimFrameData = *FrameData.Cast<FLiveLinkAnimationFrameData>();
+		AnimFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
 
 
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeLookUpLeft";
-		BlendShapes[blendIndex].CurveValue = subject.eyeLookUpLeft;
 
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeLookUpRight";
-		BlendShapes[blendIndex].CurveValue = subject.eyeLookUpRight;
+		AnimFrameData.PropertyValues.Add(subject.browDownLeft);
+		AnimFrameData.PropertyValues.Add(subject.browDownRight);
+		AnimFrameData.PropertyValues.Add(subject.browInnerUp);
+		AnimFrameData.PropertyValues.Add(subject.browOuterUpLeft);
+		AnimFrameData.PropertyValues.Add(subject.browOuterUpRight);
+		AnimFrameData.PropertyValues.Add(subject.cheekPuff);
+		AnimFrameData.PropertyValues.Add(subject.cheekSquintLeft);
+		AnimFrameData.PropertyValues.Add(subject.cheekSquintRight);
+		AnimFrameData.PropertyValues.Add(subject.eyeBlinkLeft);
+		AnimFrameData.PropertyValues.Add(subject.eyeBlinkRight);
+		AnimFrameData.PropertyValues.Add(subject.eyeLookDownLeft);
+		AnimFrameData.PropertyValues.Add(subject.eyeLookDownRight);
+		AnimFrameData.PropertyValues.Add(subject.eyeLookInLeft);
+		AnimFrameData.PropertyValues.Add(subject.eyeLookInRight);
+		AnimFrameData.PropertyValues.Add(subject.eyeLookOutLeft);
+		AnimFrameData.PropertyValues.Add(subject.eyeLookOutRight);
+		AnimFrameData.PropertyValues.Add(subject.eyeLookUpLeft);
+		AnimFrameData.PropertyValues.Add(subject.eyeLookUpRight);
+		AnimFrameData.PropertyValues.Add(subject.eyeSquintLeft);
+		AnimFrameData.PropertyValues.Add(subject.eyeSquintRight);
+		AnimFrameData.PropertyValues.Add(subject.eyeWideLeft);
+		AnimFrameData.PropertyValues.Add(subject.eyeWideRight);
+		AnimFrameData.PropertyValues.Add(subject.jawOpen);
+		AnimFrameData.PropertyValues.Add(subject.jawForward);
+		AnimFrameData.PropertyValues.Add(subject.jawLeft);
+		AnimFrameData.PropertyValues.Add(subject.jawRight);
+		AnimFrameData.PropertyValues.Add(subject.mouthClose);
+		AnimFrameData.PropertyValues.Add(subject.mouthDimpleLeft);
+		AnimFrameData.PropertyValues.Add(subject.mouthDimpleRight);
+		AnimFrameData.PropertyValues.Add(subject.mouthFrownLeft);
+		AnimFrameData.PropertyValues.Add(subject.mouthFrownRight);
+		AnimFrameData.PropertyValues.Add(subject.mouthFunnel);
+		AnimFrameData.PropertyValues.Add(subject.mouthLeft);
+		AnimFrameData.PropertyValues.Add(subject.mouthLowerDownLeft);
+		AnimFrameData.PropertyValues.Add(subject.mouthLowerDownRight);
+		AnimFrameData.PropertyValues.Add(subject.mouthPressLeft);
+		AnimFrameData.PropertyValues.Add(subject.mouthPressRight);
+		AnimFrameData.PropertyValues.Add(subject.mouthPucker);
+		AnimFrameData.PropertyValues.Add(subject.mouthRight);
+		AnimFrameData.PropertyValues.Add(subject.mouthRollLower);
+		AnimFrameData.PropertyValues.Add(subject.mouthRollUpper);
+		AnimFrameData.PropertyValues.Add(subject.mouthShrugLower);
+		AnimFrameData.PropertyValues.Add(subject.mouthShrugUpper);
+		AnimFrameData.PropertyValues.Add(subject.mouthSmileLeft);
+		AnimFrameData.PropertyValues.Add(subject.mouthSmileRight);
+		AnimFrameData.PropertyValues.Add(subject.mouthStretchLeft);
+		AnimFrameData.PropertyValues.Add(subject.mouthStretchRight);
+		AnimFrameData.PropertyValues.Add(subject.mouthUpperUpLeft);
+		AnimFrameData.PropertyValues.Add(subject.mouthUpperUpRight);
+		AnimFrameData.PropertyValues.Add(subject.noseSneerLeft);
+		AnimFrameData.PropertyValues.Add(subject.noseSneerRight);
+		AnimFrameData.PropertyValues.Add(subject.tongueOut);
 
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeSquintLeft";
-		BlendShapes[blendIndex].CurveValue = subject.eyeSquintLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeSquintRight";
-		BlendShapes[blendIndex].CurveValue = subject.eyeSquintRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeWideLeft";
-		BlendShapes[blendIndex].CurveValue = subject.eyeWideLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "eyeWideRight";
-		BlendShapes[blendIndex].CurveValue = subject.eyeWideRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "jawOpen";
-		BlendShapes[blendIndex].CurveValue = subject.jawOpen;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "jawForward";
-		BlendShapes[blendIndex].CurveValue = subject.jawForward;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "jawLeft";
-		BlendShapes[blendIndex].CurveValue = subject.jawLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "jawRight";
-		BlendShapes[blendIndex].CurveValue = subject.jawRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthClose";
-		BlendShapes[blendIndex].CurveValue = subject.mouthClose;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthDimpleLeft";
-		BlendShapes[blendIndex].CurveValue = subject.mouthDimpleLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthDimpleRight";
-		BlendShapes[blendIndex].CurveValue = subject.mouthDimpleRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthFrownLeft";
-		BlendShapes[blendIndex].CurveValue = subject.mouthFrownLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthFrownRight";
-		BlendShapes[blendIndex].CurveValue = subject.mouthFrownRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthFunnel";
-		BlendShapes[blendIndex].CurveValue = subject.mouthFunnel;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthLeft";
-		BlendShapes[blendIndex].CurveValue = subject.mouthLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthLowerDownLeft";
-		BlendShapes[blendIndex].CurveValue = subject.mouthLowerDownLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthLowerDownRight";
-		BlendShapes[blendIndex].CurveValue = subject.mouthLowerDownRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthPressLeft";
-		BlendShapes[blendIndex].CurveValue = subject.mouthPressLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthPressRight";
-		BlendShapes[blendIndex].CurveValue = subject.mouthPressRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthPucker";
-		BlendShapes[blendIndex].CurveValue = subject.mouthPucker;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthRight";
-		BlendShapes[blendIndex].CurveValue = subject.mouthRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthRollLower";
-		BlendShapes[blendIndex].CurveValue = subject.mouthRollLower;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthRollUpper";
-		BlendShapes[blendIndex].CurveValue = subject.mouthRollUpper;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthShrugLower";
-		BlendShapes[blendIndex].CurveValue = subject.mouthShrugLower;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthShrugUpper";
-		BlendShapes[blendIndex].CurveValue = subject.mouthShrugUpper;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthSmileLeft";
-		BlendShapes[blendIndex].CurveValue = subject.mouthSmileLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthSmileRight";
-		BlendShapes[blendIndex].CurveValue = subject.mouthSmileRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthStretchLeft";
-		BlendShapes[blendIndex].CurveValue = subject.mouthStretchLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthStretchRight";
-		BlendShapes[blendIndex].CurveValue = subject.mouthStretchRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthUpperUpLeft";
-		BlendShapes[blendIndex].CurveValue = subject.mouthUpperUpLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "mouthUpperUpRight";
-		BlendShapes[blendIndex].CurveValue = subject.mouthUpperUpRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "noseSneerLeft";
-		BlendShapes[blendIndex].CurveValue = subject.noseSneerLeft;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "noseSneerRight";
-		BlendShapes[blendIndex].CurveValue = faces[subjectIndex].noseSneerRight;
-
-		blendIndex = BlendShapes.AddUninitialized(1);
-		BlendShapes[blendIndex].CurveName = "tongueOut";
-		BlendShapes[blendIndex].CurveValue = faces[subjectIndex].tongueOut;
-
-		Client->PushSubjectData(SourceGuid, subject.GetSubjectName(), FrameData);
+		Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData));
 	}
 }
 
@@ -539,54 +550,155 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 	existingSubjects.Empty();
 	notExistingSubjects.Empty();
 
-	for (int i = 0; i < subjectNames.Num(); i++) {
+	for (int i = 0; i < subjectNames.Num(); i++) 
+	{
 		bool subjectExists = false;
-		for (int j = 0; j < subjects.Num(); j++) {
-			if (subjectNames[i] == subjects[j].name) {
+		for (int j = 0; j < subjects.Num(); j++) 
+		{
+			if (subjectNames[i] == subjects[j].name) 
+			{
 				subjectExists = true;
 			}
 		}
-		if (!subjectExists) {
+		if (!subjectExists) 
+		{
 			notExistingSubjects.Add(subjectNames[i]);
 		}
 	}
 
-	for (int i = 0; i < notExistingSubjects.Num(); i++) {
-		Client->ClearSubject(notExistingSubjects[i]);
+	for (int i = 0; i < notExistingSubjects.Num(); i++) 
+	{
+		Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, notExistingSubjects[i]));
 		subjectNames.RemoveSingle(notExistingSubjects[i]);
 	}
 
-	for (int subjectIndex = 0; subjectIndex < subjects.Num(); subjectIndex++) {
+	for (int subjectIndex = 0; subjectIndex < subjects.Num(); subjectIndex++) 
+	{
 		FVirtualProductionSubject subject = subjects[subjectIndex];
 		
 		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
 		bool nameExists = false;
-		for (int subjectNameIndex = 0; subjectNameIndex < subjectNames.Num(); subjectNameIndex++) {
-			if (subject.name == subjectNames[subjectNameIndex]) {
+		for (int subjectNameIndex = 0; subjectNameIndex < subjectNames.Num(); subjectNameIndex++) 
+		{
+			if (subject.name == subjectNames[subjectNameIndex]) 
+			{
 				nameExists = true;
 				existingSubjects.Add(subject);
 				break;
 			}
 		}
 
-		if (!nameExists) {
+		if (!nameExists) 
+		{
 			existingSubjects.Add(subject);
 			HandleSubjectData(subject);
 			existingSubjects.Add(subject);
 		}
+
 
 		FTransform hardCodedTransform;
 		hardCodedTransform.SetTranslation(subject.position);
 		hardCodedTransform.SetRotation(subject.rotation);
 		hardCodedTransform.SetScale3D(FVector(1, 1, 1));
 
-		FLiveLinkFrameData FrameData;
-		FrameData.Transforms.Add(hardCodedTransform);
-		FTimer timer;
+		if (subject.name.ToString().StartsWith("prop"))
+		{
+			FString subjectname = subject.name.ToString();
+			int32 indexlastchar = -1;
+			subjectname.FindLastChar(':', indexlastchar);
+			FString testval = subjectname.RightChop(indexlastchar + 1);
 
-		FrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+			if (testval.StartsWith("Camera"))
+			{
+				FTimer timer;
+				FLiveLinkFrameDataStruct FrameData1(FLiveLinkCameraFrameData::StaticStruct());
+				FLiveLinkCameraFrameData& CameraFrameData = *FrameData1.Cast<FLiveLinkCameraFrameData>();
+				CameraFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+				CameraFrameData.Transform = hardCodedTransform;
+				CameraFrameData.AspectRatio = 1.11f;
+				CameraFrameData.FieldOfView = 130.f;
+				
+				Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.name), MoveTemp(FrameData1));
+			}
+			else
+			if (testval.StartsWith("light"))
+			{
+				FTimer timer;
+				FLiveLinkFrameDataStruct FrameData1(FLiveLinkCameraFrameData::StaticStruct());
+				FLiveLinkLightFrameData& LightFrameData = *FrameData1.Cast<FLiveLinkLightFrameData>();
+				LightFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+				LightFrameData.Transform = hardCodedTransform;
+				//CameraFrameData.LightColor = FColor::Green;
 
-		Client->PushSubjectData(SourceGuid, subject.name, FrameData);
+				Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.name), MoveTemp(FrameData1));
 
+			}
+			else
+			{
+				FTimer timer;
+				FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
+				FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
+				AnimFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+				AnimFrameData.Transforms.Add(hardCodedTransform);
+
+				Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.name), MoveTemp(FrameData1));
+			}
+		}
+		else
+		//if (subject.name.ToString().StartsWith("tracker"))
+		{
+			FTimer timer;
+			FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
+			FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
+			AnimFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+			AnimFrameData.Transforms.Add(hardCodedTransform);
+
+			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.name), MoveTemp(FrameData1));
+		}
+	}
+}
+
+TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::CreateLiveLinkSource()
+{
+	IModularFeatures& ModularFeatures = IModularFeatures::Get();
+
+	if (ModularFeatures.IsModularFeatureAvailable(ILiveLinkClient::ModularFeatureName))
+	{
+		bool bDoesAlreadyExist = false;
+		{
+			ILiveLinkClient& LiveLinkClient = IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
+			TArray<FGuid> Sources = LiveLinkClient.GetSources();
+			for (FGuid SourceGuid : Sources)
+			{
+				if (LiveLinkClient.GetSourceType(SourceGuid).ToString() == "Studio")
+				{
+					UE_LOG(LogTemp, Warning, TEXT("you can't add more than one instance of FVirtualProductionSource!!"));
+					bDoesAlreadyExist = true;
+					break;
+				}
+			}
+		}
+
+		if (!bDoesAlreadyExist)
+		{
+			ILiveLinkClient* LiveLinkClient = &IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
+			TSharedPtr<FVirtualProductionSource> Source = MakeShared<FVirtualProductionSource>(FText::FromString("Studio"), FText::FromString(""), FMessageAddress::NewAddress());
+			FVirtualProductionSource::SetInstance(Source);
+			LiveLinkClient->AddSource(Source);
+			return Source;
+		}
+	}
+	return TSharedPtr<FVirtualProductionSource>();
+}
+
+void FVirtualProductionSource::RemoveLiveLinkSource(TSharedPtr<FVirtualProductionSource> InSource)
+{
+	IModularFeatures& ModularFeatures = IModularFeatures::Get();
+
+	if (ModularFeatures.IsModularFeatureAvailable(ILiveLinkClient::ModularFeatureName))
+	{
+		ILiveLinkClient* LiveLinkClient = &IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
+
+		LiveLinkClient->RemoveSource(InSource);
 	}
 }
