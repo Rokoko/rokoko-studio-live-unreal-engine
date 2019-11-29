@@ -4,6 +4,8 @@
 #include "RokokoStudioCommandAPI.h"
 #include "HttpModule.h"
 #include "Interfaces/IHttpResponse.h"
+#include "Dom/JsonObject.h"
+#include "Serialization/JsonSerializer.h"
 
 URokokoStudioCommandAPI::URokokoStudioCommandAPI()
 {

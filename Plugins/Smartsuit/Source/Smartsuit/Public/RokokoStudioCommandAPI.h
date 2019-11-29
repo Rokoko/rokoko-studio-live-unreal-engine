@@ -12,13 +12,13 @@ struct FRokokoCommandAPI_IPInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, Category="Command API")
 	FString IPAddress;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, Category="Command API")
 	FString Port;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, Category="Command API")
 	FString APIKey;
 };
 
@@ -36,28 +36,28 @@ public:
 
 	URokokoStudioCommandAPI();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Command API")
 	void Restart(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitName);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Command API")
 	void Calibrate(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitName, int32 CountdownDelay=3);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Command API")
 	void StartRecording(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& FileName);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Command API")
 	void StopRecording(const FRokokoCommandAPI_IPInfo& IPInfo);
 
-	UPROPERTY(BlueprintAssignable)
+	UPROPERTY(BlueprintAssignable, Category="Command API")
 	FOnCompletedRequest OnCompletedRequest;
 
-	UPROPERTY(Config, BlueprintReadOnly)
+	UPROPERTY(Config, BlueprintReadOnly, Category="Command API")
 	FRokokoCommandAPI_IPInfo Default_IPInfo;
 
-	UPROPERTY(Config, BlueprintReadOnly)
+	UPROPERTY(Config, BlueprintReadOnly, Category="Command API")
 	FString Default_SmartSuitName;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Command API")
 	void SaveConfigFile(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitname);
 
 	void OnProcessRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);

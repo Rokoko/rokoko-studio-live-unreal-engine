@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "JsonValue.h"
-#include "JsonObject.h"
+#include "Dom/JsonValue.h"
+#include "Dom/JsonObject.h"
 //#include "SmartsuitBlueprintLibrary.h"
 #include "VirtualProductionFrame.generated.h"
 

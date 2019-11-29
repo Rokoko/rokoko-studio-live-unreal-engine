@@ -4,10 +4,10 @@
 #define __SmartsuitEditorPrivatePCH_h__
 
 //#include "SmartsuitEditor.h"
-#include "Engine.h"
+//#include "Engine.h"
 #include "AnimGraphDefinitions.h"
 #include "Kismet2/BlueprintEditorUtils.h"
-#include "UnrealEd.h"
+//#include "UnrealEd.h"
 //#include "Smartsuit.h"
 //#include "Core.h"
 //#include "BlueprintGraphModule.h"

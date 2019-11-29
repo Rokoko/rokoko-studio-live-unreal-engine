@@ -6,7 +6,8 @@
 #include "SmartsuitStreamingNetwork.h"
 #include "VPStreamingNetwork.h"
 #include "VirtualProductionFrame.h"
-#include "Engine.h"
+//#include "Engine.h"
+#include "UObject/UObjectIterator.h"
 #include "SmartsuitReceiver.generated.h"
 
 /*! \brief This AActor class implements the network layer between unreal and the SmartsuitPro.
