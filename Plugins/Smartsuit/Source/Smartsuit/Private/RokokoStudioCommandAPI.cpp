@@ -18,7 +18,7 @@ URokokoStudioCommandAPI::URokokoStudioCommandAPI()
 void URokokoStudioCommandAPI::Restart(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitName)
 {
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
-	JsonObject->SetStringField("smartsuit_name", SmartSuitName);
+	//JsonObject->SetStringField("smartsuit_name", SmartSuitName);
 	FString JsonString;
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
@@ -40,7 +40,7 @@ void URokokoStudioCommandAPI::Restart(const FRokokoCommandAPI_IPInfo& IPInfo, co
 void URokokoStudioCommandAPI::Calibrate(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitName, int32 CountdownDelay)
 {
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
-	JsonObject->SetStringField("smartsuit_name", SmartSuitName);
+	//JsonObject->SetStringField("smartsuit_name", SmartSuitName);
 	JsonObject->SetNumberField("coundtown_delay", CountdownDelay);
 	FString JsonString;
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
@@ -63,7 +63,7 @@ void URokokoStudioCommandAPI::Calibrate(const FRokokoCommandAPI_IPInfo& IPInfo, 
 void URokokoStudioCommandAPI::StartRecording(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& FileName)
 {
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
-	JsonObject->SetStringField("filename", FileName);
+	//JsonObject->SetStringField("filename", FileName);
 	FString JsonString;
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
