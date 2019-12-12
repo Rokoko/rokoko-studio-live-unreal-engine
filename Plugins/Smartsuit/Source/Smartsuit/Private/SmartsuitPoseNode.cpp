@@ -401,10 +401,8 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 
 	FString teststring3 = FString::SanitizeFloat(scale);
 
-	UE_LOG(LogTemp, Warning, TEXT("size 1: %s    size 2: %s"), *teststring1, *teststring2);
-	UE_LOG(LogTemp, Warning, TEXT("scale: %s"), *teststring3);
-
-
+	//UE_LOG(LogTemp, Warning, TEXT("size 1: %s    size 2: %s"), *teststring1, *teststring2);
+	//UE_LOG(LogTemp, Warning, TEXT("scale: %s"), *teststring3);
 
 	if (RelativeToStart) 
 	{
