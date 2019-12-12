@@ -93,7 +93,7 @@ void FSmartsuitPoseNode::ApplySmartsuitTransform(FBoneReference bone, FQuat quat
 	FTransform NewBoneTM = MeshBases.GetComponentSpaceTransform(CompactPoseBoneToModify);
 
 	FAnimationRuntime::ConvertCSTransformToBoneSpace(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
-	NewBoneTM.SetScale3D(scale);
+	//NewBoneTM.SetScale3D(scale);
 	const FQuat BoneQuat(quat);
 	NewBoneTM.SetRotation(BoneQuat);
 	NewBoneTM.SetTranslation(position);
@@ -179,16 +179,16 @@ void FSmartsuitPoseNode::ApplyAllBonePositions(FBoneReference bone, float hipWid
 	{
 		if (i == BoneMap.leftUpleg.BoneIndex || i == BoneMap.rightUpleg.BoneIndex) 
 		{
-			FVector hipWPos = OriginalTransform(BoneMap.hip, BCS_WorldSpace, SkelComp, MeshBases).GetTranslation();
+			FVector hipWPos = OriginalTransform(BoneMap.hip, space, SkelComp, MeshBases).GetTranslation();
 			
 			FVector upLegWPos;
 			if (i == BoneMap.leftUpleg.BoneIndex) 
 			{
-				upLegWPos = OriginalTransform(BoneMap.leftUpleg, BCS_WorldSpace, SkelComp, MeshBases).GetTranslation();
+				upLegWPos = OriginalTransform(BoneMap.leftUpleg, space, SkelComp, MeshBases).GetTranslation();
 			}
 			else 
 			{
-				upLegWPos = OriginalTransform(BoneMap.rightUpleg, BCS_WorldSpace, SkelComp, MeshBases).GetTranslation();
+				upLegWPos = OriginalTransform(BoneMap.rightUpleg, space, SkelComp, MeshBases).GetTranslation();
 			}
 			FVector diff = upLegWPos - hipWPos;
 			FVector dir;
@@ -199,9 +199,9 @@ void FSmartsuitPoseNode::ApplyAllBonePositions(FBoneReference bone, float hipWid
 			//UE_LOG(LogTemp, Warning, TEXT("UpLeg found, will use world lenght: %f, with dir %f, %f, %f"), hipWidth / 2, diff.X, diff.Y, diff.Z);
 
 			//if (i == BoneMap.)
-			FAnimationRuntime::ConvertCSTransformToBoneSpace(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, BCS_WorldSpace);
+			FAnimationRuntime::ConvertCSTransformToBoneSpace(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
 			NewBoneTM.SetTranslation(hipWPos + (dir * (hipWidth / 2)));
-			FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, BCS_WorldSpace);
+			FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
 			MeshBases.SetComponentSpaceTransform(CompactPoseBoneToModify, NewBoneTM);
 		}
 		else 
@@ -234,6 +234,7 @@ float FSmartsuitPoseNode::ScaleBonesToDistance(FBoneReference scaleBone, FBoneRe
 	float currBoneDistance = DistanceBetweenTwoBones(bone1, bone2, space, SkelComp, MeshBases);
 	FVector currScale = OriginalTransform(scaleBone, space, SkelComp, MeshBases).GetTranslation();
 	float boneScale = desiredDistance / currBoneDistance;
+	//float boneScale = 10.f;
 	ApplySmartsuitScale(scaleBone, FVector(boneScale, boneScale, boneScale), space, SkelComp, MeshBases);
 
 	//ApplySmartsuitPosition(nextBone, nextBonePosition, EBoneControlSpace::BCS_ParentBoneSpace, SkelComp, MeshBases);
@@ -300,15 +301,18 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 			//}
 			//else 
 			{
-				TPose.startPos = FVector::ZeroVector;
+				//TPose.startPos = FVector::ZeroVector;
 			}
 			//use always Z from the smartsuit.
 			//TPose.startPos.Z = 0;
 		}
 		else 
 		{
-			TPose.startPos = FVector::ZeroVector;
+			//TPose.startPos = FVector::ZeroVector;
 		}
+
+
+		//TPose.startPos = FVector(OriginalTransform(BoneMap.hip, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases).GetTranslation());
 
 		TPose.Pose.hip = FTransform(OriginalTransform(BoneMap.hip, TestBoneControlSpace, SkelComp, MeshBases));
 		TPose.Pose.stomach = FTransform(OriginalTransform(BoneMap.stomach, TestBoneControlSpace, SkelComp, MeshBases));
@@ -381,13 +385,34 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	FQuat rightLegExpected = SMARTSUIT_TPOSE_RIGHT_LEG.Inverse() * TPose.Pose.rightLeg.GetRotation();
 	FQuat rightFootExpected = SMARTSUIT_TPOSE_RIGHT_FOOT.Inverse() * TPose.Pose.rightFoot.GetRotation();
 
+	//float ImportInformScale = SkelComp->SkeletalMesh->AssetImportData->
+
+	const FBoneContainer& BoneContainer = MeshBases.GetPose().GetBoneContainer();
+	FCompactPoseBoneIndex CompactPoseBoneToModify = BoneMap.hip.GetCompactPoseIndex(BoneContainer);
+	FTransform NewBoneTM = MeshBases.GetLocalSpaceTransform(CompactPoseBoneToModify);//.GetComponentSpaceTransform(CompactPoseBoneToModify);
+
+	float testval1 = NewBoneTM.GetLocation().Size();
+	float testval2 = TPose.Pose.hip.GetLocation().Size();
+
+	float scale = testval2 / testval1;
+
+	FString teststring1 = FString::SanitizeFloat(testval1);
+	FString teststring2 = FString::SanitizeFloat(testval2);
+
+	FString teststring3 = FString::SanitizeFloat(scale);
+
+	UE_LOG(LogTemp, Warning, TEXT("size 1: %s    size 2: %s"), *teststring1, *teststring2);
+	UE_LOG(LogTemp, Warning, TEXT("scale: %s"), *teststring3);
+
+
+
 	if (RelativeToStart) 
 	{
-		ApplySmartsuitTransform(BoneMap.hip, hipQuat*hipExpected, hipPosition + TPose.startPos, FVector(1, 1, 1), TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitTransform(BoneMap.hip, hipQuat*hipExpected, (hipPosition*scale) + TPose.startPos, FVector(1, 1, 1), TestBoneControlSpace, SkelComp, MeshBases);
 	}
 	else 
 	{
-		ApplySmartsuitTransform(BoneMap.hip, hipQuat*hipExpected, hipPosition, FVector(1, 1, 1), TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitTransform(BoneMap.hip, hipQuat*hipExpected, hipPosition * scale, FVector(1, 1, 1), TestBoneControlSpace, SkelComp, MeshBases);
 	}
 	ApplySmartsuitRotation(BoneMap.stomach, stomachQuat * stomachExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 	ApplySmartsuitRotation(BoneMap.chest, chestQuat * chestExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
