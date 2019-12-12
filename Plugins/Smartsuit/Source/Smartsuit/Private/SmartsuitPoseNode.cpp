@@ -42,7 +42,8 @@ void FSmartsuitPoseNode::GatherDebugData(FNodeDebugData& DebugData)
 	ComponentPose.GatherDebugData(DebugData);
 }
 
-void FSmartsuitPoseNode::ApplySmartsuitRotation(FBoneReference bone, FQuat quat, FQuat dir, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) {
+void FSmartsuitPoseNode::ApplySmartsuitRotation(FBoneReference bone, FQuat quat, FQuat dir, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
+{
 	const FBoneContainer& BoneContainer = MeshBases.GetPose().GetBoneContainer();
 
 	FCompactPoseBoneIndex CompactPoseBoneToModify = bone.GetCompactPoseIndex(BoneContainer);
@@ -60,7 +61,8 @@ void FSmartsuitPoseNode::ApplySmartsuitRotation(FBoneReference bone, FQuat quat,
 	//OutBoneTransforms.Add(FBoneTransform(bone.GetCompactPoseIndex(BoneContainer), NewBoneTM));
 }
 
-void FSmartsuitPoseNode::ApplySmartsuitPosition(FBoneReference bone, FVector position, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) {
+void FSmartsuitPoseNode::ApplySmartsuitPosition(FBoneReference bone, FVector position, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
+{
 	const FBoneContainer& BoneContainer = MeshBases.GetPose().GetBoneContainer();
 
 	FCompactPoseBoneIndex CompactPoseBoneToModify = bone.GetCompactPoseIndex(BoneContainer);
@@ -72,7 +74,8 @@ void FSmartsuitPoseNode::ApplySmartsuitPosition(FBoneReference bone, FVector pos
 	MeshBases.SetComponentSpaceTransform(CompactPoseBoneToModify, NewBoneTM);
 }
 
-void FSmartsuitPoseNode::ApplySmartsuitScale(FBoneReference bone, FVector scale, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) {
+void FSmartsuitPoseNode::ApplySmartsuitScale(FBoneReference bone, FVector scale, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
+{
 	const FBoneContainer& BoneContainer = MeshBases.GetPose().GetBoneContainer();
 	FCompactPoseBoneIndex CompactPoseBoneToModify = bone.GetCompactPoseIndex(BoneContainer);
 	FTransform NewBoneTM = MeshBases.GetComponentSpaceTransform(CompactPoseBoneToModify);
@@ -83,7 +86,8 @@ void FSmartsuitPoseNode::ApplySmartsuitScale(FBoneReference bone, FVector scale,
 	MeshBases.SetComponentSpaceTransform(CompactPoseBoneToModify, NewBoneTM);
 }
 
-void FSmartsuitPoseNode::ApplySmartsuitTransform(FBoneReference bone, FQuat quat, FVector position, FVector scale, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) {
+void FSmartsuitPoseNode::ApplySmartsuitTransform(FBoneReference bone, FQuat quat, FVector position, FVector scale, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
+{
 	const FBoneContainer& BoneContainer = MeshBases.GetPose().GetBoneContainer();
 	FCompactPoseBoneIndex CompactPoseBoneToModify = bone.GetCompactPoseIndex(BoneContainer);
 	FTransform NewBoneTM = MeshBases.GetComponentSpaceTransform(CompactPoseBoneToModify);
@@ -98,7 +102,8 @@ void FSmartsuitPoseNode::ApplySmartsuitTransform(FBoneReference bone, FQuat quat
 	//OutBoneTransforms.Add(FBoneTransform(bone.GetCompactPoseIndex(BoneContainer), NewBoneTM));
 }
 
-void FSmartsuitPoseNode::ApplySmartsuitRotationScale(FBoneReference bone, FQuat quat, FVector scale, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) {
+void FSmartsuitPoseNode::ApplySmartsuitRotationScale(FBoneReference bone, FQuat quat, FVector scale, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
+{
 	const FBoneContainer& BoneContainer = MeshBases.GetPose().GetBoneContainer();
 	FCompactPoseBoneIndex CompactPoseBoneToModify = bone.GetCompactPoseIndex(BoneContainer);
 	FTransform NewBoneTM = MeshBases.GetComponentSpaceTransform(CompactPoseBoneToModify);
@@ -112,7 +117,8 @@ void FSmartsuitPoseNode::ApplySmartsuitRotationScale(FBoneReference bone, FQuat 
 	//OutBoneTransforms.Add(FBoneTransform(bone.GetCompactPoseIndex(BoneContainer), NewBoneTM));
 }
 
-float FSmartsuitPoseNode::DistanceBetweenTwoBones(FBoneReference bone1, FBoneReference bone2, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) {
+float FSmartsuitPoseNode::DistanceBetweenTwoBones(FBoneReference bone1, FBoneReference bone2, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
+{
 	const FBoneContainer& BoneContainer = MeshBases.GetPose().GetBoneContainer();
 	
 	FCompactPoseBoneIndex Modify1 = bone1.GetCompactPoseIndex(BoneContainer);
@@ -131,7 +137,8 @@ float FSmartsuitPoseNode::DistanceBetweenTwoBones(FBoneReference bone1, FBoneRef
 }
 
 
-FTransform OriginalTransform(FBoneReference bone, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) {
+FTransform OriginalTransform(FBoneReference bone, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
+{
 	const FBoneContainer& BoneContainer = MeshBases.GetPose().GetBoneContainer();
 	FCompactPoseBoneIndex CompactPoseBoneToModify = bone.GetCompactPoseIndex(BoneContainer);
 	FTransform NewBoneTM = MeshBases.GetComponentSpaceTransform(CompactPoseBoneToModify);
@@ -142,13 +149,16 @@ FTransform OriginalTransform(FBoneReference bone, EBoneControlSpace space, USkel
 	//OutBoneTransforms.Add(FBoneTransform(bone.GetCompactPoseIndex(BoneContainer), NewBoneTM));
 }
 
-TArray<FTransform> FSmartsuitPoseNode::GetAllBoneTransforms(FBoneReference bone, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) {
+TArray<FTransform> FSmartsuitPoseNode::GetAllBoneTransforms(FBoneReference bone, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
+{
 	const FBoneContainer& BoneContainer = MeshBases.GetPose().GetBoneContainer();
 	
 
 	TArray<FTransform> result;
-	for (int i = 0; i < BoneContainer.GetNumBones(); i++) {
-		if (i <= bone.BoneIndex) {
+	for (int i = 0; i < BoneContainer.GetNumBones(); i++) 
+	{
+		if (i <= bone.BoneIndex) 
+		{
 			continue;
 		}
 		FCompactPoseBoneIndex CompactPoseBoneToModify(i);
@@ -161,18 +171,23 @@ TArray<FTransform> FSmartsuitPoseNode::GetAllBoneTransforms(FBoneReference bone,
 	//OutBoneTransforms.Add(FBoneTransform(bone.GetCompactPoseIndex(BoneContainer), NewBoneTM));
 }
 
-void FSmartsuitPoseNode::ApplyAllBonePositions(FBoneReference bone, float hipWidth, TArray<FTransform> transforms, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) {
+void FSmartsuitPoseNode::ApplyAllBonePositions(FBoneReference bone, float hipWidth, TArray<FTransform> transforms, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
+{
 	const FBoneContainer& BoneContainer = MeshBases.GetPose().GetBoneContainer();
 	int index = 0;
-	for (int i = bone.BoneIndex + 1; i < BoneContainer.GetNumBones(); i++) {
-		if (i == BoneMap.leftUpleg.BoneIndex || i == BoneMap.rightUpleg.BoneIndex) {
+	for (int i = bone.BoneIndex + 1; i < BoneContainer.GetNumBones(); i++) 
+	{
+		if (i == BoneMap.leftUpleg.BoneIndex || i == BoneMap.rightUpleg.BoneIndex) 
+		{
 			FVector hipWPos = OriginalTransform(BoneMap.hip, BCS_WorldSpace, SkelComp, MeshBases).GetTranslation();
 			
 			FVector upLegWPos;
-			if (i == BoneMap.leftUpleg.BoneIndex) {
+			if (i == BoneMap.leftUpleg.BoneIndex) 
+			{
 				upLegWPos = OriginalTransform(BoneMap.leftUpleg, BCS_WorldSpace, SkelComp, MeshBases).GetTranslation();
 			}
-			else {
+			else 
+			{
 				upLegWPos = OriginalTransform(BoneMap.rightUpleg, BCS_WorldSpace, SkelComp, MeshBases).GetTranslation();
 			}
 			FVector diff = upLegWPos - hipWPos;
@@ -189,7 +204,8 @@ void FSmartsuitPoseNode::ApplyAllBonePositions(FBoneReference bone, float hipWid
 			FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, BCS_WorldSpace);
 			MeshBases.SetComponentSpaceTransform(CompactPoseBoneToModify, NewBoneTM);
 		}
-		else {
+		else 
+		{
 			FCompactPoseBoneIndex CompactPoseBoneToModify(i);
 			FTransform NewBoneTM = MeshBases.GetComponentSpaceTransform(CompactPoseBoneToModify);
 			//if (i == BoneMap.)
@@ -202,14 +218,16 @@ void FSmartsuitPoseNode::ApplyAllBonePositions(FBoneReference bone, float hipWid
 	}
 }
 
-FVector FSmartsuitPoseNode::GetBoneScale(FBoneReference scaleBone, FBoneReference bone1, FBoneReference bone2, float desiredDistance, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) {
+FVector FSmartsuitPoseNode::GetBoneScale(FBoneReference scaleBone, FBoneReference bone1, FBoneReference bone2, float desiredDistance, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
+{
 	float currBoneDistance = DistanceBetweenTwoBones(bone1, bone2, space, SkelComp, MeshBases);
 	FVector currScale = OriginalTransform(scaleBone, space, SkelComp, MeshBases).GetTranslation();
 	float boneScale = desiredDistance / currBoneDistance;
 	return FVector(boneScale, boneScale, boneScale);
 }
 
-float FSmartsuitPoseNode::ScaleBonesToDistance(FBoneReference scaleBone, FBoneReference bone1, FBoneReference bone2, float desiredDistance, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) {
+float FSmartsuitPoseNode::ScaleBonesToDistance(FBoneReference scaleBone, FBoneReference bone1, FBoneReference bone2, float desiredDistance, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
+{
 	//scale bones...
 	//FVector nextBonePosition = OriginalTransform(nextBone, EBoneControlSpace::BCS_ParentBoneSpace, SkelComp, MeshBases).GetTranslation();
 
@@ -222,18 +240,24 @@ float FSmartsuitPoseNode::ScaleBonesToDistance(FBoneReference scaleBone, FBoneRe
 	return boneScale;
 }
 
-FQuat GetRotation(uint8 sensor, Sensor *sensors, int numOfSensors) {
-	for (int s = 0; s < numOfSensors; s++) {
-		if (sensors[s].addr == sensor) {
+FQuat GetRotation(uint8 sensor, Sensor *sensors, int numOfSensors) 
+{
+	for (int s = 0; s < numOfSensors; s++) 
+	{
+		if (sensors[s].addr == sensor) 
+		{
 			return sensors[s].Uquaternion();
 		}
 	}
 	return FQuat::Identity;
 }
 
-FVector GetPosition(uint8 sensor, Sensor *sensors, int numOfSensors) {
-	for (int s = 0; s < numOfSensors; s++) {
-		if (sensors[s].addr == sensor) {
+FVector GetPosition(uint8 sensor, Sensor *sensors, int numOfSensors) 
+{
+	for (int s = 0; s < numOfSensors; s++) 
+	{
+		if (sensors[s].addr == sensor) 
+		{
 			return sensors[s].UPosition();
 		}
 	}
