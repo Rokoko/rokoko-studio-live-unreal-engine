@@ -20,6 +20,34 @@ FSmartsuitPoseNode::FSmartsuitPoseNode()
 	Controller = nullptr;
 	RelativeToStart = false;
 	ScaleBones = false;
+
+	//if (BoneMapOverride->IsValidLowLevel())
+	//{
+	//	BoneMap.hip = BoneMapOverride->hip;
+	//	BoneMap.stomach = BoneMapOverride->stomach;
+	//	BoneMap.chest = BoneMapOverride->chest;
+	//	BoneMap.neck = BoneMapOverride->neck;
+	//	BoneMap.head = BoneMapOverride->head;
+	//	BoneMap.headTop = BoneMapOverride->headTop;
+	//	BoneMap.leftShoulder = BoneMapOverride->leftShoulder;
+	//	BoneMap.leftArm = BoneMapOverride->leftArm;
+	//	BoneMap.leftForearm = BoneMapOverride->leftForearm;
+	//	BoneMap.leftHand = BoneMapOverride->leftHand;
+	//	BoneMap.leftFingerTip = BoneMapOverride->leftFingerTip;
+	//	BoneMap.rightShoulder = BoneMapOverride->rightShoulder;
+	//	BoneMap.rightArm = BoneMapOverride->rightArm;
+	//	BoneMap.rightForearm = BoneMapOverride->rightForearm;
+	//	BoneMap.rightHand = BoneMapOverride->rightHand;
+	//	BoneMap.rightFingerTip = BoneMapOverride->rightFingerTip;
+	//	BoneMap.leftUpleg = BoneMapOverride->leftUpleg;
+	//	BoneMap.leftLeg = BoneMapOverride->leftLeg;
+	//	BoneMap.leftFoot = BoneMapOverride->leftFoot;
+	//	BoneMap.leftToe = BoneMapOverride->leftToe;
+	//	BoneMap.rightUpleg = BoneMapOverride->rightUpleg;
+	//	BoneMap.rightLeg = BoneMapOverride->rightLeg;
+	//	BoneMap.rightFoot = BoneMapOverride->rightFoot;
+	//	BoneMap.rightToe = BoneMapOverride->rightToe;
+	//}
 }
 
 FSmartsuitPoseNode::~FSmartsuitPoseNode()
@@ -494,6 +522,34 @@ bool FSmartsuitPoseNode::IsValidToEvaluate(const USkeleton* Skeleton, const FBon
 
 void FSmartsuitPoseNode::InitializeBoneReferences(const FBoneContainer& RequiredBones)
 {
+	if (BoneMapOverride->IsValidLowLevel())
+	{
+		BoneMap.hip = BoneMapOverride->hip;
+		BoneMap.stomach = BoneMapOverride->stomach;
+		BoneMap.chest = BoneMapOverride->chest;
+		BoneMap.neck = BoneMapOverride->neck;
+		BoneMap.head = BoneMapOverride->head;
+		BoneMap.headTop = BoneMapOverride->headTop;
+		BoneMap.leftShoulder = BoneMapOverride->leftShoulder;
+		BoneMap.leftArm = BoneMapOverride->leftArm;
+		BoneMap.leftForearm = BoneMapOverride->leftForearm;
+		BoneMap.leftHand = BoneMapOverride->leftHand;
+		BoneMap.leftFingerTip = BoneMapOverride->leftFingerTip;
+		BoneMap.rightShoulder = BoneMapOverride->rightShoulder;
+		BoneMap.rightArm = BoneMapOverride->rightArm;
+		BoneMap.rightForearm = BoneMapOverride->rightForearm;
+		BoneMap.rightHand = BoneMapOverride->rightHand;
+		BoneMap.rightFingerTip = BoneMapOverride->rightFingerTip;
+		BoneMap.leftUpleg = BoneMapOverride->leftUpleg;
+		BoneMap.leftLeg = BoneMapOverride->leftLeg;
+		BoneMap.leftFoot = BoneMapOverride->leftFoot;
+		BoneMap.leftToe = BoneMapOverride->leftToe;
+		BoneMap.rightUpleg = BoneMapOverride->rightUpleg;
+		BoneMap.rightLeg = BoneMapOverride->rightLeg;
+		BoneMap.rightFoot = BoneMapOverride->rightFoot;
+		BoneMap.rightToe = BoneMapOverride->rightToe;
+	}
+
 	BoneMap.hip.Initialize(RequiredBones);
 	BoneMap.stomach.Initialize(RequiredBones);
 	BoneMap.chest.Initialize(RequiredBones);
@@ -518,4 +574,32 @@ void FSmartsuitPoseNode::InitializeBoneReferences(const FBoneContainer& Required
 	BoneMap.rightLeg.Initialize(RequiredBones);
 	BoneMap.rightFoot.Initialize(RequiredBones);
 	BoneMap.rightToe.Initialize(RequiredBones);
+}
+
+USmartsuitBodyMapData::USmartsuitBodyMapData()
+{
+	hip = "hip";
+	stomach = "stomach";
+	chest = "chest";
+	neck = "neck";
+	head = "head";
+	headTop = "headTop";
+	leftShoulder = "leftShoulder";
+	leftArm = "leftArm";
+	leftForearm = "leftForearm";
+	leftHand = "leftHand";
+	leftFingerTip = "leftFingerTip";
+	rightShoulder = "rightShoulder";
+	rightArm = "rightArm";
+	rightForearm = "rightForearm";
+	rightHand = "rightHand";
+	rightFingerTip = "rightFingerTip";
+	leftUpleg = "leftUpleg";
+	leftLeg = "leftLeg";
+	leftFoot = "leftFoot";
+	leftToe = "leftToe";
+	rightUpleg = "rightUpleg";
+	rightLeg = "rightLeg";
+	rightFoot = "rightFoot";
+	rightToe = "rightToe";
 }

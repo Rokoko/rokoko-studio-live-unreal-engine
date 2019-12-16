@@ -40,6 +40,34 @@ void USmartsuitPose::CheckForWarnings(FString name, FBoneReference bone, USkelet
 
 void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, FCompilerResultsLog& MessageLog)
 {
+	if (Node.BoneMapOverride->IsValidLowLevel())
+	{
+		Node.BoneMap.hip =				Node.BoneMapOverride->hip;
+		Node.BoneMap.stomach =			Node.BoneMapOverride->stomach;
+		Node.BoneMap.chest =			Node.BoneMapOverride->chest;
+		Node.BoneMap.neck =				Node.BoneMapOverride->neck;
+		Node.BoneMap.head =				Node.BoneMapOverride->head;
+		Node.BoneMap.headTop =			Node.BoneMapOverride->headTop;
+		Node.BoneMap.leftShoulder =		Node.BoneMapOverride->leftShoulder;
+		Node.BoneMap.leftArm =			Node.BoneMapOverride->leftArm;
+		Node.BoneMap.leftForearm =		Node.BoneMapOverride->leftForearm;
+		Node.BoneMap.leftHand =			Node.BoneMapOverride->leftHand;
+		Node.BoneMap.leftFingerTip =	Node.BoneMapOverride->leftFingerTip;
+		Node.BoneMap.rightShoulder =	Node.BoneMapOverride->rightShoulder;
+		Node.BoneMap.rightArm =			Node.BoneMapOverride->rightArm;
+		Node.BoneMap.rightForearm =		Node.BoneMapOverride->rightForearm;
+		Node.BoneMap.rightHand =		Node.BoneMapOverride->rightHand;
+		Node.BoneMap.rightFingerTip =	Node.BoneMapOverride->rightFingerTip;
+		Node.BoneMap.leftUpleg =		Node.BoneMapOverride->leftUpleg;
+		Node.BoneMap.leftLeg =			Node.BoneMapOverride->leftLeg;
+		Node.BoneMap.leftFoot =			Node.BoneMapOverride->leftFoot;
+		Node.BoneMap.leftToe =			Node.BoneMapOverride->leftToe;
+		Node.BoneMap.rightUpleg =		Node.BoneMapOverride->rightUpleg;
+		Node.BoneMap.rightLeg =			Node.BoneMapOverride->rightLeg;
+		Node.BoneMap.rightFoot =		Node.BoneMapOverride->rightFoot;
+		Node.BoneMap.rightToe =			Node.BoneMapOverride->rightToe;
+	}
+
 	CheckForWarnings("Hip", Node.BoneMap.hip, ForSkeleton, MessageLog);
 	CheckForWarnings("Stomach", Node.BoneMap.stomach, ForSkeleton, MessageLog);
 	CheckForWarnings("Chest", Node.BoneMap.chest, ForSkeleton, MessageLog);

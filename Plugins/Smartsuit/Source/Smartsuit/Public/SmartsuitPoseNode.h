@@ -92,6 +92,87 @@ struct SMARTSUIT_API FSmartsuitBodyMap {
 		FBoneReference rightToe;
 };
 
+UCLASS(BlueprintType)
+class SMARTSUIT_API USmartsuitBodyMapData : public UDataAsset
+{
+	GENERATED_BODY()
+
+	USmartsuitBodyMapData();
+public:
+
+	UPROPERTY(EditAnywhere)
+	FName hip;
+
+	UPROPERTY(EditAnywhere)
+	FName stomach;
+
+	UPROPERTY(EditAnywhere)
+	FName chest;
+
+	UPROPERTY(EditAnywhere)
+	FName neck;
+
+	UPROPERTY(EditAnywhere)
+	FName head;
+
+	UPROPERTY(EditAnywhere)
+	FName headTop;
+
+	UPROPERTY(EditAnywhere)
+	FName leftShoulder;
+
+	UPROPERTY(EditAnywhere)
+	FName leftArm;
+
+	UPROPERTY(EditAnywhere)
+	FName leftForearm;
+
+	UPROPERTY(EditAnywhere)
+	FName leftHand;
+
+	UPROPERTY(EditAnywhere)
+	FName leftFingerTip;
+
+	UPROPERTY(EditAnywhere)
+	FName rightShoulder;
+
+	UPROPERTY(EditAnywhere)
+	FName rightArm;
+
+	UPROPERTY(EditAnywhere)
+	FName rightForearm;
+
+	UPROPERTY(EditAnywhere)
+	FName rightHand;
+
+	UPROPERTY(EditAnywhere)
+	FName rightFingerTip;
+
+	UPROPERTY(EditAnywhere)
+	FName leftUpleg;
+
+	UPROPERTY(EditAnywhere)
+	FName leftLeg;
+
+	UPROPERTY(EditAnywhere)
+	FName leftFoot;
+
+	UPROPERTY(EditAnywhere)
+	FName leftToe;
+
+	UPROPERTY(EditAnywhere)
+	FName rightUpleg;
+
+	UPROPERTY(EditAnywhere)
+	FName rightLeg;
+
+	UPROPERTY(EditAnywhere)
+	FName rightFoot;
+
+	UPROPERTY(EditAnywhere)
+	FName rightToe;
+};
+
 
 /*! \brief An animation controller which poses a humanoid character to the pose as received from the Smartsuit.
 *
@@ -106,6 +187,9 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 	/** Bone mapping between Smartsuit sensors and character's humanoid bones. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SmartsuitAnimationSetup, meta = (ToolTip = "A mapping between the Smartsuit expected bone names and the bones that will animate from the Smartsuit component. Every bone is required for the animation to work properly."))
 	FSmartsuitBodyMap BoneMap;
+
+	UPROPERTY(EditAnywhere)
+	USmartsuitBodyMapData* BoneMapOverride;
 
 	/** The smartsuit controller to use. This defines which Smartsuit to use for the animation. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SmartsuitAnimationSetup, meta = (AlwaysAsPin, ToolTip = "The SmartsuitController that will be used to animate this character. This is required for the animation to work."))
