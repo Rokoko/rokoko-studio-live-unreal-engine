@@ -72,6 +72,7 @@ FFace::FFace(TSharedPtr<FJsonObject> jsonObject)
 {
 	version = jsonObject->GetIntegerField("version");
 	provider = jsonObject->GetStringField("provider");
+	faceId = jsonObject->GetStringField("faceId");
 
 	eyeBlinkLeft = jsonObject->GetNumberField("eyeBlinkLeft");
 	eyeLookDownLeft = jsonObject->GetNumberField("eyeLookDownLeft");

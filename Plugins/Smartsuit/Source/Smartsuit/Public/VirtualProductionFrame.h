@@ -248,6 +248,8 @@ struct FFace
 	int version;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's provider."))
 	FString provider;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's ID."))
+	FString faceId;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
 	float eyeBlinkLeft;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
@@ -354,7 +356,7 @@ struct FFace
 	float tongueOut;
 
 	FName GetSubjectName() {
-		return FName(*provider);
+		return FName(*faceId);
 	}
 };
 
