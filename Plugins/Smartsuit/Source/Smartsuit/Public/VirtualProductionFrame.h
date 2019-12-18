@@ -355,7 +355,8 @@ struct FFace
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
 	float tongueOut;
 
-	FName GetSubjectName() {
+	FName GetSubjectName() 
+	{
 		return FName(*faceId);
 	}
 };
