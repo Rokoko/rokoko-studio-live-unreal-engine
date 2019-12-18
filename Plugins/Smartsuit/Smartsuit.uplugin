@@ -7,7 +7,7 @@
     "Category": "Animation",
     "CreatedBy": "Rokoko Electronics ApS",
     "CreatedByURL": "https://www.rokoko.com",
-    "EngineVersion": "4.23.0",
+    "EngineVersion": "4.24.0",
     "DocsURL": "https://rokokoelectronics.github.io/Smartsuit-Unreal-Plugin-Docs/1.0.0b/annotated.html",
     "MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/7e20fe7d4247410cb4f7d3e162d61c21",
     "SupportURL": "",
@@ -26,7 +26,7 @@
         },
         {
             "Name": "SmartsuitEditor",
-            "Type": "Editor",
+            "Type": "Developer",
             "LoadingPhase": "PreDefault",
             "WhitelistPlatforms": [
                 "Win64"
