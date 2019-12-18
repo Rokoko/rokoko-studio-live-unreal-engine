@@ -1,0 +1,18 @@
+{
+	"source": "UE",
+	"applications": [
+		{
+			"app_key": "application.generated.ue.unrealsampleproject-10570792.ue4editor.exe",
+			"launch_type": "url",
+			"url": "steam://launch/",
+			"action_manifest_path": "C:/GIT/ue4/rokoko-studio-live-unreal-engine/Config/SteamVRBindings/steamvr_manifest.json",
+			"strings":
+			{
+				"en_us":
+				{
+					"name": "UnrealSampleProject-10570792 [UE Editor]"
+				}
+			}
+		}
+	]
+}
