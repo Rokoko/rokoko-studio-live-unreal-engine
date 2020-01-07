@@ -100,76 +100,76 @@ class SMARTSUIT_API USmartsuitBodyMapData : public UDataAsset
 	USmartsuitBodyMapData();
 public:
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName hip;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName stomach;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName chest;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName neck;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName head;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName headTop;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName leftShoulder;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName leftArm;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName leftForearm;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName leftHand;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName leftFingerTip;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName rightShoulder;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName rightArm;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName rightForearm;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName rightHand;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName rightFingerTip;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName leftUpleg;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName leftLeg;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName leftFoot;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName leftToe;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName rightUpleg;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName rightLeg;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName rightFoot;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SkeletalControl)
 	FName rightToe;
 };
 
@@ -188,7 +188,7 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SmartsuitAnimationSetup, meta = (ToolTip = "A mapping between the Smartsuit expected bone names and the bones that will animate from the Smartsuit component. Every bone is required for the animation to work properly."))
 	FSmartsuitBodyMap BoneMap;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = SmartsuitAnimationSetup)
 	USmartsuitBodyMapData* BoneMapOverride;
 
 	/** The smartsuit controller to use. This defines which Smartsuit to use for the animation. */
