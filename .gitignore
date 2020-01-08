@@ -75,3 +75,5 @@ DerivedDataCache/*
 
 #include necessary shared libraries
 !Plugins/Smartsuit/Lib/**
+
+ToRelease/
