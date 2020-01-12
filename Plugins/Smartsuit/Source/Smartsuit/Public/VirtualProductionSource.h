@@ -338,7 +338,7 @@ public:
 
 	void HandleSubjectFrame(TArray<FVirtualProductionSubject> virtualProductionObject);
 	void HandleFace(TArray<FFace> faces);
-	void HandleSuits(TArray<SuitData> suits);
+	void HandleSuits(TArray<FSuitData> suits);
 	void ClearAllSubjects();
 
 	static void SetInstance(TSharedPtr<FVirtualProductionSource> NewInstance) { instance = NewInstance; }
@@ -349,15 +349,15 @@ private:
 	void HandleClearSubject(const FName subjectName);
 	void HandleSubjectData(FVirtualProductionSubject virtualProductionObject);
 	void HandleFaceData(FFace face);
-	void HandleSuitData(SuitData suit);
-	void CreateJoint(TArray<FTransform>& transforms, int32 index, Sensor* parent, Sensor* sensor);
+	void HandleSuitData(FSuitData suit);
+	//void CreateJoint(TArray<FTransform>& transforms, int32 index, Sensor* parent, Sensor* sensor);
 	TArray<FName> subjectNames;
 	TArray<FName> faceNames;
 	TArray<FName> suitNames;
 
 	TArray<FVirtualProductionSubject> existingSubjects;
 	TArray<FFace> existingFaces;
-	TArray<SuitData> existingSuits;
+	TArray<FSuitData> existingSuits;
 
 	TArray<FName> notExistingSubjects;
 

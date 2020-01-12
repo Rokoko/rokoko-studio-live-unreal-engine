@@ -26,7 +26,7 @@ FProfile::FProfile(TSharedPtr<FJsonObject> jsonObject)
 	name = jsonObject->GetStringField("name");
 	uuid = jsonObject->GetStringField("uuid");
 	dimensions = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField("dimensions"));
-	color = USmartsuitBlueprintLibrary::GetFColorField(jsonObject->GetObjectField("color"));
+	color = USmartsuitBlueprintLibrary::GetFLinearColorField(jsonObject->GetObjectField("color"));
 	trackerOffset = FReferencePoint(jsonObject->GetObjectField("trackeroffset"));
 	pivot = FReferencePoint(jsonObject->GetObjectField("pivot"));
 

@@ -94,6 +94,20 @@ void VPStreamingNetwork::SendFacesToLivelink(TArray<FFace> Subjects)
 	}
 }
 
+void VPStreamingNetwork::SendSuitsToLiveLink(TArray<FSuitData> Smartsuits)
+{
+	//TArray<SuitData> suitArray;
+	//for (int i = 0; i < VPFrame.; i++)
+	//{
+	//	suitArray.Add(suits[i]);
+	//}
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		livelink->HandleSuits(Smartsuits);
+	}
+}
+
 uint32 VPStreamingNetwork::Run()
 {
 	bool added = false;
@@ -103,8 +117,8 @@ uint32 VPStreamingNetwork::Run()
 		int32 bytes_read = 0;
 		FString ret;
 
-		uint8 data[8192];
-		memset(data, '\0', 8192);
+		uint8 data[32768];
+		memset(data, '\0', 32768);
 
 		FDateTime time = FDateTime::UtcNow();
 		int seconds = time.ToUnixTimestamp();
@@ -154,6 +168,16 @@ uint32 VPStreamingNetwork::Run()
 					{
 						VPFrame.faces.Add(FFace(currentface->AsObject()));
 					}
+
+					if (JsonObject->HasField("actors"))
+					{
+						TArray<TSharedPtr<FJsonValue>> suitsarray = JsonObject->GetArrayField("actors");
+
+						for (auto& currentsuit : suitsarray)
+						{
+							VPFrame.suits.Add(FSuitData(currentsuit->AsObject()));
+						}
+					}
 				}
 
 				
@@ -165,6 +189,7 @@ uint32 VPStreamingNetwork::Run()
 				GlobalVPFrame->props.Empty();
 				GlobalVPFrame->trackers.Empty();
 				GlobalVPFrame->faces.Empty();
+				GlobalVPFrame->suits.Empty();
 
 				auto livelink = FVirtualProductionSource::Get();
 
@@ -187,8 +212,13 @@ uint32 VPStreamingNetwork::Run()
 					{
 						GlobalVPFrame->faces.Add(VPFrame.faces[i]);
 					}
+					for (int i = 0; i < VPFrame.suits.Num(); i++)
+					{
+						GlobalVPFrame->suits.Add(VPFrame.suits[i]);
+					}
 					SendToLiveLink(subjects);
 					SendFacesToLivelink(GlobalVPFrame->faces);
+					SendSuitsToLiveLink(GlobalVPFrame->suits);
 				}
 				else 
 				{
@@ -204,6 +234,10 @@ uint32 VPStreamingNetwork::Run()
 					{
 						//UE_LOG(LogTemp, Warning, TEXT("face: %d - %s - %f"), VPFrame.faces[i].version, *VPFrame.faces[i].provider, VPFrame.faces[i].jawOpen);
 						GlobalVPFrame->faces.Add(VPFrame.faces[i]);
+					}
+					for (int i = 0; i < VPFrame.suits.Num(); i++)
+					{
+						GlobalVPFrame->suits.Add(VPFrame.suits[i]);
 					}
 				}
 				//UE_LOG(LogTemp, Warning, TEXT("Faces... %i"), GlobalVPFrame->faces.Num());
@@ -252,5 +286,67 @@ FTracker* VPStreamingNetwork::GetTrackerByName(FString name, bool isLive)
 		}
 	}
 	mtx.unlock();
+	return result;
+}
+
+FSuitData* VPStreamingNetwork::GetSmartsuitByName(FString suitName)
+{
+	if (suitName.Len() == 0 || suitName.Compare(FString("")) == 0)
+	{
+		return nullptr;
+	}
+
+	FSuitData* result = nullptr;
+	mtx.lock();
+	if (GlobalVPFrame)
+	{
+		//should probably set the limit to the size of the suit array here?
+		for (int i = 0; i < GlobalVPFrame->suits.Num(); i++)
+		{
+			FString mySuitName(GlobalVPFrame->suits[i].suitname);
+			if (suitName.Compare(mySuitName) == 0 && mySuitName.Len() > 0)
+			{
+				result = &(GlobalVPFrame->suits[i]);
+			}
+		}
+	}
+	mtx.unlock();
+	return result;
+}
+
+TArray<FString> VPStreamingNetwork::GetAvailableSmartsuits()
+{
+	TArray<FString> result;
+	//maybe we should set the limit to the size of the suits array
+	mtx.lock();
+	if (GlobalVPFrame)
+	{
+		for (int i = 0; i < GlobalVPFrame->suits.Num(); i++)
+		{
+			if ((GlobalVPFrame->suits[i].suitname == "\0\0\0\0") /*&& GlobalVPFrame->suits[i].fps > 0*/)
+			{
+				result.Add(FString(GlobalVPFrame->suits[i].suitname));
+			}
+		}
+	}
+	mtx.unlock();
+	return result;
+}
+
+TArray<FProp> VPStreamingNetwork::GetAllProps()
+{
+	//return nullptr;
+	TArray<FProp> result;
+	mtx.lock();
+	if (GlobalVPFrame)
+	{
+		for (int i = 0; i < GlobalVPFrame->props.Num(); i++)
+		{
+			result.Add(GlobalVPFrame->props[i]);
+			//result->Add
+		}
+	}
+	mtx.unlock();
+	//UE_LOG(LogTemp, Display, TEXT("Yeeee3"));
 	return result;
 }

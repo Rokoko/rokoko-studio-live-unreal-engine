@@ -70,21 +70,25 @@ public:
 
 	FProp* GetPropByName(FString name, bool isLive);
 	FTracker* GetTrackerByName(FString name, bool isLive);
+	FSuitData* GetSmartsuitByName(FString suitName);
 
-	TArray<FProp> GetAllProps() {
-		//return nullptr;
-		TArray<FProp> result;
-		mtx.lock();
-		if (GlobalVPFrame) {
-			for (int i = 0; i < GlobalVPFrame->props.Num(); i++) {
-				result.Add(GlobalVPFrame->props[i]);
-				//result->Add
-			}
-		}
-		mtx.unlock();
-		//UE_LOG(LogTemp, Display, TEXT("Yeeee3"));
-		return result;
-	}
+	TArray<FString> GetAvailableSmartsuits();
+
+	TArray<FProp> GetAllProps();
+	//{
+	//	//return nullptr;
+	//	TArray<FProp> result;
+	//	mtx.lock();
+	//	if (GlobalVPFrame) {
+	//		for (int i = 0; i < GlobalVPFrame->props.Num(); i++) {
+	//			result.Add(GlobalVPFrame->props[i]);
+	//			//result->Add
+	//		}
+	//	}
+	//	mtx.unlock();
+	//	//UE_LOG(LogTemp, Display, TEXT("Yeeee3"));
+	//	return result;
+	//}
 
 private:
 	std::mutex mtx;
@@ -102,6 +106,7 @@ private:
 	TArray<FVirtualProductionSubject> subjects;
 	void SendToLiveLink(TArray<FVirtualProductionSubject> Subjects);
 	void SendFacesToLivelink(TArray<FFace> Subjects);
+	void SendSuitsToLiveLink(TArray<FSuitData> Smartsuits);
 };
 /// @endcond
 

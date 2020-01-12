@@ -6,6 +6,7 @@
 #include "Dom/JsonValue.h"
 #include "Dom/JsonObject.h"
 //#include "SmartsuitBlueprintLibrary.h"
+#include "SmartsuitDefinitions.h"
 #include "VirtualProductionFrame.generated.h"
 
 
@@ -75,7 +76,7 @@ struct FProfile {
 
 	/** Holds information about the color. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Profile's color."))
-	FColor color;
+	FLinearColor color;
 
 	/** Tracker offset position and rotation. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Tracker Offset."))
@@ -381,6 +382,10 @@ struct FVirtualProductionFrame {
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "List of faces."))
 	TArray<FFace> faces;
+
+	UPROPERTY()
+	TArray<FSuitData> suits;
+
 	//FVirtualProductionFrame (){}
 };
 

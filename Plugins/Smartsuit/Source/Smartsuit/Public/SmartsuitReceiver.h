@@ -53,7 +53,7 @@ public:
 	* @param suitName The smartsuit name to get the last data for.
 	* @return Returns the last frame received for the smartsuit with name suitName. If no frame is found, it will return nullptr.
 	*/
-	SuitData* GetSmartsuit(FString suitName);
+	FSuitData* GetSmartsuit(FString suitName);
 
 	/**
 	* Lists the names of all known Smartsuits connected to this computer.
@@ -143,7 +143,7 @@ public:
 	/// @endcond
 
 private:
-	SmartsuitStreamingNetwork listener;
+	//SmartsuitStreamingNetwork listener;
 	VPStreamingNetwork VPlistener;
 
 protected:

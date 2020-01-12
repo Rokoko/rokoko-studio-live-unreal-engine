@@ -21,7 +21,8 @@ void ASmartsuitReceiver::BeginPlay()
 	realLife = true;
 }
 
-void ASmartsuitReceiver::BeginDestroy() {
+void ASmartsuitReceiver::BeginDestroy() 
+{
 	Super::BeginDestroy();
 	StopListener();
 }
@@ -33,50 +34,59 @@ void ASmartsuitReceiver::Tick(float DeltaTime)
 }
 
 
-void ASmartsuitReceiver::StartListener() {
+void ASmartsuitReceiver::StartListener()
+{
 	UE_LOG(LogTemp, Warning, TEXT("Listening..."));
-	listener.Start(streamingDataPort);
+	//listener.Start(streamingDataPort);
 	VPlistener.Start(VPListenPort);
 }
 
-void ASmartsuitReceiver::StopListener() {
-	listener.Stop();
+void ASmartsuitReceiver::StopListener() 
+{
+	//listener.Stop();
 	VPlistener.Stop();
 	UE_LOG(LogTemp, Warning, TEXT("Not listening..."));
 }
 
-SuitData * ASmartsuitReceiver::GetSmartsuit(FString suitName)
+FSuitData * ASmartsuitReceiver::GetSmartsuit(FString suitName)
 {
-	if (suitName.Len() == 0 || suitName.Compare(FString("")) == 0) {
-		return nullptr;
-	}
-	for (int i = 0; i < 10; i++) {
-		FString mySuitName(listener.suits[i].suitname);
-		if (suitName.Compare(mySuitName) == 0 && mySuitName.Len() > 0) {
-			return &(listener.suits[i]);
-		}
-	}
-	return nullptr;
+	//if (suitName.Len() == 0 || suitName.Compare(FString("")) == 0) {
+	//	return nullptr;
+	//}
+	//for (int i = 0; i < 10; i++) {
+	//	FString mySuitName(listener.suits[i].suitname);
+	//	if (suitName.Compare(mySuitName) == 0 && mySuitName.Len() > 0) {
+	//		return &(listener.suits[i]);
+	//	}
+	//}
+	//return nullptr;
+	return VPlistener.GetSmartsuitByName(suitName);
 }
 
-FProp* ASmartsuitReceiver::GetPropByNameFromVP(FString name, bool isLive) {
+FProp* ASmartsuitReceiver::GetPropByNameFromVP(FString name, bool isLive) 
+{
 	return VPlistener.GetPropByName(name, isLive);
 }
 
-FTracker* ASmartsuitReceiver::GetTrackerByNameFromVP(FString name, bool isLive) {
+FTracker* ASmartsuitReceiver::GetTrackerByNameFromVP(FString name, bool isLive) 
+{
 	return VPlistener.GetTrackerByName(name, isLive);
 }
 
-TArray<FString> ASmartsuitReceiver::GetAvailableSmartsuits() {
-	TArray<FString> result;
-	for (int i = 0; i < 10; i++) {
-		if (strcmp(listener.suits[i].suitname, "\0\0\0\0") != 0 && listener.suits[i].fps > 0) {
-			result.Add(FString(listener.suits[i].suitname));
-		}
-	}
-	return result;
+TArray<FString> ASmartsuitReceiver::GetAvailableSmartsuits() 
+{
+	//TArray<FString> result;
+	//for (int i = 0; i < 10; i++) {
+	//	if (strcmp(listener.suits[i].suitname, "\0\0\0\0") != 0 && listener.suits[i].fps > 0) {
+	//		result.Add(FString(listener.suits[i].suitname));
+	//	}
+	//}
+	//return result;
+
+	return VPlistener.GetAvailableSmartsuits();
 }
 
-void ASmartsuitReceiver::SetSupportsWiFiAPI(FString suitname) {
-	listener.wifiSupportedSuits.Add(suitname);
+void ASmartsuitReceiver::SetSupportsWiFiAPI(FString suitname) 
+{
+	//listener.wifiSupportedSuits.Add(suitname);
 }

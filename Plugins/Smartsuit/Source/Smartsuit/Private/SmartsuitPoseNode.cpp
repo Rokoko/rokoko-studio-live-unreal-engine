@@ -269,25 +269,49 @@ float FSmartsuitPoseNode::ScaleBonesToDistance(FBoneReference scaleBone, FBoneRe
 	return boneScale;
 }
 
-FQuat GetRotation(uint8 sensor, Sensor *sensors, int numOfSensors) 
+//FQuat GetRotation(uint8 sensor, Sensor *sensors, int numOfSensors) 
+//{
+//	for (int s = 0; s < numOfSensors; s++) 
+//	{
+//		if (sensors[s].addr == sensor) 
+//		{
+//			return sensors[s].Uquaternion();
+//		}
+//	}
+//	return FQuat::Identity;
+//}
+//
+//FVector GetPosition(uint8 sensor, Sensor *sensors, int numOfSensors) 
+//{
+//	for (int s = 0; s < numOfSensors; s++) 
+//	{
+//		if (sensors[s].addr == sensor) 
+//		{
+//			return sensors[s].UPosition();
+//		}
+//	}
+//	return FVector::ZeroVector;
+//}
+
+FQuat GetRotation2(const FString& BoneName, TArray<FSmartsuitBone> SmartsuitBones)
 {
-	for (int s = 0; s < numOfSensors; s++) 
+	for (int s = 0; s < SmartsuitBones.Num(); s++)
 	{
-		if (sensors[s].addr == sensor) 
+		if (SmartsuitBones[s].name == BoneName)
 		{
-			return sensors[s].Uquaternion();
+			return SmartsuitBones[s].Uquaternion();
 		}
 	}
 	return FQuat::Identity;
 }
 
-FVector GetPosition(uint8 sensor, Sensor *sensors, int numOfSensors) 
+FVector GetPosition2(const FString& BoneName, TArray<FSmartsuitBone> SmartsuitBones)
 {
-	for (int s = 0; s < numOfSensors; s++) 
+	for (int s = 0; s < SmartsuitBones.Num(); s++)
 	{
-		if (sensors[s].addr == sensor) 
+		if (SmartsuitBones[s].name == BoneName)
 		{
-			return sensors[s].UPosition();
+			return SmartsuitBones[s].UPosition();
 		}
 	}
 	return FVector::ZeroVector;
@@ -310,7 +334,7 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 		//UE_LOG(LogTemp, Warning, TEXT("No receiver"));
 		return;
 	}
-	SuitData* data = receiver->GetSmartsuit(Controller->suitname);
+	FSuitData* data = receiver->GetSmartsuit(Controller->suitname);
 	if (!data) 
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("No data for %s"), *Controller->suitname);
@@ -372,26 +396,47 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	FQuat modifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
 	FQuat forwardModifier = FQuat::MakeFromEuler(FVector(0, 0, 90));
 
-	FQuat hipQuat = GetRotation(SENSOR_HIP, data->sensors, 19) * modifier;
-	FVector hipPosition = GetPosition(SENSOR_HIP, data->sensors, 19);
-	FQuat stomachQuat = GetRotation(SENSOR_STOMACH, data->sensors, 19);
-	FQuat chestQuat = GetRotation(SENSOR_CHEST, data->sensors, 19);
-	FQuat neckQuat = GetRotation(SENSOR_NECK, data->sensors, 19);
-	FQuat headQuat = GetRotation(SENSOR_HEAD, data->sensors, 19);
-	FQuat leftShoulderQuat = GetRotation(SENSOR_LEFT_SHOULDER, data->sensors, 19);
-	FQuat leftArmQuat = GetRotation(SENSOR_LEFT_UPPER_ARM, data->sensors, 19);
-	FQuat leftForearmQuat = GetRotation(SENSOR_LEFT_LOWER_ARM, data->sensors, 19);
-	FQuat leftHandQuat = GetRotation(SENSOR_LEFT_HAND, data->sensors, 19);
-	FQuat rightShoulderQuat = GetRotation(SENSOR_RIGHT_SHOULDER, data->sensors, 19);
-	FQuat rightArmQuat = GetRotation(SENSOR_RIGHT_UPPER_ARM, data->sensors, 19);
-	FQuat rightForearmQuat = GetRotation(SENSOR_RIGHT_LOWER_ARM, data->sensors, 19);
-	FQuat rightHandQuat = GetRotation(SENSOR_RIGHT_HAND, data->sensors, 19);
-	FQuat leftUpLegQuat = GetRotation(SENSOR_LEFT_UPPER_LEG, data->sensors, 19);
-	FQuat leftLegQuat = GetRotation(SENSOR_LEFT_LOWER_LEG, data->sensors, 19);
-	FQuat leftFootQuat = GetRotation(SENSOR_LEFT_FOOT, data->sensors, 19);
-	FQuat rightUpLegQuat = GetRotation(SENSOR_RIGHT_UPPER_LEG, data->sensors, 19);
-	FQuat rightLegQuat = GetRotation(SENSOR_RIGHT_LOWER_LEG, data->sensors, 19);
-	FQuat rightFootQuat = GetRotation(SENSOR_RIGHT_FOOT, data->sensors, 19);
+	//FQuat hipQuat = GetRotation(SENSOR_HIP, data->sensors, 19) * modifier;
+	//FVector hipPosition = GetPosition(SENSOR_HIP, data->sensors, 19);
+	//FQuat stomachQuat = GetRotation(SENSOR_STOMACH, data->sensors, 19);
+	//FQuat chestQuat = GetRotation(SENSOR_CHEST, data->sensors, 19);
+	//FQuat neckQuat = GetRotation(SENSOR_NECK, data->sensors, 19);
+	//FQuat headQuat = GetRotation(SENSOR_HEAD, data->sensors, 19);
+	//FQuat leftShoulderQuat = GetRotation(SENSOR_LEFT_SHOULDER, data->sensors, 19);
+	//FQuat leftArmQuat = GetRotation(SENSOR_LEFT_UPPER_ARM, data->sensors, 19);
+	//FQuat leftForearmQuat = GetRotation(SENSOR_LEFT_LOWER_ARM, data->sensors, 19);
+	//FQuat leftHandQuat = GetRotation(SENSOR_LEFT_HAND, data->sensors, 19);
+	//FQuat rightShoulderQuat = GetRotation(SENSOR_RIGHT_SHOULDER, data->sensors, 19);
+	//FQuat rightArmQuat = GetRotation(SENSOR_RIGHT_UPPER_ARM, data->sensors, 19);
+	//FQuat rightForearmQuat = GetRotation(SENSOR_RIGHT_LOWER_ARM, data->sensors, 19);
+	//FQuat rightHandQuat = GetRotation(SENSOR_RIGHT_HAND, data->sensors, 19);
+	//FQuat leftUpLegQuat = GetRotation(SENSOR_LEFT_UPPER_LEG, data->sensors, 19);
+	//FQuat leftLegQuat = GetRotation(SENSOR_LEFT_LOWER_LEG, data->sensors, 19);
+	//FQuat leftFootQuat = GetRotation(SENSOR_LEFT_FOOT, data->sensors, 19);
+	//FQuat rightUpLegQuat = GetRotation(SENSOR_RIGHT_UPPER_LEG, data->sensors, 19);
+	//FQuat rightLegQuat = GetRotation(SENSOR_RIGHT_LOWER_LEG, data->sensors, 19);
+	//FQuat rightFootQuat = GetRotation(SENSOR_RIGHT_FOOT, data->sensors, 19);
+
+	FQuat hipQuat = GetRotation2("hip", data->SmartsuitBones) * modifier;
+	FVector hipPosition = GetPosition2("hip", data->SmartsuitBones);
+	FQuat stomachQuat = GetRotation2("spine", data->SmartsuitBones);
+	FQuat chestQuat = GetRotation2("chest", data->SmartsuitBones);
+	FQuat neckQuat = GetRotation2("neck", data->SmartsuitBones);
+	FQuat headQuat = GetRotation2("head", data->SmartsuitBones);
+	FQuat leftShoulderQuat = GetRotation2("leftShoulder", data->SmartsuitBones);
+	FQuat leftArmQuat = GetRotation2("leftUpperArm", data->SmartsuitBones);
+	FQuat leftForearmQuat = GetRotation2("leftLowerArm", data->SmartsuitBones);
+	FQuat leftHandQuat = GetRotation2("leftHand", data->SmartsuitBones);
+	FQuat rightShoulderQuat = GetRotation2("rightShoulder", data->SmartsuitBones);
+	FQuat rightArmQuat = GetRotation2("rightUpperArm", data->SmartsuitBones);
+	FQuat rightForearmQuat = GetRotation2("rightLowerArm", data->SmartsuitBones);
+	FQuat rightHandQuat = GetRotation2("rightHand", data->SmartsuitBones);
+	FQuat leftUpLegQuat = GetRotation2("leftUpLeg", data->SmartsuitBones);
+	FQuat leftLegQuat = GetRotation2("leftLeg", data->SmartsuitBones);
+	FQuat leftFootQuat = GetRotation2("leftFoot", data->SmartsuitBones);
+	FQuat rightUpLegQuat = GetRotation2("rightUpLeg", data->SmartsuitBones);
+	FQuat rightLegQuat = GetRotation2("rightLeg", data->SmartsuitBones);
+	FQuat rightFootQuat = GetRotation2("rightFoot", data->SmartsuitBones);
 
 	FQuat hipExpected = SMARTSUIT_TPOSE_HIP.Inverse() * TPose.Pose.hip.GetRotation();
 	FQuat stomachExpected = SMARTSUIT_TPOSE_STOMACH.Inverse() * TPose.Pose.stomach.GetRotation();

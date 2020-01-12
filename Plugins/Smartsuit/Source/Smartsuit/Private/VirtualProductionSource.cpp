@@ -192,7 +192,7 @@ void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtu
 	//UE_LOG(LogTemp, Warning, TEXT("SKELETON!! "), skeleton);
 }
 	
-void FVirtualProductionSource::HandleSuitData(SuitData suit) 
+void FVirtualProductionSource::HandleSuitData(FSuitData suit) 
 {
 	suitNames.Add(suit.GetSubjectName());
 
@@ -257,7 +257,7 @@ void FVirtualProductionSource::HandleSuitData(SuitData suit)
 	SkeletonData->SetBoneParents(boneParents);
 	Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
 }
-
+/*
 void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32 index, Sensor* parent, Sensor* sensor) {
 	
 	int32 transformIndex = transforms.AddUninitialized(1);
@@ -328,15 +328,15 @@ void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32
 		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
 	}
 }
-
-void FVirtualProductionSource::HandleSuits(TArray<SuitData> suits) 
+*/
+void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits) 
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Handling faces %d"), faces.Num());
 	existingSuits.Empty();
 	notExistingSubjects.Empty();
 	for (int subjectIndex = 0; subjectIndex < suits.Num(); subjectIndex++) 
 	{
-		SuitData subject = suits[subjectIndex];
+		FSuitData subject = suits[subjectIndex];
 
 		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
 		bool nameExists = false;
@@ -396,6 +396,7 @@ void FVirtualProductionSource::HandleSuits(TArray<SuitData> suits)
 		transforms[transformIndex].SetRotation(FQuat::Identity);
 		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
 
+		/*
 		CreateJoint(transforms, 0, nullptr, subject.Hip());
 		CreateJoint(transforms, -1, subject.Hip(), subject.GetSensor(SENSOR_STOMACH));
 		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_STOMACH), subject.GetSensor(SENSOR_CHEST));
@@ -415,11 +416,12 @@ void FVirtualProductionSource::HandleSuits(TArray<SuitData> suits)
 		CreateJoint(transforms, -1, subject.GetSensor(SENSOR_HIP), subject.GetSensor(SENSOR_LEFT_UPPER_LEG));
 		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_LEFT_UPPER_LEG), subject.GetSensor(SENSOR_LEFT_LOWER_LEG));
 		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_LEFT_LOWER_LEG), subject.GetSensor(SENSOR_LEFT_FOOT));
-		
+
 		CreateJoint(transforms, -1, subject.GetSensor(SENSOR_HIP), subject.GetSensor(SENSOR_RIGHT_UPPER_LEG));
 		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_UPPER_LEG), subject.GetSensor(SENSOR_RIGHT_LOWER_LEG));
 		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_LOWER_LEG), subject.GetSensor(SENSOR_RIGHT_FOOT));
-		
+		*/
+
 		AnimFrameData.Transforms.Append(transforms);
 
 		Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData1));
