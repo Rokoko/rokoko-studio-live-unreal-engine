@@ -202,10 +202,25 @@ struct FSmartsuitBone
 	FSmartsuitBone() {}
 	FSmartsuitBone(FString Name, FVector Position, FQuat Rotation) { name = Name; position = Position; rotation = Rotation; }
 
+	FQuat NED2Unreal(FQuat InRotation)
+	{
+		FQuat result(InRotation.X, InRotation.Y, InRotation.Z, InRotation.W);
+		result.Z = -result.Z;
+		result.Y = -result.Y;
+
+		FQuat modifier = FQuat::MakeFromEuler(FVector(180, 0, 90));
+		FQuat postModifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
+		FQuat finalResult = modifier * result * postModifier;
+
+		return FQuat(finalResult.X, finalResult.Y, finalResult.Z, finalResult.W);
+	}
+
 	FQuat Uquaternion()
 	{
 		FQuat result(rotation.Z, rotation.X, rotation.Y, rotation.W);
 		return result;
+
+		//return NED2Unreal(rotation);
 	}
 
 	FVector UPosition()

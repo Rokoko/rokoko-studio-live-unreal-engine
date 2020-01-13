@@ -218,7 +218,7 @@ uint32 VPStreamingNetwork::Run()
 					}
 					SendToLiveLink(subjects);
 					SendFacesToLivelink(GlobalVPFrame->faces);
-					SendSuitsToLiveLink(GlobalVPFrame->suits);
+					//SendSuitsToLiveLink(GlobalVPFrame->suits);
 				}
 				else 
 				{

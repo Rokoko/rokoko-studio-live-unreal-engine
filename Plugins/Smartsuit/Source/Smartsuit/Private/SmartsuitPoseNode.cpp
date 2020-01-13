@@ -419,6 +419,30 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 
 	FQuat hipQuat = GetRotation2("hip", data->SmartsuitBones) * modifier;
 	FVector hipPosition = GetPosition2("hip", data->SmartsuitBones);
+
+	/*
+	UE_LOG(LogTemp, Warning, TEXT("hip position: %s"), *hipPosition.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("hip quat: %s"), *hipQuat.ToString());
+
+	FQuat unmodifiedHipQuat = GetRotation2("hip", data->SmartsuitBones);
+	UE_LOG(LogTemp, Warning, TEXT("unmodified hip quat: %s"), *unmodifiedHipQuat.ToString());
+
+	FRotator rotatortest = GetRotation2("hip", data->SmartsuitBones).Rotator();
+	UE_LOG(LogTemp, Warning, TEXT("rotator: %s"), *rotatortest.ToString());
+
+	for (int s = 0; s < data->SmartsuitBones.Num(); s++)
+	{
+		if (data->SmartsuitBones[s].name == "hip")
+		{
+			FQuat rawQuat = data->SmartsuitBones[s].rotation;
+			UE_LOG(LogTemp, Warning, TEXT("raw quat: %s"), *rawQuat.ToString());
+
+			FRotator rawRotator = rawQuat.Rotator();
+			UE_LOG(LogTemp, Warning, TEXT("raw rotator: %s"), *rawRotator.ToString());
+		}
+	}
+	*/
+
 	FQuat stomachQuat = GetRotation2("spine", data->SmartsuitBones);
 	FQuat chestQuat = GetRotation2("chest", data->SmartsuitBones);
 	FQuat neckQuat = GetRotation2("neck", data->SmartsuitBones);
