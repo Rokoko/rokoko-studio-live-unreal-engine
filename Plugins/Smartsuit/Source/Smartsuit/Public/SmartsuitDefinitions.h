@@ -215,7 +215,7 @@ struct FSmartsuitBone
 		return FQuat(finalResult.X, finalResult.Y, finalResult.Z, finalResult.W);
 	}
 
-	FQuat Uquaternion()
+	FQuat Uquaternion() const
 	{
 		FQuat result(rotation.Z, rotation.X, rotation.Y, rotation.W);
 		return result;
@@ -223,7 +223,7 @@ struct FSmartsuitBone
 		//return NED2Unreal(rotation);
 	}
 
-	FVector UPosition()
+	FVector UPosition() const
 	{
 		return FVector(100.0f * position.Z, 100.0f * position.X, 100.0f * position.Y);
 	}
@@ -261,7 +261,8 @@ struct FSuitData
 
 	FLinearColor color;
 
-	TArray<FSmartsuitBone> SmartsuitBones;
+	//TArray<FSmartsuitBone> SmartsuitBones;
+	TMap<FName, FSmartsuitBone> SmartsuitBones;
 
 	FSmartsuitBone* Hip()
 	{
@@ -270,14 +271,16 @@ struct FSuitData
 
 	FSmartsuitBone* GetBoneByName(const FString& BoneName)
 	{
-		for (int i = 0; i < SmartsuitBones.Num(); i++)
-		{
-			if (SmartsuitBones[i].name == BoneName)
-			{
-				return &(SmartsuitBones[i]);
-			}
-		}
-		return nullptr;
+		//for (int i = 0; i < SmartsuitBones.Num(); i++)
+		//{
+		//	if (SmartsuitBones[i].name == BoneName)
+		//	{
+		//		return &(SmartsuitBones[i]);
+		//	}
+		//}
+		//return nullptr;
+
+		return SmartsuitBones.Find(FName(*BoneName));
 	}
 
 	FName GetSubjectName()

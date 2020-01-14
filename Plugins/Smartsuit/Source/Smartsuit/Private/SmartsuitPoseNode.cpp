@@ -293,27 +293,23 @@ float FSmartsuitPoseNode::ScaleBonesToDistance(FBoneReference scaleBone, FBoneRe
 //	return FVector::ZeroVector;
 //}
 
-FQuat GetRotation2(const FString& BoneName, TArray<FSmartsuitBone> SmartsuitBones)
+FQuat GetRotation2(const FString& BoneName, const TMap<FName, FSmartsuitBone>& SmartsuitBones)
 {
-	for (int s = 0; s < SmartsuitBones.Num(); s++)
+	if (auto SmartsuitBone = SmartsuitBones.Find(FName(*BoneName)))
 	{
-		if (SmartsuitBones[s].name == BoneName)
-		{
-			return SmartsuitBones[s].Uquaternion();
-		}
+		return SmartsuitBone->Uquaternion();
 	}
+
 	return FQuat::Identity;
 }
 
-FVector GetPosition2(const FString& BoneName, TArray<FSmartsuitBone> SmartsuitBones)
+FVector GetPosition2(const FString& BoneName, const TMap<FName, FSmartsuitBone>& SmartsuitBones)
 {
-	for (int s = 0; s < SmartsuitBones.Num(); s++)
+	if (auto SmartsuitBone = SmartsuitBones.Find(FName(*BoneName)))
 	{
-		if (SmartsuitBones[s].name == BoneName)
-		{
-			return SmartsuitBones[s].UPosition();
-		}
+		return SmartsuitBone->UPosition();
 	}
+
 	return FVector::ZeroVector;
 }
 

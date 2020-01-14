@@ -92,6 +92,6 @@ void FSuitData::ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& Bon
 		TSharedPtr<FJsonObject> BoneObject = jsonObject->GetObjectField(BoneName);
 		FVector SensorPosition = USmartsuitBlueprintLibrary::GetVectorField(BoneObject->GetObjectField("position"));
 		FQuat SensorRotation = USmartsuitBlueprintLibrary::GetQuaternionField(BoneObject->GetObjectField("rotation"));
-		SmartsuitBones.Add(FSmartsuitBone(BoneName, SensorPosition, SensorRotation));
+		SmartsuitBones.Add(FName(*BoneName), FSmartsuitBone(BoneName, SensorPosition, SensorRotation));
 	}
 }
