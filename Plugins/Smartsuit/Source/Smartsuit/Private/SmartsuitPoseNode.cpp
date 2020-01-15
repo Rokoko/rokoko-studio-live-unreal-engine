@@ -415,6 +415,27 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 
 	FQuat hipQuat = GetRotation2("hip", data->SmartsuitBones) * modifier;
 	FVector hipPosition = GetPosition2("hip", data->SmartsuitBones);
+	FQuat stomachQuat = GetRotation2("spine", data->SmartsuitBones);
+	FQuat chestQuat = GetRotation2("chest", data->SmartsuitBones);
+	FQuat neckQuat = GetRotation2("neck", data->SmartsuitBones);
+	FQuat headQuat = GetRotation2("head", data->SmartsuitBones);
+	FQuat leftShoulderQuat = GetRotation2("leftShoulder", data->SmartsuitBones);
+	FQuat leftArmQuat = GetRotation2("leftUpperArm", data->SmartsuitBones);
+	FQuat leftForearmQuat = GetRotation2("leftLowerArm", data->SmartsuitBones);
+	FQuat leftHandQuat = GetRotation2("leftHand", data->SmartsuitBones);
+	FQuat rightShoulderQuat = GetRotation2("rightShoulder", data->SmartsuitBones);
+	FQuat rightArmQuat = GetRotation2("rightUpperArm", data->SmartsuitBones);
+	FQuat rightForearmQuat = GetRotation2("rightLowerArm", data->SmartsuitBones);
+	FQuat rightHandQuat = GetRotation2("rightHand", data->SmartsuitBones);
+	FQuat leftUpLegQuat = GetRotation2("leftUpLeg", data->SmartsuitBones);
+	FQuat leftLegQuat = GetRotation2("leftLeg", data->SmartsuitBones);
+	FQuat leftFootQuat = GetRotation2("leftFoot", data->SmartsuitBones);
+	FQuat rightUpLegQuat = GetRotation2("rightUpLeg", data->SmartsuitBones);
+	FQuat rightLegQuat = GetRotation2("rightLeg", data->SmartsuitBones);
+	FQuat rightFootQuat = GetRotation2("rightFoot", data->SmartsuitBones);
+
+
+
 
 	/*
 	UE_LOG(LogTemp, Warning, TEXT("hip position: %s"), *hipPosition.ToString());
@@ -439,24 +460,9 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	}
 	*/
 
-	FQuat stomachQuat = GetRotation2("spine", data->SmartsuitBones);
-	FQuat chestQuat = GetRotation2("chest", data->SmartsuitBones);
-	FQuat neckQuat = GetRotation2("neck", data->SmartsuitBones);
-	FQuat headQuat = GetRotation2("head", data->SmartsuitBones);
-	FQuat leftShoulderQuat = GetRotation2("leftShoulder", data->SmartsuitBones);
-	FQuat leftArmQuat = GetRotation2("leftUpperArm", data->SmartsuitBones);
-	FQuat leftForearmQuat = GetRotation2("leftLowerArm", data->SmartsuitBones);
-	FQuat leftHandQuat = GetRotation2("leftHand", data->SmartsuitBones);
-	FQuat rightShoulderQuat = GetRotation2("rightShoulder", data->SmartsuitBones);
-	FQuat rightArmQuat = GetRotation2("rightUpperArm", data->SmartsuitBones);
-	FQuat rightForearmQuat = GetRotation2("rightLowerArm", data->SmartsuitBones);
-	FQuat rightHandQuat = GetRotation2("rightHand", data->SmartsuitBones);
-	FQuat leftUpLegQuat = GetRotation2("leftUpLeg", data->SmartsuitBones);
-	FQuat leftLegQuat = GetRotation2("leftLeg", data->SmartsuitBones);
-	FQuat leftFootQuat = GetRotation2("leftFoot", data->SmartsuitBones);
-	FQuat rightUpLegQuat = GetRotation2("rightUpLeg", data->SmartsuitBones);
-	FQuat rightLegQuat = GetRotation2("rightLeg", data->SmartsuitBones);
-	FQuat rightFootQuat = GetRotation2("rightFoot", data->SmartsuitBones);
+
+
+
 
 	FQuat hipExpected = SMARTSUIT_TPOSE_HIP.Inverse() * TPose.Pose.hip.GetRotation();
 	FQuat stomachExpected = SMARTSUIT_TPOSE_STOMACH.Inverse() * TPose.Pose.stomach.GetRotation();
@@ -489,10 +495,10 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 
 	float scale = testval2 / testval1;
 
-	FString teststring1 = FString::SanitizeFloat(testval1);
-	FString teststring2 = FString::SanitizeFloat(testval2);
+	//FString teststring1 = FString::SanitizeFloat(testval1);
+	//FString teststring2 = FString::SanitizeFloat(testval2);
 
-	FString teststring3 = FString::SanitizeFloat(scale);
+	//FString teststring3 = FString::SanitizeFloat(scale);
 
 	//UE_LOG(LogTemp, Warning, TEXT("size 1: %s    size 2: %s"), *teststring1, *teststring2);
 	//UE_LOG(LogTemp, Warning, TEXT("scale: %s"), *teststring3);
