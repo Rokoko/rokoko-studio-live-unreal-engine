@@ -413,7 +413,7 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	//FQuat rightLegQuat = GetRotation(SENSOR_RIGHT_LOWER_LEG, data->sensors, 19);
 	//FQuat rightFootQuat = GetRotation(SENSOR_RIGHT_FOOT, data->sensors, 19);
 
-	FQuat hipQuat = GetRotation2("hip", data->SmartsuitBones) * modifier;
+	FQuat hipQuat = GetRotation2("hip", data->SmartsuitBones);// *modifier;
 	FVector hipPosition = GetPosition2("hip", data->SmartsuitBones);
 	FQuat stomachQuat = GetRotation2("spine", data->SmartsuitBones);
 	FQuat chestQuat = GetRotation2("chest", data->SmartsuitBones);

@@ -218,6 +218,11 @@ struct FSmartsuitBone
 	FQuat Uquaternion() const
 	{
 		FQuat result(rotation.Z, rotation.X, rotation.Y, rotation.W);
+
+		FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, -90));
+
+		result *= modifier;
+
 		return result;
 
 		//return NED2Unreal(rotation);
