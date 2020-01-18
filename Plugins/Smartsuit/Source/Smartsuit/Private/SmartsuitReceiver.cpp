@@ -48,7 +48,7 @@ void ASmartsuitReceiver::StopListener()
 	UE_LOG(LogTemp, Warning, TEXT("Not listening..."));
 }
 
-FSuitData * ASmartsuitReceiver::GetSmartsuit(FString suitName)
+FSuitData* ASmartsuitReceiver::GetSmartsuit(FString suitName)
 {
 	//if (suitName.Len() == 0 || suitName.Compare(FString("")) == 0) {
 	//	return nullptr;
@@ -62,6 +62,10 @@ FSuitData * ASmartsuitReceiver::GetSmartsuit(FString suitName)
 	//return nullptr;
 	return VPlistener.GetSmartsuitByName(suitName);
 }
+FSuitData ASmartsuitReceiver::GetSmartsuitByName(FString suitName)
+{
+	return *VPlistener.GetSmartsuitByName(suitName);
+}
 
 FProp* ASmartsuitReceiver::GetPropByNameFromVP(FString name, bool isLive) 
 {
@@ -73,7 +77,7 @@ FTracker* ASmartsuitReceiver::GetTrackerByNameFromVP(FString name, bool isLive)
 	return VPlistener.GetTrackerByName(name, isLive);
 }
 
-TArray<FString> ASmartsuitReceiver::GetAvailableSmartsuits() 
+TArray<FString> ASmartsuitReceiver::GetAvailableSmartsuitNames() 
 {
 	//TArray<FString> result;
 	//for (int i = 0; i < 10; i++) {
@@ -83,7 +87,7 @@ TArray<FString> ASmartsuitReceiver::GetAvailableSmartsuits()
 	//}
 	//return result;
 
-	return VPlistener.GetAvailableSmartsuits();
+	return VPlistener.GetAvailableSmartsuitNames();
 }
 
 void ASmartsuitReceiver::SetSupportsWiFiAPI(FString suitname) 

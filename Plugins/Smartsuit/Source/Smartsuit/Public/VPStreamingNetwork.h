@@ -72,7 +72,7 @@ public:
 	FTracker* GetTrackerByName(FString name, bool isLive);
 	FSuitData* GetSmartsuitByName(FString suitName);
 
-	TArray<FString> GetAvailableSmartsuits();
+	TArray<FString> GetAvailableSmartsuitNames();
 
 	TArray<FProp> GetAllProps();
 	//{

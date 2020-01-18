@@ -59,10 +59,10 @@ void ASmartsuitController::Tick(float DeltaTime)
 
 	if (AutoConnect) 
 	{
-		TArray<FString> suits = listener->GetAvailableSmartsuits();
-		if (suits.Num() > 0) 
+		TArray<FString> suitnames = listener->GetAvailableSmartsuitNames();
+		if (suitnames.Num() > 0)
 		{
-			suitname = suits[0];
+			suitname = suitnames[0];
 			AutoConnect = false;
 		}
 	}

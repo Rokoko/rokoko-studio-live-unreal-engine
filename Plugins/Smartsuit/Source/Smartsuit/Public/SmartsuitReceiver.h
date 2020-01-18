@@ -55,13 +55,17 @@ public:
 	*/
 	FSuitData* GetSmartsuit(FString suitName);
 
+	UFUNCTION(BlueprintCallable)
+	FSuitData GetSmartsuitByName(FString suitName);
+
 	/**
 	* Lists the names of all known Smartsuits connected to this computer.
 	* It will only list the currently active Smartsuits.
 	*
 	* @return Returns an array with all the available in the network Smartsuit names.
 	*/
-	TArray<FString> GetAvailableSmartsuits();
+	UFUNCTION(BlueprintCallable)
+	TArray<FString> GetAvailableSmartsuitNames();
 
 	/**
 	* The port number used to listen for the streaming data of Smartsuits.

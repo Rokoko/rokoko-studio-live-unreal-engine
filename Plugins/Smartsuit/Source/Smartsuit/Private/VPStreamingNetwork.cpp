@@ -309,7 +309,7 @@ FSuitData* VPStreamingNetwork::GetSmartsuitByName(FString suitName)
 	return result;
 }
 
-TArray<FString> VPStreamingNetwork::GetAvailableSmartsuits()
+TArray<FString> VPStreamingNetwork::GetAvailableSmartsuitNames()
 {
 	TArray<FString> result;
 	//maybe we should set the limit to the size of the suits array

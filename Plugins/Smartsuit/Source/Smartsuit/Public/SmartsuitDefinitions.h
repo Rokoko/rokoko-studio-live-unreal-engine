@@ -313,7 +313,7 @@ struct FSmartsuitBone
 * This struct represents a Smartsuit data frame as received from the Smartsuit.
 * It also includes meta variables used to manage the state of the Smartsuit in Unreal.
 */
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FSuitData
 {
 	GENERATED_BODY()
@@ -324,17 +324,22 @@ struct FSuitData
 	void ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& BoneName);
 
 	/** The name of the Smartsuit. */
+	UPROPERTY(BlueprintReadOnly)
 	FString suitname;
 
 	uint32_t timestamp;
-
+	
+	UPROPERTY(BlueprintReadOnly)
 	FString id;
 
+	UPROPERTY(BlueprintReadOnly)
 	bool isLive;
 
 	/** The name of the profile. */
+	UPROPERTY(BlueprintReadOnly)
 	FString profileName;
 
+	UPROPERTY(BlueprintReadOnly)
 	FLinearColor color;
 
 	TMap<FName, FSmartsuitBone> SmartsuitBones;
