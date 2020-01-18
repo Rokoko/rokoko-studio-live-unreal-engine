@@ -58,7 +58,8 @@ struct FReferencePoint {
 };
 
 USTRUCT(BlueprintType, meta = (ToolTip = "Contains all information about a prop's profile."))
-struct FProfile {
+struct FProfile 
+{
 
 	GENERATED_USTRUCT_BODY()
 

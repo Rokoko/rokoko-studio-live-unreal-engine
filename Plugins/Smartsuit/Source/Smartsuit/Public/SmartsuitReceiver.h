@@ -87,34 +87,40 @@ public:
 	//HubInfo* CheckForHubInfo(FString suitname);
 	void SetSupportsWiFiAPI(FString suitname);
 	
-	static TArray<FProp> GetAllProps() {
+	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve all props."))
+	static TArray<FProp> GetAllProps() 
+	{
 		TArray<FProp> result;
-		UE_LOG(LogTemp, Display, TEXT("Yeeee1"));
+		//UE_LOG(LogTemp, Display, TEXT("Yeeee1"));
 		bool found = false;
 		int i = 0;
 		for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
 		{
-			UE_LOG(LogTemp, Display, TEXT("Looking up receiver %d"), i);
+			//UE_LOG(LogTemp, Display, TEXT("Looking up receiver %d"), i);
 			i++;
-			if (It->realLife) {
+			if (It->realLife) 
+			{
 				found = true;
-				UE_LOG(LogTemp, Display, TEXT("Real life!"));
+				//UE_LOG(LogTemp, Display, TEXT("Real life!"));
 				result = It->VPlistener.GetAllProps();
 			}
 		}
-		if (!found) {
-			UE_LOG(LogTemp, Display, TEXT("not Real life..."));
+		if (!found)
+		{
+			//UE_LOG(LogTemp, Display, TEXT("not Real life..."));
 		}
-		UE_LOG(LogTemp, Display, TEXT("Yeeee2 %d"), result.Num());
+		//UE_LOG(LogTemp, Display, TEXT("Yeeee2 %d"), result.Num());
 		return result;
 	}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a prop by name."))
-	static FProp GetProp(FString name, bool isLive) {
+	static FProp GetProp(FString name, bool isLive) 
+	{
 		FProp result;
 		for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
 		{
-			if (It->realLife) {
+			if (It->realLife) 
+			{
 				result = *It->GetPropByNameFromVP(name, isLive);
 			}
 		}
@@ -122,7 +128,8 @@ public:
 	}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a tracker by name."))
-	static FTracker GetTracker(FString name, bool isLive) {
+	static FTracker GetTracker(FString name, bool isLive) 
+	{
 		FTracker result;
 		for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
 		{
@@ -134,14 +141,16 @@ public:
 	}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Converts Quaternions into rotators."))
-	static FRotator FQuatToRotator(FQuat rotation) {
+	static FRotator FQuatToRotator(FQuat rotation) 
+	{
 		FQuat result(rotation.Z, rotation.X, rotation.Y, rotation.W);
 		FRotator Rotator = result.Rotator();
 		return Rotator;
 	}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Converts position into Unreal position."))
-	static FVector UPosition(FVector position) {
+	static FVector UPosition(FVector position) 
+	{
 		return FVector(100.0f*position.Z, 100.0f*position.X, 100.0f*position.Y);
 	}
 	/// @endcond

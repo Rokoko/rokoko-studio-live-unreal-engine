@@ -66,8 +66,11 @@ FLinearColor USmartsuitBlueprintLibrary::GetFLinearColorField(TSharedPtr<FJsonOb
 	LinearColor.R = jsonObject->GetNumberField("x");
 	LinearColor.G = jsonObject->GetNumberField("y");
 	LinearColor.B = jsonObject->GetNumberField("z");
+
+	//this is so we can properly convert the color to srgb
+	FColor NewColor = LinearColor.QuantizeRound();
 	
-	return LinearColor;
+	return FLinearColor(NewColor);
 }
 
 FQuat USmartsuitBlueprintLibrary::GetQuaternionField(TSharedPtr<FJsonObject> jsonObject)
