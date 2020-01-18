@@ -350,6 +350,7 @@ private:
 	void HandleSubjectData(FVirtualProductionSubject virtualProductionObject);
 	void HandleFaceData(FFace face);
 	void HandleSuitData(FSuitData suit);
+	void CreateJoint(TArray<FTransform>& transforms, int32 index, FSmartsuitBone* parent, FSmartsuitBone* sensor);
 	//void CreateJoint(TArray<FTransform>& transforms, int32 index, Sensor* parent, Sensor* sensor);
 	TArray<FName> subjectNames;
 	TArray<FName> faceNames;

@@ -257,6 +257,81 @@ void FVirtualProductionSource::HandleSuitData(FSuitData suit)
 	SkeletonData->SetBoneParents(boneParents);
 	Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
 }
+
+
+void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32 index, FSmartsuitBone* parent, FSmartsuitBone* sensor)
+{
+
+	int32 transformIndex = transforms.AddUninitialized(1);
+	if (!sensor)
+	{
+		transforms[transformIndex].SetLocation(FVector(0, 0, 0));
+		transforms[transformIndex].SetRotation(FQuat::Identity);
+		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
+	}
+	else if (parent)
+	{
+		FQuat parentRealRotation;
+		if (index == -1)
+		{
+			parentRealRotation = parent->Uquaternion() * FQuat::MakeFromEuler(FVector(0, 0, 180));
+		}
+		else
+		{
+			parentRealRotation = parent->Uquaternion();
+		}
+
+		//FVector realSensorPosition;
+		//float chestOffset = 20;
+		//if (sensor->addr == SENSOR_NECK) {
+		//	realSensorPosition
+		//
+		//} else if (sensor->addr == SENSOR_LEFT_SHOULDER || sensor->addr == SENSOR_RIGHT_SHOULDER) {
+		//	FVector direction = sensor->UPosition();
+		//	direction.Normalize();
+		//	realSensorPosition = sensor->UPosition() + (direction * (-chestOffset));
+		//}
+		//else {
+		//	realSensorPosition = sensor->UPosition();
+		//}
+
+
+		//FVector realParentPosition;
+		//if (parent->addr == SENSOR_CHEST) {
+
+		//}
+		//else {
+		//	realParentPosition = parent->UPosition();
+		//}
+		if (sensor->name == SmartsuitBones::neck)
+		{
+			transforms[transformIndex].SetLocation(FVector(0, 20.150345, 0));
+		}
+		else if (sensor->name == SmartsuitBones::rightShoulder)
+		{
+			transforms[transformIndex].SetLocation(FVector(7, 12.368073, 1.90378));
+		}
+		else if (sensor->name == SmartsuitBones::leftShoulder)
+		{
+			transforms[transformIndex].SetLocation(FVector(-7, 12.368073, 1.90378));
+		}
+		else
+		{
+			transforms[transformIndex].SetLocation(parentRealRotation.Inverse() * (sensor->UPosition() - parent->UPosition()));
+		}
+		transforms[transformIndex].SetRotation(parentRealRotation.Inverse() * sensor->Uquaternion());
+		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
+	}
+	else
+	{
+		FQuat modifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
+		transforms[transformIndex].SetLocation(sensor->UPosition());
+		transforms[transformIndex].SetRotation(sensor->Uquaternion() * modifier);
+		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
+	}
+}
+
+
 /*
 void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32 index, Sensor* parent, Sensor* sensor) {
 	
@@ -396,31 +471,31 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 		transforms[transformIndex].SetRotation(FQuat::Identity);
 		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
 
-		/*
+		
 		CreateJoint(transforms, 0, nullptr, subject.Hip());
-		CreateJoint(transforms, -1, subject.Hip(), subject.GetSensor(SENSOR_STOMACH));
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_STOMACH), subject.GetSensor(SENSOR_CHEST));
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_CHEST), subject.GetSensor(SENSOR_NECK));
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_NECK), subject.GetSensor(SENSOR_HEAD));
+		CreateJoint(transforms, -1, subject.Hip(), subject.GetBoneByName(SmartsuitBones::spine));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::spine), subject.GetBoneByName(SmartsuitBones::chest));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::chest), subject.GetBoneByName(SmartsuitBones::neck));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::neck), subject.GetBoneByName(SmartsuitBones::head));
 
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_CHEST), subject.GetSensor(SENSOR_LEFT_SHOULDER));
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_LEFT_SHOULDER), subject.GetSensor(SENSOR_LEFT_UPPER_ARM));
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_LEFT_UPPER_ARM), subject.GetSensor(SENSOR_LEFT_LOWER_ARM));
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_LEFT_LOWER_ARM), subject.GetSensor(SENSOR_LEFT_HAND));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::chest), subject.GetBoneByName(SmartsuitBones::leftShoulder));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftShoulder), subject.GetBoneByName(SmartsuitBones::leftUpperArm));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftUpperArm), subject.GetBoneByName(SmartsuitBones::leftLowerArm));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftLowerArm), subject.GetBoneByName(SmartsuitBones::leftHand));
 
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_CHEST), subject.GetSensor(SENSOR_RIGHT_SHOULDER));
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_SHOULDER), subject.GetSensor(SENSOR_RIGHT_UPPER_ARM));
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_UPPER_ARM), subject.GetSensor(SENSOR_RIGHT_LOWER_ARM));
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_LOWER_ARM), subject.GetSensor(SENSOR_RIGHT_HAND));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::chest), subject.GetBoneByName(SmartsuitBones::rightShoulder));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightShoulder), subject.GetBoneByName(SmartsuitBones::rightUpperArm));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightUpperArm), subject.GetBoneByName(SmartsuitBones::rightLowerArm));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightLowerArm), subject.GetBoneByName(SmartsuitBones::rightHand));
 
-		CreateJoint(transforms, -1, subject.GetSensor(SENSOR_HIP), subject.GetSensor(SENSOR_LEFT_UPPER_LEG));
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_LEFT_UPPER_LEG), subject.GetSensor(SENSOR_LEFT_LOWER_LEG));
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_LEFT_LOWER_LEG), subject.GetSensor(SENSOR_LEFT_FOOT));
+		CreateJoint(transforms, -1, subject.GetBoneByName(SmartsuitBones::hip), subject.GetBoneByName(SmartsuitBones::leftUpLeg));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftUpLeg), subject.GetBoneByName(SmartsuitBones::leftLeg));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftLeg), subject.GetBoneByName(SmartsuitBones::leftFoot));
 
-		CreateJoint(transforms, -1, subject.GetSensor(SENSOR_HIP), subject.GetSensor(SENSOR_RIGHT_UPPER_LEG));
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_UPPER_LEG), subject.GetSensor(SENSOR_RIGHT_LOWER_LEG));
-		CreateJoint(transforms, 0, subject.GetSensor(SENSOR_RIGHT_LOWER_LEG), subject.GetSensor(SENSOR_RIGHT_FOOT));
-		*/
+		CreateJoint(transforms, -1, subject.GetBoneByName(SmartsuitBones::hip), subject.GetBoneByName(SmartsuitBones::rightUpLeg));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightUpLeg), subject.GetBoneByName(SmartsuitBones::rightLeg));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightLeg), subject.GetBoneByName(SmartsuitBones::rightFoot));
+		
 
 		AnimFrameData.Transforms.Append(transforms);
 

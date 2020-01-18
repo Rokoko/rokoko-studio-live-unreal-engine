@@ -50,6 +50,76 @@
 /*! \brief Expected rotation of the right foot in T-Pose. */
 #define SMARTSUIT_TPOSE_RIGHT_FOOT			FQuat::MakeFromEuler(FVector(-179.999893,-0.000171,-179.999939))
 
+
+
+namespace SmartsuitBones
+{
+	extern const FName hip;
+	extern const FName spine;
+	extern const FName chest;
+	extern const FName neck;
+	extern const FName head;
+	extern const FName leftShoulder;
+	extern const FName leftUpperArm;
+	extern const FName leftLowerArm;
+	extern const FName leftHand;
+	extern const FName rightShoulder;
+	extern const FName rightUpperArm;
+	extern const FName rightLowerArm;
+	extern const FName rightHand;
+	extern const FName leftUpLeg;
+	extern const FName leftLeg;
+	extern const FName leftFoot;
+	extern const FName leftToe;
+	extern const FName leftToeEnd;
+	extern const FName rightUpLeg;
+	extern const FName rightLeg;
+	extern const FName rightFoot;
+	extern const FName rightToe;
+	extern const FName rightToeEnd;
+	extern const FName leftThumbProximal;
+	extern const FName leftThumbMedial;
+	extern const FName leftThumbDistal;
+	extern const FName leftThumbTip;
+	extern const FName leftIndexProximal;
+	extern const FName leftIndexMedial;
+	extern const FName leftIndexDistal;
+	extern const FName leftIndexTip;
+	extern const FName leftMiddleProximal;
+	extern const FName leftMiddleMedial;
+	extern const FName leftMiddleDistal;
+	extern const FName leftMiddleTip;
+	extern const FName leftRingProximal;
+	extern const FName leftRingMedial;
+	extern const FName leftRingDistal;
+	extern const FName leftRingTip;
+	extern const FName leftLittleProximal;
+	extern const FName leftLittleMedial;
+	extern const FName leftLittleDistal;
+	extern const FName leftLittleTip;
+	extern const FName rightThumbProximal;
+	extern const FName rightThumbMedial;
+	extern const FName rightThumbDistal;
+	extern const FName rightThumbTip;
+	extern const FName rightIndexProximal;
+	extern const FName rightIndexMedial;
+	extern const FName rightIndexDistal;
+	extern const FName rightIndexTip;
+	extern const FName rightMiddleProximal;
+	extern const FName rightMiddleMedial;
+	extern const FName rightMiddleDistal;
+	extern const FName rightMiddleTip;
+	extern const FName rightRingProximal;
+	extern const FName rightRingMedial;
+	extern const FName rightRingDistal;
+	extern const FName rightRingTip;
+	extern const FName rightLittleProximal;
+	extern const FName rightLittleMedial;
+	extern const FName rightLittleDistal;
+	extern const FName rightLittleTip;
+}
+
+
 ///*! \brief Information about specific sensor, including its status, rotation, position.*/
 //struct Sensor {
 //
@@ -200,7 +270,7 @@ struct FSmartsuitBone
 	GENERATED_BODY()
 
 	FSmartsuitBone() {}
-	FSmartsuitBone(FString Name, FVector Position, FQuat Rotation) { name = Name; position = Position; rotation = Rotation; }
+	FSmartsuitBone(FName Name, FVector Position, FQuat Rotation) { name = Name; position = Position; rotation = Rotation; }
 
 	FQuat NED2Unreal(FQuat InRotation)
 	{
@@ -233,7 +303,7 @@ struct FSmartsuitBone
 		return FVector(100.0f * position.Z, 100.0f * position.X, 100.0f * position.Y);
 	}
 
-	FString name;
+	FName name;
 	FVector position;
 	FQuat rotation;
 };
@@ -262,11 +332,11 @@ struct FSuitData
 
 	bool isLive;
 
+	/** The name of the profile. */
 	FString profileName;
 
 	FLinearColor color;
 
-	//TArray<FSmartsuitBone> SmartsuitBones;
 	TMap<FName, FSmartsuitBone> SmartsuitBones;
 
 	FSmartsuitBone* Hip()
@@ -274,18 +344,9 @@ struct FSuitData
 		return GetBoneByName("hip");
 	}
 
-	FSmartsuitBone* GetBoneByName(const FString& BoneName)
+	FSmartsuitBone* GetBoneByName(const FName& BoneName)
 	{
-		//for (int i = 0; i < SmartsuitBones.Num(); i++)
-		//{
-		//	if (SmartsuitBones[i].name == BoneName)
-		//	{
-		//		return &(SmartsuitBones[i]);
-		//	}
-		//}
-		//return nullptr;
-
-		return SmartsuitBones.Find(FName(*BoneName));
+		return SmartsuitBones.Find(BoneName);
 	}
 
 	FName GetSubjectName()

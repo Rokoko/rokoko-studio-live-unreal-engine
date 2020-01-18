@@ -96,11 +96,6 @@ void VPStreamingNetwork::SendFacesToLivelink(TArray<FFace> Subjects)
 
 void VPStreamingNetwork::SendSuitsToLiveLink(TArray<FSuitData> Smartsuits)
 {
-	//TArray<SuitData> suitArray;
-	//for (int i = 0; i < VPFrame.; i++)
-	//{
-	//	suitArray.Add(suits[i]);
-	//}
 	auto livelink = FVirtualProductionSource::Get();
 	if (livelink.IsValid())
 	{
@@ -218,7 +213,7 @@ uint32 VPStreamingNetwork::Run()
 					}
 					SendToLiveLink(subjects);
 					SendFacesToLivelink(GlobalVPFrame->faces);
-					//SendSuitsToLiveLink(GlobalVPFrame->suits);
+					SendSuitsToLiveLink(GlobalVPFrame->suits);
 				}
 				else 
 				{
@@ -323,7 +318,7 @@ TArray<FString> VPStreamingNetwork::GetAvailableSmartsuits()
 	{
 		for (int i = 0; i < GlobalVPFrame->suits.Num(); i++)
 		{
-			if ((GlobalVPFrame->suits[i].suitname == "\0\0\0\0") /*&& GlobalVPFrame->suits[i].fps > 0*/)
+			if ((GlobalVPFrame->suits[i].suitname != "\0\0\0\0") /*&& GlobalVPFrame->suits[i].fps > 0*/)
 			{
 				result.Add(FString(GlobalVPFrame->suits[i].suitname));
 			}
