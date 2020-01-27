@@ -8,6 +8,7 @@
 #include "MessageEndpoint.h"
 #include "VirtualProductionFrame.h"
 #include "SmartsuitDefinitions.h"
+#include "Engine/DataAsset.h"
 #include "VirtualProductionSource.generated.h"
 
 class ILiveLinkClient;
@@ -91,7 +92,7 @@ class SMARTSUIT_API UVPFaceMorphTargetNameRemapping : public UDataAsset
 	}
 public:
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = MorphTargetRemapping)
 	void InitializeTMap()
 	{
 		NameMapping.Add("browDownLeft", browDownLeft);
@@ -148,163 +149,163 @@ public:
 		NameMapping.Add("tongueOut", tongueOut);
 	}
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 	TMap<FName, FName> NameMapping;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName browDownLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName browDownRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName browInnerUp;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName browOuterUpLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName browOuterUpRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName cheekPuff;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName cheekSquintLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName cheekSquintRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeBlinkLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeBlinkRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeLookDownLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeLookDownRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeLookInLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeLookInRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeLookOutLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeLookOutRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeLookUpLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeLookUpRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeSquintLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeSquintRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeWideLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName eyeWideRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName jawOpen;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName jawForward;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName jawLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName jawRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthClose;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthDimpleLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthDimpleRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthFrownLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthFrownRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthFunnel;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthLowerDownLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthLowerDownRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthPressLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthPressRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthPucker;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthRollLower;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthRollUpper;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthShrugLower;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthShrugUpper;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthSmileLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthSmileRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthStretchLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthStretchRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthUpperUpLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName mouthUpperUpRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName noseSneerLeft;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName noseSneerRight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MorphTargetRemapping)
 		FName tongueOut;
 
 };
