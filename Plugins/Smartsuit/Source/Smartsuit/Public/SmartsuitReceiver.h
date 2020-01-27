@@ -46,6 +46,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Rokoko")
 		void StopListener();
 
+	UFUNCTION(BlueprintCallable)
+	FFace GetFaceByFaceID(FString faceName);
+
+	UFUNCTION(BlueprintCallable)
+	FFace GetFaceByProfileName(const FString& faceName, bool& found);
+
+	UFUNCTION(BlueprintCallable)
+	TArray<FFace> GetAllFaces();
+
+	UFUNCTION(BlueprintCallable)
+	TArray<FFace> GetFacesNotAssociatedWithActor();
+
 	/**
 	* This function returns the last frame of data received from a Smartsuit with the given name.
 	* If there is no data for the given name, then nullptr will return.
@@ -67,6 +79,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<FString> GetAvailableSmartsuitNames();
 
+	UFUNCTION(BlueprintCallable)
+	TArray<FSuitData> GetAllSmartsuits();
+
 	/**
 	* The port number used to listen for the streaming data of Smartsuits.
 	*/
@@ -82,63 +97,66 @@ public:
 	FProp* GetPropByNameFromVP(FString name, bool isLive);
 	FTracker* GetTrackerByNameFromVP(FString name, bool isLive);
 
+	UFUNCTION(BlueprintPure, Category = "VirtualProduction")
+	FTracker GetTrackerByConnectionIDFromVP(const FString& name, bool isLive, bool& found);
+
 	/// @cond nodoc
 	//Body* CheckForBodyCommand(FString suitname);
 	//HubInfo* CheckForHubInfo(FString suitname);
 	void SetSupportsWiFiAPI(FString suitname);
 	
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve all props."))
-	static TArray<FProp> GetAllProps() 
-	{
-		TArray<FProp> result;
-		//UE_LOG(LogTemp, Display, TEXT("Yeeee1"));
-		bool found = false;
-		int i = 0;
-		for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
-		{
-			//UE_LOG(LogTemp, Display, TEXT("Looking up receiver %d"), i);
-			i++;
-			if (It->realLife) 
-			{
-				found = true;
-				//UE_LOG(LogTemp, Display, TEXT("Real life!"));
-				result = It->VPlistener.GetAllProps();
-			}
-		}
-		if (!found)
-		{
-			//UE_LOG(LogTemp, Display, TEXT("not Real life..."));
-		}
-		//UE_LOG(LogTemp, Display, TEXT("Yeeee2 %d"), result.Num());
-		return result;
-	}
+	static TArray<FProp> GetAllProps(); 
+	//{
+	//	TArray<FProp> result;
+	//	//UE_LOG(LogTemp, Display, TEXT("Yeeee1"));
+	//	bool found = false;
+	//	int i = 0;
+	//	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	//	{
+	//		//UE_LOG(LogTemp, Display, TEXT("Looking up receiver %d"), i);
+	//		i++;
+	//		if (It->realLife) 
+	//		{
+	//			found = true;
+	//			//UE_LOG(LogTemp, Display, TEXT("Real life!"));
+	//			result = It->VPlistener.GetAllProps();
+	//		}
+	//	}
+	//	if (!found)
+	//	{
+	//		//UE_LOG(LogTemp, Display, TEXT("not Real life..."));
+	//	}
+	//	//UE_LOG(LogTemp, Display, TEXT("Yeeee2 %d"), result.Num());
+	//	return result;
+	//}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a prop by name."))
-	static FProp GetProp(FString name, bool isLive) 
-	{
-		FProp result;
-		for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
-		{
-			if (It->realLife) 
-			{
-				result = *It->GetPropByNameFromVP(name, isLive);
-			}
-		}
-		return result;
-	}
+	static FProp GetProp(FString name, bool isLive);
+	//{
+	//	FProp result;
+	//	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	//	{
+	//		if (It->realLife) 
+	//		{
+	//			result = *It->GetPropByNameFromVP(name, isLive);
+	//		}
+	//	}
+	//	return result;
+	//}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a tracker by name."))
-	static FTracker GetTracker(FString name, bool isLive) 
-	{
-		FTracker result;
-		for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
-		{
-			if (It->realLife) {
-				result = *It->GetTrackerByNameFromVP(name, isLive);
-			}
-		}
-		return result;
-	}
+	static FTracker GetTracker(FString name, bool isLive);
+	//{
+	//	FTracker result;
+	//	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	//	{
+	//		if (It->realLife) {
+	//			result = *It->GetTrackerByNameFromVP(name, isLive);
+	//		}
+	//	}
+	//	return result;
+	//}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Converts Quaternions into rotators."))
 	static FRotator FQuatToRotator(FQuat rotation) 

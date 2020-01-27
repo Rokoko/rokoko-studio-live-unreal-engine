@@ -266,6 +266,26 @@ FProp* VPStreamingNetwork::GetPropByName(FString name, bool isLive)
 	return result;
 }
 
+TArray<FProp> VPStreamingNetwork::GetAllProps()
+{
+	//return nullptr;
+	TArray<FProp> result;
+	mtx.lock();
+	if (GlobalVPFrame)
+	{
+		for (int i = 0; i < GlobalVPFrame->props.Num(); i++)
+		{
+			result.Add(GlobalVPFrame->props[i]);
+			//result->Add
+		}
+	}
+	mtx.unlock();
+	//UE_LOG(LogTemp, Display, TEXT("Yeeee3"));
+	return result;
+
+	//return GlobalVPFrame->props;
+}
+
 FTracker* VPStreamingNetwork::GetTrackerByName(FString name, bool isLive)
 {
 	FTracker *result = nullptr;
@@ -277,6 +297,42 @@ FTracker* VPStreamingNetwork::GetTrackerByName(FString name, bool isLive)
 			if (name == GlobalVPFrame->trackers[i].name && GlobalVPFrame->trackers[i].isLive == isLive)
 			{
 				result = &GlobalVPFrame->trackers[i];
+			}
+		}
+	}
+	mtx.unlock();
+	return result;
+}
+
+FTracker* VPStreamingNetwork::GetTrackerByConnectionID(const FString& name, bool isLive)
+{
+	FTracker* result = nullptr;
+	mtx.lock();
+	if (GlobalVPFrame)
+	{
+		for (int i = 0; i < GlobalVPFrame->trackers.Num(); i++)
+		{
+			if (name == GlobalVPFrame->trackers[i].connectionId /*&& GlobalVPFrame->trackers[i].isLive == isLive*/)
+			{
+				result = &GlobalVPFrame->trackers[i];
+			}
+		}
+	}
+	mtx.unlock();
+	return result;
+}
+
+TArray<FTracker> VPStreamingNetwork::GetTrackersWithMatchingId(FString ConnectionId, bool isLive)
+{
+	TArray<FTracker> result;
+	mtx.lock();
+	if (GlobalVPFrame)
+	{
+		for (int i = 0; i < GlobalVPFrame->trackers.Num(); i++)
+		{
+			if (ConnectionId == GlobalVPFrame->trackers[i].connectionId /*&& GlobalVPFrame->trackers[i].isLive == isLive*/)
+			{
+				result.Add(GlobalVPFrame->trackers[i]);
 			}
 		}
 	}
@@ -328,20 +384,80 @@ TArray<FString> VPStreamingNetwork::GetAvailableSmartsuitNames()
 	return result;
 }
 
-TArray<FProp> VPStreamingNetwork::GetAllProps()
+TArray<FSuitData> VPStreamingNetwork::GetAllSmartsuits()
 {
-	//return nullptr;
-	TArray<FProp> result;
+	TArray<FSuitData> suits;
+	//maybe we should set the limit to the size of the suits array
 	mtx.lock();
 	if (GlobalVPFrame)
 	{
-		for (int i = 0; i < GlobalVPFrame->props.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame->suits.Num(); i++)
 		{
-			result.Add(GlobalVPFrame->props[i]);
-			//result->Add
+			if ((GlobalVPFrame->suits[i].suitname != "\0\0\0\0") /*&& GlobalVPFrame->suits[i].fps > 0*/)
+			{
+				suits.Add(GlobalVPFrame->suits[i]);
+			}
 		}
 	}
 	mtx.unlock();
-	//UE_LOG(LogTemp, Display, TEXT("Yeeee3"));
+	return suits;
+}
+
+FFace VPStreamingNetwork::GetFaceByFaceID(FString faceID)
+{
+	FFace result;
+	mtx.lock();
+	if (GlobalVPFrame)
+	{
+		for (int i = 0; i < GlobalVPFrame->faces.Num(); i++)
+		{
+			if (GlobalVPFrame->faces[i].faceId == faceID)
+			{
+				result = GlobalVPFrame->faces[i];
+				break;
+			}
+		}
+	}
+	mtx.unlock();
+
 	return result;
+}
+
+FFace* VPStreamingNetwork::GetFaceByProfileName(const FString& profileName)
+{
+	FFace* result = nullptr;
+	mtx.lock();
+	if (GlobalVPFrame)
+	{
+		for (int i = 0; i < GlobalVPFrame->faces.Num(); i++)
+		{
+			if (GlobalVPFrame->faces[i].profileName == profileName)
+			{
+				result = &GlobalVPFrame->faces[i];
+				break;
+			}
+		}
+	}
+	mtx.unlock();
+
+	return result;
+}
+
+TArray<FFace> VPStreamingNetwork::GetAllFaces()
+{
+	//TArray<FFace> result;
+	//mtx.lock();
+	//if (GlobalVPFrame)
+	//{
+	//	for (int i = 0; i < GlobalVPFrame->faces.Num(); i++)
+	//	{
+	//		result.Add(GlobalVPFrame->faces[i]);
+	//		//result->Add
+	//	}
+	//}
+	//mtx.unlock();
+
+	//return result;
+
+	return GlobalVPFrame->faces;
 }

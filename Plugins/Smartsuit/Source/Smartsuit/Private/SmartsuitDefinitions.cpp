@@ -83,6 +83,7 @@ FSuitData::FSuitData(TSharedPtr<FJsonObject> jsonObject)
 {
 	suitname = jsonObject->GetStringField("name");
 	timestamp = jsonObject->GetNumberField("timestamp");
+	id = jsonObject->GetStringField("id");
 	isLive = jsonObject->GetBoolField("isLive");
 	profileName = jsonObject->GetStringField("profileName");
 	color = USmartsuitBlueprintLibrary::GetFLinearColorField(jsonObject->GetObjectField("color"));

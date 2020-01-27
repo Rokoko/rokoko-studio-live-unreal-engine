@@ -70,9 +70,15 @@ FTracker::FTracker(TSharedPtr<FJsonObject> jsonObject)
 
 FFace::FFace(TSharedPtr<FJsonObject> jsonObject)
 {
+
+	//profileName = jsonObject->GetStringField("profileName");
 	version = jsonObject->GetIntegerField("version");
 	provider = jsonObject->GetStringField("provider");
 	faceId = jsonObject->GetStringField("faceId");
+	if (!jsonObject->TryGetStringField("profileName", profileName))
+	{
+		profileName = "NOPROFILENAME for " + faceId;
+	}
 
 	eyeBlinkLeft = jsonObject->GetNumberField("eyeBlinkLeft");
 	eyeLookDownLeft = jsonObject->GetNumberField("eyeLookDownLeft");

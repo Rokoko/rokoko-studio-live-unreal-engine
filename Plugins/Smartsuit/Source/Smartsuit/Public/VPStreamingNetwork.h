@@ -69,26 +69,20 @@ public:
 	virtual void Exit() override { }
 
 	FProp* GetPropByName(FString name, bool isLive);
-	FTracker* GetTrackerByName(FString name, bool isLive);
-	FSuitData* GetSmartsuitByName(FString suitName);
-
-	TArray<FString> GetAvailableSmartsuitNames();
-
 	TArray<FProp> GetAllProps();
-	//{
-	//	//return nullptr;
-	//	TArray<FProp> result;
-	//	mtx.lock();
-	//	if (GlobalVPFrame) {
-	//		for (int i = 0; i < GlobalVPFrame->props.Num(); i++) {
-	//			result.Add(GlobalVPFrame->props[i]);
-	//			//result->Add
-	//		}
-	//	}
-	//	mtx.unlock();
-	//	//UE_LOG(LogTemp, Display, TEXT("Yeeee3"));
-	//	return result;
-	//}
+
+	FTracker* GetTrackerByName(FString name, bool isLive);
+	FTracker* GetTrackerByConnectionID(const FString& name, bool isLive);
+	TArray<FTracker> GetTrackersWithMatchingId(FString name, bool isLive);
+
+	FSuitData* GetSmartsuitByName(FString suitName);
+	TArray<FString> GetAvailableSmartsuitNames();
+	TArray<FSuitData> GetAllSmartsuits();
+
+	FFace GetFaceByFaceID(FString faceID);
+	FFace* GetFaceByProfileName(const FString& profileName);
+	TArray<FFace> GetAllFaces();
+
 
 private:
 	std::mutex mtx;
