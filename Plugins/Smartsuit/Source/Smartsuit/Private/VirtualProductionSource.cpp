@@ -779,3 +779,17 @@ void FVirtualProductionSource::RemoveLiveLinkSource(TSharedPtr<FVirtualProductio
 		LiveLinkClient->RemoveSource(InSource);
 	}
 }
+
+FName UVPFaceMorphTargetNameRemappingNew::GetRemappedCurveName_Implementation(FName CurveName) const
+{
+	if (auto RemappedName = NameMapping.Find(CurveName))
+	{
+		return *RemappedName;
+	}
+	return "";
+}
+
+void UVPFaceMorphTargetNameRemappingNew::Initialize()
+{
+	InitializeTMap();
+}
