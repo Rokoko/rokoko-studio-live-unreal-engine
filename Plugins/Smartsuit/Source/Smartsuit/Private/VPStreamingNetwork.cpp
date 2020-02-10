@@ -445,19 +445,19 @@ FFace* VPStreamingNetwork::GetFaceByProfileName(const FString& profileName)
 
 TArray<FFace> VPStreamingNetwork::GetAllFaces()
 {
-	//TArray<FFace> result;
-	//mtx.lock();
-	//if (GlobalVPFrame)
-	//{
-	//	for (int i = 0; i < GlobalVPFrame->faces.Num(); i++)
-	//	{
-	//		result.Add(GlobalVPFrame->faces[i]);
-	//		//result->Add
-	//	}
-	//}
-	//mtx.unlock();
+	TArray<FFace> result;
+	mtx.lock();
+	if (GlobalVPFrame)
+	{
+		for (int i = 0; i < GlobalVPFrame->faces.Num(); i++)
+		{
+			result.Add(GlobalVPFrame->faces[i]);
+			//result->Add
+		}
+	}
+	mtx.unlock();
 
-	//return result;
+	return result;
 
-	return GlobalVPFrame->faces;
+	//return GlobalVPFrame->faces;
 }
