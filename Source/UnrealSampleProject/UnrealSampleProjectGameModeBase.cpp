@@ -63,9 +63,9 @@ bool AUnrealSampleProjectGameModeBase::Sender_SendData()
 
 	FRokokoRemoteInstance NewData;
 	NewData.type = "Instance";
-	NewData.version = 10;
+	NewData.version = 1;
 	NewData.provider = "PROVIDERNAMEGOESHERE_Remote";
-	NewData.faceId = "";
+	NewData.faceId = "KQ452";
 	NewData.deviceName = "DEVICENAMEGOESHERE";
 	NewData.connectedTo = "";
 	NewData.requestedFrom = "";
