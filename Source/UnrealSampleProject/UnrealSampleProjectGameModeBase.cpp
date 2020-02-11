@@ -75,11 +75,20 @@ bool AUnrealSampleProjectGameModeBase::Sender_SendData()
 	NewData.currentRecordingTime = 0.f;
 	NewData.numberOfLiveSuits = 1;
 
-	FArrayWriter Writer;
+	//FArrayWriter Writer;
+	//Writer << NewData;
+	//SenderSocket->SendTo(Writer.GetData(), Writer.Num(), BytesSent, *RemoteAddr);
 
-	Writer << NewData;
 
-	SenderSocket->SendTo(Writer.GetData(), Writer.Num(), BytesSent, *RemoteAddr);
+
+	FString MessageString = NewData.Serialize();
+	TCHAR* serializedmessage = MessageString.GetCharArray().GetData();
+	int32 size = FCString::Strlen(serializedmessage);
+	int32 sent = 0;
+
+
+
+	SenderSocket->SendTo((uint8*)TCHAR_TO_UTF8(serializedmessage), size, BytesSent, *RemoteAddr);
 
 	if (BytesSent <= 0)
 	{
@@ -201,3 +210,30 @@ FArchive& operator<<(FArchive& Ar, FRokokoRemoteInstance& TheStruct)
 	return Ar;
 }
 PRAGMA_ENABLE_OPTIMIZATION
+
+FString FRokokoRemoteInstance::Serialize()
+{
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+	JsonObject->SetStringField(TEXT("type"), type);
+	JsonObject->SetNumberField(TEXT("version"), version);
+	JsonObject->SetStringField(TEXT("provider"), provider);
+	JsonObject->SetStringField(TEXT("faceId"), faceId);
+	JsonObject->SetStringField(TEXT("deviceName"), deviceName);
+	JsonObject->SetStringField(TEXT("connectedTo"), connectedTo);
+	JsonObject->SetStringField(TEXT("requestedFrom"), requestedFrom);
+	JsonObject->SetStringField(TEXT("commandKey"), commandKey);
+	JsonObject->SetNumberField(TEXT("commandPort"), commandPort);
+	JsonObject->SetBoolField(TEXT("recording"), recording);
+	JsonObject->SetNumberField(TEXT("currentRecordingTime"), currentRecordingTime);
+	JsonObject->SetNumberField(TEXT("numberOfLiveSuits"), numberOfLiveSuits);
+	JsonObject->SetBoolField(TEXT("commandApiOn"), commandApiOn);
+	JsonObject->SetBoolField(TEXT("commandApiLicense"), commandApiLicense);
+	JsonObject->SetBoolField(TEXT("faceLicense"), faceLicense);
+
+	FString OutputString = "";
+
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
+	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+
+	return OutputString;
+}

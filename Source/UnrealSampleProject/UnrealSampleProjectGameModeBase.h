@@ -38,22 +38,23 @@ public:
 	GENERATED_BODY()
 
 
-	//friend FArchive& operator<<(FArchive& Ar, FRokokoRemoteInstance& TheStruct);
+		//friend FArchive& operator<<(FArchive& Ar, FRokokoRemoteInstance& TheStruct);
 
 
-	//FString type;
-	//int version;
-	//FString provider;
-	//FString faceId;
-	//FString deviceName;
-	//FString connectedTo;
-	//FString requestedFrom;
-	//FString commandKey;
-	//int commandPort;
-	//bool recording;
-	//float currentRecordingTime;
-	//int numberOfLiveSuits;
+		//FString type;
+		//int version;
+		//FString provider;
+		//FString faceId;
+		//FString deviceName;
+		//FString connectedTo;
+		//FString requestedFrom;
+		//FString commandKey;
+		//int commandPort;
+		//bool recording;
+		//float currentRecordingTime;
+		//int numberOfLiveSuits;
 
+	FString Serialize();
 
 	FString type;
 	int version;
