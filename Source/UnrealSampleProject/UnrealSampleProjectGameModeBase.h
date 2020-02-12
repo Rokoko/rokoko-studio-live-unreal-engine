@@ -37,7 +37,8 @@ struct FRokokoRemoteInstance /*: IValuable*/
 public:
 	GENERATED_BODY()
 
-
+	FRokokoRemoteInstance() {}
+	FRokokoRemoteInstance(TSharedPtr<FJsonObject> jsonObject);
 		//friend FArchive& operator<<(FArchive& Ar, FRokokoRemoteInstance& TheStruct);
 
 
@@ -73,7 +74,7 @@ public:
 	bool faceLicense;
 };
 
-FArchive& operator<<(FArchive& Ar, FRokokoRemoteInstance& TheStruct);
+//FArchive& operator<<(FArchive& Ar, FRokokoRemoteInstance& TheStruct);
 
 /**
  * 

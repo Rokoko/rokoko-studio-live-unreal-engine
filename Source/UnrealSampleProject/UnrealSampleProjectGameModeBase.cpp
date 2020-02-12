@@ -98,7 +98,7 @@ bool AUnrealSampleProjectGameModeBase::Sender_SendData()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Sent %d bytes"), BytesSent);
+		//UE_LOG(LogTemp, Warning, TEXT("Sent %d bytes"), BytesSent);
 	}
 
 	return true;
@@ -165,51 +165,62 @@ bool AUnrealSampleProjectGameModeBase::StartUDPReceiver(const FString& YourChose
 	FTimespan ThreadWaitTime = FTimespan::FromMilliseconds(100);
 	UDPReceiver = new FUdpSocketReceiver(ListenSocket, ThreadWaitTime, TEXT("UDP RECEIVER"));
 	UDPReceiver->OnDataReceived().BindUObject(this, &ThisClass::Recv);
+	UDPReceiver->Start();
 
 	return true;
 }
 
+FString WriteBoolValue(bool InValue)
+{
+	return InValue ? "True" : "False";
+}
+
+FString testfunc(const uint8* SrcBuffer, const uint32 SrcSize)
+{
+	FString Result;
+	Result.Reserve(SrcSize * 2);
+	// Convert and append each byte in the buffer
+	for (uint32 Count = 0; Count < SrcSize; Count++)
+	{
+		Result += FString::Printf(TEXT("%c"), SrcBuffer[Count]);
+	}
+	return Result;
+}
 
 void AUnrealSampleProjectGameModeBase::Recv(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Received bytes: %d"), ArrayReaderPtr->Num());
 
-	FRokokoRemoteInstance Data;
-	*ArrayReaderPtr << Data;
+	FRokokoRemoteInstance Data2;
 
+	//FString DataString = FString::FromHexBlob(ArrayReaderPtr->GetData(), ArrayReaderPtr->Num());
+	//FString DataString = BytesToString(ArrayReaderPtr->GetData(), ArrayReaderPtr->Num());
+	FString DataString = testfunc(ArrayReaderPtr->GetData(), ArrayReaderPtr->Num());
+	
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(DataString);
+	if (FJsonSerializer::Deserialize(Reader, JsonObject))
+	{
+		Data2 = FRokokoRemoteInstance(JsonObject);
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("type: %s"), *Data2.type);
+	UE_LOG(LogTemp, Warning, TEXT("version: %d"), Data2.version);
+	UE_LOG(LogTemp, Warning, TEXT("provider: %s"), *Data2.provider);
+	UE_LOG(LogTemp, Warning, TEXT("faceId: %s"), *Data2.faceId);
+	UE_LOG(LogTemp, Warning, TEXT("deviceName: %s"), *Data2.deviceName);
+	UE_LOG(LogTemp, Warning, TEXT("connectedTo: %s"), *Data2.connectedTo);
+	UE_LOG(LogTemp, Warning, TEXT("requestedFrom: %s"), *Data2.requestedFrom);
+	UE_LOG(LogTemp, Warning, TEXT("commandKey: %s"), *Data2.commandKey);
+	UE_LOG(LogTemp, Warning, TEXT("commandPort: %d"), Data2.commandPort);
+	UE_LOG(LogTemp, Warning, TEXT("recording: %s"), *WriteBoolValue(Data2.recording));
+	UE_LOG(LogTemp, Warning, TEXT("currentRecordingTime: %f"), Data2.currentRecordingTime);
+	UE_LOG(LogTemp, Warning, TEXT("numberOfLiveSuits: %d"), Data2.numberOfLiveSuits);
+	UE_LOG(LogTemp, Warning, TEXT("commandApiOn: %s"), *WriteBoolValue(Data2.commandApiOn));
+	UE_LOG(LogTemp, Warning, TEXT("commandApiLicense: %s"), *WriteBoolValue(Data2.commandApiLicense));
+	UE_LOG(LogTemp, Warning, TEXT("faceLicense: %s"), *WriteBoolValue(Data2.faceLicense));
 
 }
-
-PRAGMA_DISABLE_OPTIMIZATION
-FArchive& operator<<(FArchive& Ar, FRokokoRemoteInstance& TheStruct)
-{
-	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
-	JsonObject->SetStringField(TEXT("type"), TheStruct.type);
-	JsonObject->SetNumberField(TEXT("version"), TheStruct.version);
-	JsonObject->SetStringField(TEXT("provider"), TheStruct.provider);
-	JsonObject->SetStringField(TEXT("faceId"), TheStruct.faceId);
-	JsonObject->SetStringField(TEXT("deviceName"), TheStruct.deviceName);
-	JsonObject->SetStringField(TEXT("connectedTo"), TheStruct.connectedTo);
-	JsonObject->SetStringField(TEXT("requestedFrom"), TheStruct.requestedFrom);
-	JsonObject->SetStringField(TEXT("commandKey"), TheStruct.commandKey);
-	JsonObject->SetNumberField(TEXT("commandPort"), TheStruct.commandPort);
-	JsonObject->SetBoolField(TEXT("recording"), TheStruct.recording);
-	JsonObject->SetNumberField(TEXT("currentRecordingTime"), TheStruct.currentRecordingTime);
-	JsonObject->SetNumberField(TEXT("numberOfLiveSuits"), TheStruct.numberOfLiveSuits);
-	JsonObject->SetBoolField(TEXT("commandApiOn"), TheStruct.commandApiOn);
-	JsonObject->SetBoolField(TEXT("commandApiLicense"), TheStruct.commandApiLicense);
-	JsonObject->SetBoolField(TEXT("faceLicense"), TheStruct.faceLicense);
-
-	FString OutputString = "";
-
-	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&OutputString);
-	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
-
-	Ar << OutputString;
-
-	return Ar;
-}
-PRAGMA_ENABLE_OPTIMIZATION
 
 FString FRokokoRemoteInstance::Serialize()
 {
@@ -236,4 +247,27 @@ FString FRokokoRemoteInstance::Serialize()
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
 	return OutputString;
+}
+
+FRokokoRemoteInstance::FRokokoRemoteInstance(TSharedPtr<FJsonObject> jsonObject)
+{
+	jsonObject->TryGetStringField("type", type);
+	jsonObject->TryGetNumberField(TEXT("version"), version);
+	jsonObject->TryGetStringField(TEXT("provider"), provider);
+	jsonObject->TryGetStringField(TEXT("faceId"), faceId);
+	jsonObject->TryGetStringField(TEXT("deviceName"), deviceName);
+	jsonObject->TryGetStringField(TEXT("connectedTo"), connectedTo);
+	jsonObject->TryGetStringField(TEXT("requestedFrom"), requestedFrom);
+	jsonObject->TryGetStringField(TEXT("commandKey"), commandKey);
+	jsonObject->TryGetNumberField(TEXT("commandPort"), commandPort);
+	jsonObject->TryGetBoolField(TEXT("recording"), recording);
+	double recordingTimeVal;
+	if (jsonObject->TryGetNumberField(TEXT("currentRecordingTime"), recordingTimeVal))
+	{
+		currentRecordingTime = recordingTimeVal;
+	}
+	jsonObject->TryGetNumberField(TEXT("numberOfLiveSuits"), numberOfLiveSuits);
+	jsonObject->TryGetBoolField(TEXT("commandApiOn"), commandApiOn);
+	jsonObject->TryGetBoolField(TEXT("commandApiLicense"), commandApiLicense);
+	jsonObject->TryGetBoolField(TEXT("faceLicense"), faceLicense);
 }
