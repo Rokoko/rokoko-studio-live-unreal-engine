@@ -75,18 +75,10 @@ bool AUnrealSampleProjectGameModeBase::Sender_SendData()
 	NewData.currentRecordingTime = 0.f;
 	NewData.numberOfLiveSuits = 1;
 
-	//FArrayWriter Writer;
-	//Writer << NewData;
-	//SenderSocket->SendTo(Writer.GetData(), Writer.Num(), BytesSent, *RemoteAddr);
-
-
-
 	FString MessageString = NewData.Serialize();
 	TCHAR* serializedmessage = MessageString.GetCharArray().GetData();
 	int32 size = FCString::Strlen(serializedmessage);
 	int32 sent = 0;
-
-
 
 	SenderSocket->SendTo((uint8*)TCHAR_TO_UTF8(serializedmessage), size, BytesSent, *RemoteAddr);
 
@@ -182,7 +174,7 @@ FString testfunc(const uint8* SrcBuffer, const uint32 SrcSize)
 	// Convert and append each byte in the buffer
 	for (uint32 Count = 0; Count < SrcSize; Count++)
 	{
-		Result += FString::Printf(TEXT("%c"), SrcBuffer[Count]);
+		Result += TCHAR(SrcBuffer[Count]);
 	}
 	return Result;
 }
@@ -204,22 +196,7 @@ void AUnrealSampleProjectGameModeBase::Recv(const FArrayReaderPtr& ArrayReaderPt
 		Data2 = FRokokoRemoteInstance(JsonObject);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("type: %s"), *Data2.type);
-	UE_LOG(LogTemp, Warning, TEXT("version: %d"), Data2.version);
-	UE_LOG(LogTemp, Warning, TEXT("provider: %s"), *Data2.provider);
-	UE_LOG(LogTemp, Warning, TEXT("faceId: %s"), *Data2.faceId);
-	UE_LOG(LogTemp, Warning, TEXT("deviceName: %s"), *Data2.deviceName);
-	UE_LOG(LogTemp, Warning, TEXT("connectedTo: %s"), *Data2.connectedTo);
-	UE_LOG(LogTemp, Warning, TEXT("requestedFrom: %s"), *Data2.requestedFrom);
-	UE_LOG(LogTemp, Warning, TEXT("commandKey: %s"), *Data2.commandKey);
-	UE_LOG(LogTemp, Warning, TEXT("commandPort: %d"), Data2.commandPort);
-	UE_LOG(LogTemp, Warning, TEXT("recording: %s"), *WriteBoolValue(Data2.recording));
-	UE_LOG(LogTemp, Warning, TEXT("currentRecordingTime: %f"), Data2.currentRecordingTime);
-	UE_LOG(LogTemp, Warning, TEXT("numberOfLiveSuits: %d"), Data2.numberOfLiveSuits);
-	UE_LOG(LogTemp, Warning, TEXT("commandApiOn: %s"), *WriteBoolValue(Data2.commandApiOn));
-	UE_LOG(LogTemp, Warning, TEXT("commandApiLicense: %s"), *WriteBoolValue(Data2.commandApiLicense));
-	UE_LOG(LogTemp, Warning, TEXT("faceLicense: %s"), *WriteBoolValue(Data2.faceLicense));
-
+	Data2.DisplayValues();
 }
 
 FString FRokokoRemoteInstance::Serialize()
@@ -270,4 +247,23 @@ FRokokoRemoteInstance::FRokokoRemoteInstance(TSharedPtr<FJsonObject> jsonObject)
 	jsonObject->TryGetBoolField(TEXT("commandApiOn"), commandApiOn);
 	jsonObject->TryGetBoolField(TEXT("commandApiLicense"), commandApiLicense);
 	jsonObject->TryGetBoolField(TEXT("faceLicense"), faceLicense);
+}
+
+void FRokokoRemoteInstance::DisplayValues()
+{
+	UE_LOG(LogTemp, Warning, TEXT("type: %s"), *type);
+	UE_LOG(LogTemp, Warning, TEXT("version: %d"), version);
+	UE_LOG(LogTemp, Warning, TEXT("provider: %s"), *provider);
+	UE_LOG(LogTemp, Warning, TEXT("faceId: %s"), *faceId);
+	UE_LOG(LogTemp, Warning, TEXT("deviceName: %s"), *deviceName);
+	UE_LOG(LogTemp, Warning, TEXT("connectedTo: %s"), *connectedTo);
+	UE_LOG(LogTemp, Warning, TEXT("requestedFrom: %s"), *requestedFrom);
+	UE_LOG(LogTemp, Warning, TEXT("commandKey: %s"), *commandKey);
+	UE_LOG(LogTemp, Warning, TEXT("commandPort: %d"), commandPort);
+	UE_LOG(LogTemp, Warning, TEXT("recording: %s"), *WriteBoolValue(recording));
+	UE_LOG(LogTemp, Warning, TEXT("currentRecordingTime: %f"), currentRecordingTime);
+	UE_LOG(LogTemp, Warning, TEXT("numberOfLiveSuits: %d"), numberOfLiveSuits);
+	UE_LOG(LogTemp, Warning, TEXT("commandApiOn: %s"), *WriteBoolValue(commandApiOn));
+	UE_LOG(LogTemp, Warning, TEXT("commandApiLicense: %s"), *WriteBoolValue(commandApiLicense));
+	UE_LOG(LogTemp, Warning, TEXT("faceLicense: %s"), *WriteBoolValue(faceLicense));
 }

@@ -39,23 +39,10 @@ public:
 
 	FRokokoRemoteInstance() {}
 	FRokokoRemoteInstance(TSharedPtr<FJsonObject> jsonObject);
-		//friend FArchive& operator<<(FArchive& Ar, FRokokoRemoteInstance& TheStruct);
-
-
-		//FString type;
-		//int version;
-		//FString provider;
-		//FString faceId;
-		//FString deviceName;
-		//FString connectedTo;
-		//FString requestedFrom;
-		//FString commandKey;
-		//int commandPort;
-		//bool recording;
-		//float currentRecordingTime;
-		//int numberOfLiveSuits;
 
 	FString Serialize();
+
+	void DisplayValues();
 
 	FString type;
 	int version;
@@ -73,8 +60,6 @@ public:
 	bool commandApiLicense;
 	bool faceLicense;
 };
-
-//FArchive& operator<<(FArchive& Ar, FRokokoRemoteInstance& TheStruct);
 
 /**
  * 
