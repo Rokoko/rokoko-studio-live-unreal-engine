@@ -17,6 +17,19 @@ void AUnrealSampleProjectGameModeBase::InitGame(const FString& MapName, const FS
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
+	CurrentData.type = "Instance";
+	CurrentData.version = 1;
+	CurrentData.provider = "PROVIDERNAME";
+	CurrentData.faceId = "KQ452";
+	CurrentData.deviceName = FPlatformProcess::ComputerName();//"DEVICENAME";
+	CurrentData.connectedTo = "";
+	CurrentData.requestedFrom = "";
+	CurrentData.commandKey = "";
+	CurrentData.commandPort = 0;
+	CurrentData.recording = false;
+	CurrentData.currentRecordingTime = 0.f;
+	CurrentData.numberOfLiveSuits = 1;
+
 	StartUDPSender("TESTSOCKETSENDER", "192.168.1.133", 55606);
 	//StartUDPReceiver("TESTSOCKETLISTENER", "192.168.1.133", 55606);
 	StartUDPReceiver("TESTSOCKETLISTENER", "0.0.0.0", 55606);
@@ -61,21 +74,21 @@ bool AUnrealSampleProjectGameModeBase::Sender_SendData()
 
 	int32 BytesSent = 0;
 
-	FRokokoRemoteInstance NewData;
-	NewData.type = "Instance";
-	NewData.version = 1;
-	NewData.provider = "PROVIDERNAME";
-	NewData.faceId = "KQ452";
-	NewData.deviceName = "DEVICENAME";
-	NewData.connectedTo = "";
-	NewData.requestedFrom = "";
-	NewData.commandKey = "";
-	NewData.commandPort = 0;
-	NewData.recording = false;
-	NewData.currentRecordingTime = 0.f;
-	NewData.numberOfLiveSuits = 1;
+	//FRokokoRemoteInstance NewData;
+	//NewData.type = "Instance";
+	//NewData.version = 1;
+	//NewData.provider = "PROVIDERNAME";
+	//NewData.faceId = "KQ452";
+	//NewData.deviceName = "DEVICENAME";
+	//NewData.connectedTo = "";
+	//NewData.requestedFrom = "";
+	//NewData.commandKey = "";
+	//NewData.commandPort = 0;
+	//NewData.recording = false;
+	//NewData.currentRecordingTime = 0.f;
+	//NewData.numberOfLiveSuits = 1;
 
-	FString MessageString = NewData.Serialize();
+	FString MessageString = CurrentData.Serialize();
 	TCHAR* serializedmessage = MessageString.GetCharArray().GetData();
 	int32 size = FCString::Strlen(serializedmessage);
 	int32 sent = 0;
@@ -196,7 +209,30 @@ void AUnrealSampleProjectGameModeBase::Recv(const FArrayReaderPtr& ArrayReaderPt
 		Data2 = FRokokoRemoteInstance(JsonObject);
 	}
 
-	Data2.DisplayValues();
+
+
+
+	if (Data2.type == "studio-keep-alive")
+	{
+
+	}
+	else
+	if (Data2.type == "studio-request")
+	{
+		CurrentData.connectedTo = Data2.deviceName;
+	}
+	else
+	if (Data2.type == "studio-cancel-request")
+	{
+		CurrentData.connectedTo = "";
+		UE_LOG(LogTemp, Warning, TEXT("DISCONNECT"));
+	}
+	else
+	{
+		Data2.DisplayValues();
+	}
+
+
 }
 
 FString FRokokoRemoteInstance::Serialize()

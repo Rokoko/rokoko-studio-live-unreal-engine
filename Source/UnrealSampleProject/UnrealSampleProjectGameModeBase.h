@@ -102,4 +102,7 @@ public:
 
 	FUdpSocketReceiver* UDPReceiver;
 	void Recv(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt);
+
+
+	FRokokoRemoteInstance CurrentData;
 };
