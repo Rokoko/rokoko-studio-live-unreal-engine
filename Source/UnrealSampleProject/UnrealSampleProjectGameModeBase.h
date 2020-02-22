@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "UdpSocketReceiver.h"
-
-#include "Dom/JsonObject.h"
-#include "Serialization/JsonWriter.h"
-#include "Serialization/JsonSerializer.h"
+//#include "UdpSocketReceiver.h"
+//
+//#include "Dom/JsonObject.h"
+//#include "Serialization/JsonWriter.h"
+//#include "Serialization/JsonSerializer.h"
 
 #include "UnrealSampleProjectGameModeBase.generated.h"
 
@@ -31,35 +31,35 @@ class FUdpSocketReceiver;
 //	public int numberOfLiveSuits;
 //};
 
-USTRUCT()
-struct FRokokoRemoteInstance /*: IValuable*/
-{
-public:
-	GENERATED_BODY()
-
-	FRokokoRemoteInstance() {}
-	FRokokoRemoteInstance(TSharedPtr<FJsonObject> jsonObject);
-
-	FString Serialize();
-
-	void DisplayValues();
-
-	FString type;
-	int version;
-	FString provider;
-	FString faceId;
-	FString deviceName;
-	FString connectedTo;
-	FString requestedFrom;
-	FString commandKey;
-	int commandPort;
-	bool recording;
-	float currentRecordingTime;
-	int numberOfLiveSuits;
-	bool commandApiOn;
-	bool commandApiLicense;
-	bool faceLicense;
-};
+//USTRUCT()
+//struct FRokokoRemoteInstance /*: IValuable*/
+//{
+//public:
+//	GENERATED_BODY()
+//
+//	FRokokoRemoteInstance() {}
+//	FRokokoRemoteInstance(TSharedPtr<FJsonObject> jsonObject);
+//
+//	FString Serialize();
+//
+//	void DisplayValues();
+//
+//	FString type;
+//	int version;
+//	FString provider;
+//	FString faceId;
+//	FString deviceName;
+//	FString connectedTo;
+//	FString requestedFrom;
+//	FString commandKey;
+//	int commandPort;
+//	bool recording;
+//	float currentRecordingTime;
+//	int numberOfLiveSuits;
+//	bool commandApiOn;
+//	bool commandApiLicense;
+//	bool faceLicense;
+//};
 
 /**
  * 
@@ -71,38 +71,38 @@ class UNREALSAMPLEPROJECT_API AUnrealSampleProjectGameModeBase : public AGameMod
 public:
 	AUnrealSampleProjectGameModeBase();
 
-    virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+ //   virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 
-    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+ //   virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-    UPROPERTY()
-    FTimerHandle FTH_TestHandle;
+ //   UPROPERTY()
+ //   FTimerHandle FTH_TestHandle;
 
-    UFUNCTION()
-    void TestFunction();
-
-
-
-
-	TSharedPtr<FInternetAddr> RemoteAddr;
-
-	FSocket* SenderSocket;
-
-	bool StartUDPSender(const FString& YourChosenSocketName, const FString& TheIP, const int32 ThePort);
-
-	bool Sender_SendData();
+ //   UFUNCTION()
+ //   void TestFunction();
 
 
 
 
+	//TSharedPtr<FInternetAddr> RemoteAddr;
 
-	bool StartUDPReceiver(const FString& YourChosenSocketName, const FString& TheIP, const int32 ThePort);
+	//FSocket* SenderSocket;
 
-	FSocket* ListenSocket;
+	//bool StartUDPSender(const FString& YourChosenSocketName, const FString& TheIP, const int32 ThePort);
 
-	FUdpSocketReceiver* UDPReceiver;
-	void Recv(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt);
+	//bool Sender_SendData();
 
 
-	FRokokoRemoteInstance CurrentData;
+
+
+
+	//bool StartUDPReceiver(const FString& YourChosenSocketName, const FString& TheIP, const int32 ThePort);
+
+	//FSocket* ListenSocket;
+
+	//FUdpSocketReceiver* UDPReceiver;
+	//void Recv(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt);
+
+
+	//FRokokoRemoteInstance CurrentData;
 };
