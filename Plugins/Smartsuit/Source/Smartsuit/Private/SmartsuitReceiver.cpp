@@ -21,7 +21,8 @@ void ASmartsuitReceiver::BeginPlay()
 	realLife = true;
 }
 
-void ASmartsuitReceiver::BeginDestroy() {
+void ASmartsuitReceiver::BeginDestroy() 
+{
 	Super::BeginDestroy();
 	StopListener();
 }
@@ -33,50 +34,165 @@ void ASmartsuitReceiver::Tick(float DeltaTime)
 }
 
 
-void ASmartsuitReceiver::StartListener() {
+void ASmartsuitReceiver::StartListener()
+{
 	UE_LOG(LogTemp, Warning, TEXT("Listening..."));
-	listener.Start(streamingDataPort);
+	//listener.Start(streamingDataPort);
 	VPlistener.Start(VPListenPort);
 }
 
-void ASmartsuitReceiver::StopListener() {
-	listener.Stop();
+void ASmartsuitReceiver::StopListener() 
+{
+	//listener.Stop();
 	VPlistener.Stop();
 	UE_LOG(LogTemp, Warning, TEXT("Not listening..."));
 }
 
-SuitData * ASmartsuitReceiver::GetSmartsuit(FString suitName)
+FFace ASmartsuitReceiver::GetFaceByFaceID(FString faceId)
 {
-	if (suitName.Len() == 0 || suitName.Compare(FString("")) == 0) {
-		return nullptr;
-	}
-	for (int i = 0; i < 10; i++) {
-		FString mySuitName(listener.suits[i].suitname);
-		if (suitName.Compare(mySuitName) == 0 && mySuitName.Len() > 0) {
-			return &(listener.suits[i]);
-		}
-	}
-	return nullptr;
+	return VPlistener.GetFaceByFaceID(faceId);
 }
 
-FProp* ASmartsuitReceiver::GetPropByNameFromVP(FString name, bool isLive) {
+FFace ASmartsuitReceiver::GetFaceByProfileName(const FString& faceName, bool& found)
+{
+	//return *VPlistener.GetFaceByProfileName(faceName);
+
+
+
+	found = false;
+	FFace returnval;
+	FFace* temp = VPlistener.GetFaceByProfileName(faceName);
+	if (temp)
+	{
+		returnval = *temp;
+		found = true;
+	}
+	return returnval;
+}
+
+TArray<FFace> ASmartsuitReceiver::GetAllFaces()
+{
+	return VPlistener.GetAllFaces();
+}
+
+TArray<FFace> ASmartsuitReceiver::GetFacesNotAssociatedWithActor()
+{
+	TArray<FFace> FacesNotPairedWithSuit;
+	for (auto CurrentFace : GetAllFaces())
+	{
+		bool FoundExistingProfileForFace = false;
+
+		for (auto CurrentSuit : GetAllSmartsuits())
+		{
+			if (CurrentSuit.id == CurrentFace.profileName)
+			{
+				FoundExistingProfileForFace = true;
+			}
+		}
+
+		if (!FoundExistingProfileForFace)
+		{
+			FacesNotPairedWithSuit.Add(CurrentFace);
+		}
+	}
+	return FacesNotPairedWithSuit;
+}
+
+FSuitData* ASmartsuitReceiver::GetSmartsuit(FString suitName)
+{
+	return VPlistener.GetSmartsuitByName(suitName);
+}
+FSuitData ASmartsuitReceiver::GetSmartsuitByName(FString suitName)
+{
+	return *VPlistener.GetSmartsuitByName(suitName);
+}
+
+TArray<FSuitData> ASmartsuitReceiver::GetAllSmartsuits()
+{
+	return VPlistener.GetAllSmartsuits();
+}
+
+TArray<FString> ASmartsuitReceiver::GetAvailableSmartsuitNames()
+{
+	return VPlistener.GetAvailableSmartsuitNames();
+}
+
+
+FProp* ASmartsuitReceiver::GetPropByNameFromVP(FString name, bool isLive) 
+{
 	return VPlistener.GetPropByName(name, isLive);
 }
 
-FTracker* ASmartsuitReceiver::GetTrackerByNameFromVP(FString name, bool isLive) {
-	return VPlistener.GetTrackerByName(name, isLive);
+TArray<FProp> ASmartsuitReceiver::GetAllProps()
+{
+	TArray<FProp> result;
+	//UE_LOG(LogTemp, Display, TEXT("Yeeee1"));
+	bool found = false;
+	int i = 0;
+	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	{
+		//UE_LOG(LogTemp, Display, TEXT("Looking up receiver %d"), i);
+		i++;
+		if (It->realLife)
+		{
+			found = true;
+			//UE_LOG(LogTemp, Display, TEXT("Real life!"));
+			result = It->VPlistener.GetAllProps();
+		}
+	}
+	if (!found)
+	{
+		//UE_LOG(LogTemp, Display, TEXT("not Real life..."));
+	}
+	//UE_LOG(LogTemp, Display, TEXT("Yeeee2 %d"), result.Num());
+	return result;
 }
 
-TArray<FString> ASmartsuitReceiver::GetAvailableSmartsuits() {
-	TArray<FString> result;
-	for (int i = 0; i < 10; i++) {
-		if (strcmp(listener.suits[i].suitname, "\0\0\0\0") != 0 && listener.suits[i].fps > 0) {
-			result.Add(FString(listener.suits[i].suitname));
+FProp ASmartsuitReceiver::GetProp(FString name, bool isLive)
+{
+	FProp result;
+	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	{
+		if (It->realLife)
+		{
+			result = *It->GetPropByNameFromVP(name, isLive);
 		}
 	}
 	return result;
 }
 
-void ASmartsuitReceiver::SetSupportsWiFiAPI(FString suitname) {
-	listener.wifiSupportedSuits.Add(suitname);
+FTracker* ASmartsuitReceiver::GetTrackerByNameFromVP(FString name, bool isLive) 
+{
+	return VPlistener.GetTrackerByName(name, isLive);
+}
+
+FTracker ASmartsuitReceiver::GetTracker(FString name, bool isLive)
+{
+	FTracker result;
+	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	{
+		if (It->realLife)
+		{
+			result = *It->GetTrackerByNameFromVP(name, isLive);
+		}
+	}
+	return result;
+}
+
+FTracker ASmartsuitReceiver::GetTrackerByConnectionIDFromVP(const FString& name, bool isLive, bool& found)
+{
+	found = false;
+	FTracker returnval;
+	FTracker* temp = VPlistener.GetTrackerByConnectionID(name, isLive);
+	if (temp)
+	{
+		returnval = *temp;
+		found = true;
+	}
+	return returnval;
+}
+
+void ASmartsuitReceiver::SetSupportsWiFiAPI(FString suitname) 
+{
+	//listener.wifiSupportedSuits.Add(suitname);
 }

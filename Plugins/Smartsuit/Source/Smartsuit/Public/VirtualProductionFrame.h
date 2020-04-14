@@ -6,6 +6,7 @@
 #include "Dom/JsonValue.h"
 #include "Dom/JsonObject.h"
 //#include "SmartsuitBlueprintLibrary.h"
+#include "SmartsuitDefinitions.h"
 #include "VirtualProductionFrame.generated.h"
 
 
@@ -57,7 +58,8 @@ struct FReferencePoint {
 };
 
 USTRUCT(BlueprintType, meta = (ToolTip = "Contains all information about a prop's profile."))
-struct FProfile {
+struct FProfile 
+{
 
 	GENERATED_USTRUCT_BODY()
 
@@ -75,7 +77,7 @@ struct FProfile {
 
 	/** Holds information about the color. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Profile's color."))
-	FColor color;
+	FLinearColor color;
 
 	/** Tracker offset position and rotation. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Tracker Offset."))
@@ -244,6 +246,8 @@ struct FFace
 	FFace() {}
 	FFace(TSharedPtr<FJsonObject> jsonObject);
 
+	UPROPERTY(BlueprintReadOnly)
+	FString profileName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's version."))
 	int version;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's provider."))
@@ -381,6 +385,10 @@ struct FVirtualProductionFrame {
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "List of faces."))
 	TArray<FFace> faces;
+
+	UPROPERTY()
+	TArray<FSuitData> suits;
+
 	//FVirtualProductionFrame (){}
 };
 

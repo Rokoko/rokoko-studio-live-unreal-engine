@@ -56,7 +56,8 @@ public class SmartsuitEditor : ModuleRules
                 "SlateCore",
                 "Slate",
 
-                "LiveLinkInterface"
+                "LiveLinkInterface",
+                "ToolMenus"
             }
             );
 
