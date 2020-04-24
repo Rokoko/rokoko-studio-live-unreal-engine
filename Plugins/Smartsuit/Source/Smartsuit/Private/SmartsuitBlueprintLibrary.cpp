@@ -80,6 +80,11 @@ FQuat USmartsuitBlueprintLibrary::GetQuaternionField(TSharedPtr<FJsonObject> jso
 	return ReturnVal;
 }
 
+double USmartsuitBlueprintLibrary::ParseMorphTargetValue(TSharedPtr<FJsonObject> jsonObject, const FString& FieldName)
+{
+	return FMath::GetMappedRangeValueClamped(FVector2D(0.f, 100.f), FVector2D(0.f, 1.f), jsonObject->GetNumberField(FieldName));
+}
+
 void USmartsuitBlueprintLibrary::CreateVirtualProductionSource()
 {
 	FVirtualProductionSource::CreateLiveLinkSource();

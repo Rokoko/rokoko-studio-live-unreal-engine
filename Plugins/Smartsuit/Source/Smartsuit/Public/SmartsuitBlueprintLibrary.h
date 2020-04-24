@@ -50,6 +50,8 @@ public:
 
 	static FQuat GetQuaternionField(TSharedPtr<FJsonObject> jsonObject);
 
+	static double ParseMorphTargetValue(TSharedPtr<FJsonObject> jsonObject, const FString& FieldName);
+
 	UFUNCTION(BlueprintCallable, Category = "Smartsuit")
 	static void CreateVirtualProductionSource();
 };
