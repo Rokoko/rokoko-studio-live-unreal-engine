@@ -157,7 +157,7 @@ void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtu
 		else
 		if (testval.StartsWith("Light"))
 		{
-			FLiveLinkStaticDataStruct LightData(FLiveLinkCameraStaticData::StaticStruct());
+			FLiveLinkStaticDataStruct LightData(FLiveLinkLightStaticData::StaticStruct());
 			FLiveLinkLightStaticData& LightStaticData = *LightData.Cast<FLiveLinkLightStaticData>();
 
 			Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkLightRole::StaticClass(), MoveTemp(LightData));
@@ -255,7 +255,9 @@ void FVirtualProductionSource::HandleSuitData(FSuitData suit)
 	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
 	SkeletonData->SetBoneNames(boneNames);
 	SkeletonData->SetBoneParents(boneParents);
-	Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
+
+	if(Client)
+		Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
 }
 
 
@@ -499,7 +501,8 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 
 		AnimFrameData.Transforms.Append(transforms);
 
-		Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData1));
+		if(Client)
+			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData1));
 	}
 }
 
@@ -701,7 +704,7 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 			if (testval.StartsWith("light"))
 			{
 				FTimer timer;
-				FLiveLinkFrameDataStruct FrameData1(FLiveLinkCameraFrameData::StaticStruct());
+				FLiveLinkFrameDataStruct FrameData1(FLiveLinkLightFrameData::StaticStruct());
 				FLiveLinkLightFrameData& LightFrameData = *FrameData1.Cast<FLiveLinkLightFrameData>();
 				LightFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
 				LightFrameData.Transform = hardCodedTransform;
@@ -780,7 +783,7 @@ void FVirtualProductionSource::RemoveLiveLinkSource(TSharedPtr<FVirtualProductio
 	}
 }
 
-FName UVPFaceMorphTargetNameRemappingNew::GetRemappedCurveName_Implementation(FName CurveName) const
+FName URokokoFaceMapData::GetRemappedCurveName_Implementation(FName CurveName) const
 {
 	if (auto RemappedName = NameMapping.Find(CurveName))
 	{
@@ -789,7 +792,7 @@ FName UVPFaceMorphTargetNameRemappingNew::GetRemappedCurveName_Implementation(FN
 	return "";
 }
 
-void UVPFaceMorphTargetNameRemappingNew::Initialize()
+void URokokoFaceMapData::Initialize()
 {
 	InitializeTMap();
 }

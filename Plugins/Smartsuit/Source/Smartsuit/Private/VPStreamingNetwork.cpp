@@ -6,7 +6,8 @@
 #include "Runtime/Core/Public/Containers/UnrealString.h"
 //#include "Engine.h"
 #include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
-
+#include "BufferArchive.h"
+#include "lz4frame.h"
 
 VPStreamingNetwork::VPStreamingNetwork()
 {
@@ -46,7 +47,7 @@ void VPStreamingNetwork::Start(int port)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("VP port... %i"), streaming_port);
 	}
-	Thread = FRunnableThread::Create(this, *ThreadName, 8 * 1024, TPri_Normal);
+	Thread = FRunnableThread::Create(this, *ThreadName, 512 * 1024, TPri_Normal);
 }
 
 
@@ -103,8 +104,11 @@ void VPStreamingNetwork::SendSuitsToLiveLink(TArray<FSuitData> Smartsuits)
 	}
 }
 
+PRAGMA_DISABLE_OPTIMIZATION
 uint32 VPStreamingNetwork::Run()
 {
+	static LZ4F_decompressionContext_t g_dCtx;
+	LZ4F_createDecompressionContext(&g_dCtx, LZ4F_VERSION);
 	bool added = false;
 	while (!Stopping)
 	{
@@ -130,7 +134,60 @@ uint32 VPStreamingNetwork::Run()
 				if (Stopping) break;
 				mtx.lock();
 				FVirtualProductionFrame VPFrame;
-				FString result = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
+
+				int32 UncompressedSize = 2097152;
+
+				TArray<uint8> UncompressedData;
+				UncompressedData.Empty(UncompressedSize);
+				UncompressedData.AddUninitialized(UncompressedSize);
+
+				//FName FormatName = NAME_LZ4;
+				//if (!FCompression::UncompressMemory(FormatName, UncompressedData.GetData(), UncompressedSize, data, static_cast<int32_t>(bytes_read)))
+				//{
+				//	UE_LOG(LogTemp, Error, TEXT("FCompression::UncompressMemory - Failed to uncompress memory (%d/%d) from address %p using format %s, this may indicate the asset is corrupt!"), bytes_read, UncompressedSize, data, *FormatName.ToString());
+				//}
+
+				
+				IFileManager* FileManager = &IFileManager::Get();
+				uint32 WriteFlags = 0;
+
+				//FString path = "C:/GitHub/rokoko-studio-live-unreal-engine_JSONV3/test12345678.lz4";
+				//TUniquePtr<FArchive> Ar = TUniquePtr<FArchive>(FileManager->CreateFileWriter(*path, WriteFlags));
+				//if (!Ar)
+				//{
+				//	UE_LOG(LogTemp, Error, TEXT("Could not write file %s!"), bytes_read, UncompressedSize, data, *FormatName.ToString());
+				//}
+				//Ar->Serialize(const_cast<uint8*>(data), bytes_read);
+				//Ar->Close();
+
+
+				size_t srcSize = (size_t)bytes_read;
+				size_t dstSize = (size_t)UncompressedData.Num();
+				size_t decompressResult;
+				verify(srcSize >= 0);
+				verify(dstSize >= 0);
+				decompressResult = LZ4F_decompress(g_dCtx, UncompressedData.GetData(), &dstSize, data, &srcSize, NULL);
+				if (decompressResult != 0) { UE_LOG(LogTemp, Error, TEXT("Error decompressing frame : unfinished frame \n")); }
+				if (srcSize != (size_t)bytes_read) { UE_LOG(LogTemp, Error, TEXT("Error decompressing frame : read size incorrect \n")); }
+
+
+				//FString path2 = "C:/GitHub/rokoko-studio-live-unreal-engine_JSONV3/3actorstest.txt";
+				//TUniquePtr<FArchive> Ar2 = TUniquePtr<FArchive>(FileManager->CreateFileWriter(*path2, WriteFlags));
+				//if (!Ar2)
+				//{
+				//	UE_LOG(LogTemp, Error, TEXT("Could not write file %s!"), *path2);
+				//}
+				//Ar2->Serialize(UncompressedData.GetData(), dstSize);
+				//Ar2->Close();
+
+
+
+
+				FString result = BytesToStringFixed(UncompressedData.GetData(), static_cast<int32_t>(dstSize));
+				FString test = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
+				//FString result = BytesToString(UncompressedData.GetData(), static_cast<int32_t>(UncompressedData.Num()));
+				//FString result = BytesToStringFixed(UncompressedData.GetData(), UncompressedData.Num());
+				//FString result = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
 				//UE_LOG(LogTemp, Warning, TEXT("received: %s"), *result);
 				//FJsonObjectConverter::JsonObjectStringToUStruct(result, &VPFrame, 0, 0);
 
@@ -143,34 +200,59 @@ uint32 VPStreamingNetwork::Run()
 					//VPFrame.timestamp = JsonObject->GetNumberField("timestamp");
 					//VPFrame.playbackTimestamp = JsonObject->GetNumberField("");
 
-					TArray<TSharedPtr<FJsonValue>> propsarray = JsonObject->GetArrayField("props");
-
-					for (auto& currentprop : propsarray)
+					//LIVE
 					{
-						VPFrame.props.Add(FProp(currentprop->AsObject()));
-					}
+						TSharedPtr<FJsonObject> LiveObj = JsonObject->GetObjectField("Live");
+						TArray<TSharedPtr<FJsonValue>> Livepropsarray = LiveObj->GetArrayField("props");
 
-					TArray<TSharedPtr<FJsonValue>> trackersarray = JsonObject->GetArrayField("trackers");
-
-					for (auto& currenttracker : trackersarray)
-					{
-						VPFrame.trackers.Add(FTracker(currenttracker->AsObject()));
-					}
-
-					TArray<TSharedPtr<FJsonValue>> facesarray = JsonObject->GetArrayField("faces");
-
-					for (auto& currentface : facesarray)
-					{
-						VPFrame.faces.Add(FFace(currentface->AsObject()));
-					}
-
-					if (JsonObject->HasField("actors"))
-					{
-						TArray<TSharedPtr<FJsonValue>> suitsarray = JsonObject->GetArrayField("actors");
-
-						for (auto& currentsuit : suitsarray)
+						for (auto& currentprop : Livepropsarray)
 						{
-							VPFrame.suits.Add(FSuitData(currentsuit->AsObject()));
+							VPFrame.props.Add(FProp(true, currentprop->AsObject()));
+						}
+
+						if (LiveObj->HasField("actors"))
+						{
+							TArray<TSharedPtr<FJsonValue>> Livesuitsarray = LiveObj->GetArrayField("actors");
+							for (auto& currentsuit : Livesuitsarray)
+							{
+								auto SuitData = FSuitData(true, currentsuit->AsObject());
+								if (SuitData.hasFace)
+								{
+									auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
+									auto FaceData = FFace(JSONObjectface);
+									SuitData.faceId = FaceData.faceId;
+									VPFrame.faces.Add(FaceData);
+								}
+								VPFrame.suits.Add(SuitData);
+							}
+						}
+					}
+
+					//PLAYBACK
+					{
+						TSharedPtr<FJsonObject> PlaybackObj = JsonObject->GetObjectField("Playback");
+						TArray<TSharedPtr<FJsonValue>> Playbackpropsarray = PlaybackObj->GetArrayField("props");
+
+						for (auto& currentprop : Playbackpropsarray)
+						{
+							VPFrame.props.Add(FProp(false, currentprop->AsObject()));
+						}
+
+						if (PlaybackObj->HasField("actors"))
+						{
+							TArray<TSharedPtr<FJsonValue>> Playbacksuitsarray = PlaybackObj->GetArrayField("actors");
+							for (auto& currentsuit : Playbacksuitsarray)
+							{
+								auto SuitData = FSuitData(false, currentsuit->AsObject());
+								if (SuitData.hasFace)
+								{
+									auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
+									auto FaceData = FFace(JSONObjectface);
+									SuitData.faceId = FaceData.faceId;
+									VPFrame.faces.Add(FaceData);
+								}
+								VPFrame.suits.Add(SuitData);
+							}
 						}
 					}
 				}
@@ -247,7 +329,7 @@ uint32 VPStreamingNetwork::Run()
 	}
 	return 0;
 }
-
+PRAGMA_ENABLE_OPTIMIZATION
 FProp* VPStreamingNetwork::GetPropByName(FString name, bool isLive)
 {
 	FProp *result = nullptr;

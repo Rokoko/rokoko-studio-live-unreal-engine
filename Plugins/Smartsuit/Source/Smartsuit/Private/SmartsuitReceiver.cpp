@@ -102,9 +102,18 @@ FSuitData* ASmartsuitReceiver::GetSmartsuit(FString suitName)
 {
 	return VPlistener.GetSmartsuitByName(suitName);
 }
-FSuitData ASmartsuitReceiver::GetSmartsuitByName(FString suitName)
+
+bool ASmartsuitReceiver::GetSmartsuitByName(const FString& suitName, FSuitData& SuitData)
 {
-	return *VPlistener.GetSmartsuitByName(suitName);
+	//return *VPlistener.GetSmartsuitByName(suitName);
+
+	if (FSuitData* smartsuit = GetSmartsuit(suitName))
+	{
+		SuitData = *smartsuit;
+		return true;
+	}
+	SuitData = FSuitData();
+	return false;
 }
 
 TArray<FSuitData> ASmartsuitReceiver::GetAllSmartsuits()
@@ -122,7 +131,7 @@ FProp* ASmartsuitReceiver::GetPropByNameFromVP(FString name, bool isLive)
 {
 	return VPlistener.GetPropByName(name, isLive);
 }
-
+PRAGMA_DISABLE_OPTIMIZATION
 TArray<FProp> ASmartsuitReceiver::GetAllProps()
 {
 	TArray<FProp> result;
@@ -147,7 +156,7 @@ TArray<FProp> ASmartsuitReceiver::GetAllProps()
 	//UE_LOG(LogTemp, Display, TEXT("Yeeee2 %d"), result.Num());
 	return result;
 }
-
+PRAGMA_ENABLE_OPTIMIZATION
 FProp ASmartsuitReceiver::GetProp(FString name, bool isLive)
 {
 	FProp result;

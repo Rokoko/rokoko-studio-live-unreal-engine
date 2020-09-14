@@ -79,78 +79,92 @@ SmartsuitDefinitions::~SmartsuitDefinitions()
 {
 }
 
-FSuitData::FSuitData(TSharedPtr<FJsonObject> jsonObject)
+FSuitData::FSuitData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 {
 	suitname = jsonObject->GetStringField("name");
-	timestamp = jsonObject->GetNumberField("timestamp");
-	id = jsonObject->GetStringField("id");
-	isLive = jsonObject->GetBoolField("isLive");
-	profileName = jsonObject->GetStringField("profileName");
-	color = USmartsuitBlueprintLibrary::GetFLinearColorField(jsonObject->GetObjectField("color"));
 
-	ParseBone(jsonObject, SmartsuitBones::hip.ToString());
-	ParseBone(jsonObject, SmartsuitBones::spine.ToString());
-	ParseBone(jsonObject, SmartsuitBones::chest.ToString());
-	ParseBone(jsonObject, SmartsuitBones::neck.ToString());
-	ParseBone(jsonObject, SmartsuitBones::head.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftShoulder.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftUpperArm.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftLowerArm.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftHand.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightShoulder.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightUpperArm.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightLowerArm.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightHand.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftUpLeg.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftLeg.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftFoot.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftToe.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftToeEnd.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightUpLeg.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightLeg.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightFoot.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightToe.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightToeEnd.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftThumbProximal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftThumbMedial.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftThumbDistal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftThumbTip.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftIndexProximal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftIndexMedial.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftIndexDistal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftIndexTip.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftMiddleProximal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftMiddleMedial.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftMiddleDistal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftMiddleTip.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftRingProximal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftRingMedial.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftRingDistal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftRingTip.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftLittleProximal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftLittleMedial.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftLittleDistal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::leftLittleTip.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightThumbProximal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightThumbMedial.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightThumbDistal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightThumbTip.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightIndexProximal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightIndexMedial.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightIndexDistal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightIndexTip.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightMiddleProximal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightMiddleMedial.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightMiddleDistal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightMiddleTip.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightRingProximal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightRingMedial.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightRingDistal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightRingTip.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightLittleProximal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightLittleMedial.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightLittleDistal.ToString());
-	ParseBone(jsonObject, SmartsuitBones::rightLittleTip.ToString());
+	//temp
+	profileName = suitname;
+
+	//timestamp = jsonObject->GetNumberField("timestamp");
+	//id = jsonObject->GetStringField("id");
+	//isLive = jsonObject->GetBoolField("isLive");
+	isLive = InIsLive;
+	//profileName = jsonObject->GetStringField("profileName");
+	//color = USmartsuitBlueprintLibrary::GetFLinearColorField(jsonObject->GetObjectField("color"));
+	//TArray<TSharedPtr<FJsonValue>> ColorArray = jsonObject->GetArrayField("color");
+	color = USmartsuitBlueprintLibrary::GetColorField(jsonObject);
+
+	TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField("meta");
+	hasGloves = Meta->GetBoolField("hasGloves");
+	hasBody = Meta->GetBoolField("hasBody");
+	hasFace = Meta->GetBoolField("hasFace");
+
+	TSharedPtr<FJsonObject> BodyObj = jsonObject->GetObjectField("body");
+
+	ParseBone(BodyObj, SmartsuitBones::hip.ToString());
+	ParseBone(BodyObj, SmartsuitBones::spine.ToString());
+	ParseBone(BodyObj, SmartsuitBones::chest.ToString());
+	ParseBone(BodyObj, SmartsuitBones::neck.ToString());
+	ParseBone(BodyObj, SmartsuitBones::head.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftShoulder.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftUpperArm.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftLowerArm.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftHand.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightShoulder.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightUpperArm.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightLowerArm.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightHand.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftUpLeg.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftLeg.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftFoot.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftToe.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftToeEnd.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightUpLeg.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightLeg.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightFoot.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightToe.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightToeEnd.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftThumbProximal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftThumbMedial.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftThumbDistal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftThumbTip.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftIndexProximal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftIndexMedial.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftIndexDistal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftIndexTip.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftMiddleProximal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftMiddleMedial.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftMiddleDistal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftMiddleTip.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftRingProximal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftRingMedial.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftRingDistal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftRingTip.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftLittleProximal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftLittleMedial.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftLittleDistal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::leftLittleTip.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightThumbProximal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightThumbMedial.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightThumbDistal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightThumbTip.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightIndexProximal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightIndexMedial.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightIndexDistal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightIndexTip.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightMiddleProximal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightMiddleMedial.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightMiddleDistal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightMiddleTip.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightRingProximal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightRingMedial.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightRingDistal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightRingTip.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightLittleProximal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightLittleMedial.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightLittleDistal.ToString());
+	ParseBone(BodyObj, SmartsuitBones::rightLittleTip.ToString());
 }
 
 void FSuitData::ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& BoneName)

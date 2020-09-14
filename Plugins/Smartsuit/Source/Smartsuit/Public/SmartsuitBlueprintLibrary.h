@@ -46,6 +46,8 @@ public:
 
 	static FVector GetVectorField(TSharedPtr<FJsonObject> jsonObject);
 
+	static FColor GetColorField(TSharedPtr<FJsonObject> jsonObject);
+
 	static FLinearColor GetFLinearColorField(TSharedPtr<FJsonObject> jsonObject);
 
 	static FQuat GetQuaternionField(TSharedPtr<FJsonObject> jsonObject);

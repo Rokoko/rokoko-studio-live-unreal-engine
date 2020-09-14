@@ -122,6 +122,9 @@ struct FProp {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Prop's name."))
 	FString name;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Rotation information."))
+	FColor color;
+
 	/** ID of the prop. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Prop's id."))
 	FString id;
@@ -143,7 +146,7 @@ struct FProp {
 
 	FProp() {}
 
-	FProp(TSharedPtr<FJsonObject> jsonObject);
+	FProp(bool InIsLive, TSharedPtr<FJsonObject> jsonObject);
 
 	///**
 	//* Get sensor position in Unreal coordinate system.

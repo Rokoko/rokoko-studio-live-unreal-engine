@@ -68,7 +68,7 @@ public:
 	FSuitData* GetSmartsuit(FString suitName);
 
 	UFUNCTION(BlueprintCallable)
-	FSuitData GetSmartsuitByName(FString suitName);
+	bool GetSmartsuitByName(const FString& suitName, FSuitData& SuitData);
 
 	/**
 	* Lists the names of all known Smartsuits connected to this computer.

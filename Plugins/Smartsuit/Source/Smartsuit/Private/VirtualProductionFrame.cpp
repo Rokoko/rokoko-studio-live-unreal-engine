@@ -11,14 +11,16 @@ VirtualProductionFrame::~VirtualProductionFrame()
 {
 }
 
-FProp::FProp(TSharedPtr<FJsonObject> jsonObject)
+FProp::FProp(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 {
 	name = jsonObject->GetStringField("name");
-	id = jsonObject->GetStringField("id");
+	//id = jsonObject->GetStringField("id");
+	color = USmartsuitBlueprintLibrary::GetColorField(jsonObject);
 	position = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField("position"));
 	rotation = USmartsuitBlueprintLibrary::GetQuaternionField(jsonObject->GetObjectField("rotation"));
-	isLive = jsonObject->GetBoolField("isLive");
-	profile = FProfile(jsonObject->GetObjectField("profile"));
+	//isLive = jsonObject->GetBoolField("isLive");
+	isLive = InIsLive;
+	//profile = FProfile(jsonObject->GetObjectField("profile"));
 }
 
 FProfile::FProfile(TSharedPtr<FJsonObject> jsonObject)
@@ -72,8 +74,8 @@ FFace::FFace(TSharedPtr<FJsonObject> jsonObject)
 {
 
 	//profileName = jsonObject->GetStringField("profileName");
-	version = jsonObject->GetIntegerField("version");
-	provider = jsonObject->GetStringField("provider");
+	//version = jsonObject->GetIntegerField("version");
+	//provider = jsonObject->GetStringField("provider");
 	faceId = jsonObject->GetStringField("faceId");
 	if (!jsonObject->TryGetStringField("profileName", profileName))
 	{

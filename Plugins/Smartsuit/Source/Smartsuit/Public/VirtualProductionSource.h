@@ -32,11 +32,11 @@ struct FVPMorphTargetMapping
 };
 
 UCLASS(BlueprintType)
-class SMARTSUIT_API UVPFaceMorphTargetNameRemappingNew : public ULiveLinkRemapAsset
+class SMARTSUIT_API URokokoFaceMapData : public ULiveLinkRemapAsset
 {
 	GENERATED_BODY()
 
-	UVPFaceMorphTargetNameRemappingNew()
+	URokokoFaceMapData()
 	{
 		browDownLeft = "browDownLeft";
 		browDownRight = "browDownRight";
