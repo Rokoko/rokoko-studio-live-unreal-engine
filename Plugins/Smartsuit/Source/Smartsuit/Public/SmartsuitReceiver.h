@@ -132,7 +132,7 @@ public:
 	//}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a prop by name."))
-	static FProp GetProp(FString name, bool isLive);
+	bool GetProp(FString name, bool isLive, FProp& OutProp);
 	//{
 	//	FProp result;
 	//	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)

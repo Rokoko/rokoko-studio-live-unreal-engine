@@ -157,17 +157,25 @@ TArray<FProp> ASmartsuitReceiver::GetAllProps()
 	return result;
 }
 PRAGMA_ENABLE_OPTIMIZATION
-FProp ASmartsuitReceiver::GetProp(FString name, bool isLive)
+bool ASmartsuitReceiver::GetProp(FString name, bool isLive, FProp& OutProp)
 {
-	FProp result;
-	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	//FProp result;
+	//for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	//{
+	//	if (It->realLife)
+	//	{
+	//		result = *It->GetPropByNameFromVP(name, isLive);
+	//	}
+	//}
+	//return result;
+
+	if (FProp* prop = GetPropByNameFromVP(name, isLive))
 	{
-		if (It->realLife)
-		{
-			result = *It->GetPropByNameFromVP(name, isLive);
-		}
+		OutProp = *prop;
+		return true;
 	}
-	return result;
+	OutProp = FProp();
+	return false;
 }
 
 FTracker* ASmartsuitReceiver::GetTrackerByNameFromVP(FString name, bool isLive) 
