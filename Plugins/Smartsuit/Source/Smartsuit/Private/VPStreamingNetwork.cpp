@@ -6,7 +6,7 @@
 #include "Runtime/Core/Public/Containers/UnrealString.h"
 //#include "Engine.h"
 #include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
-#include "BufferArchive.h"
+#include "Serialization/BufferArchive.h"
 #include "lz4frame.h"
 
 VPStreamingNetwork::VPStreamingNetwork()
@@ -202,7 +202,7 @@ uint32 VPStreamingNetwork::Run()
 
 					//LIVE
 					{
-						TSharedPtr<FJsonObject> LiveObj = JsonObject->GetObjectField("Live");
+						TSharedPtr<FJsonObject> LiveObj = JsonObject->GetObjectField("live");
 						TArray<TSharedPtr<FJsonValue>> Livepropsarray = LiveObj->GetArrayField("props");
 
 						for (auto& currentprop : Livepropsarray)
@@ -230,7 +230,7 @@ uint32 VPStreamingNetwork::Run()
 
 					//PLAYBACK
 					{
-						TSharedPtr<FJsonObject> PlaybackObj = JsonObject->GetObjectField("Playback");
+						TSharedPtr<FJsonObject> PlaybackObj = JsonObject->GetObjectField("playback");
 						TArray<TSharedPtr<FJsonValue>> Playbackpropsarray = PlaybackObj->GetArrayField("props");
 
 						for (auto& currentprop : Playbackpropsarray)
