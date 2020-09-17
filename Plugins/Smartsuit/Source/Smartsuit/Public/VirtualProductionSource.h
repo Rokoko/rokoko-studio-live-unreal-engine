@@ -605,10 +605,14 @@ public:
 	FVirtualProductionSource(const FText& InSourceType, const FText& InSourceMachineName, const FMessageAddress& InConnectionAddress)
 		: SourceType(InSourceType)
 		, SourceMachineName(InSourceMachineName)
-		
-	{}
+	{
+		Client = nullptr;
+	}
 
-	FVirtualProductionSource(){}
+	FVirtualProductionSource()
+	{
+		Client = nullptr;
+	}
 
 	virtual ~FVirtualProductionSource();
 

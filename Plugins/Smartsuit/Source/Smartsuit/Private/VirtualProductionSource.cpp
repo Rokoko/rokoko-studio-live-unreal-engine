@@ -33,6 +33,14 @@ bool FVirtualProductionSource::IsSourceStillValid() const
 
 void FVirtualProductionSource::HandleClearSubject(const FName subjectName)
 {
+	//verify(Client != nullptr);
+
+	if (Client == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client was null!!!!!!"));
+		return;
+	}
+
 	//Client->ClearSubject(subjectName);
 	Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid,subjectName));
 }
@@ -66,6 +74,14 @@ bool FVirtualProductionSource::RequestSourceShutdown()
 
 void FVirtualProductionSource::HandleFaceData(FFace face) 
 {
+	//verify(Client != nullptr);
+
+	if (Client == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client was null!!!!!!"));
+		return;
+	}
+
 	//UE_LOG(LogTemp, Warning, TEXT("Creating a new face %s - %f"), *face.GetSubjectName().ToString(), face.jawOpen);
 	faceNames.Add(face.GetSubjectName());
 
@@ -133,6 +149,14 @@ void FVirtualProductionSource::HandleFaceData(FFace face)
 
 void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtualProductionObject)
 {
+	//verify(Client != nullptr);
+
+	if (Client == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client was null!!!!!!"));
+		return;
+	}
+
 	subjectNames.Add(virtualProductionObject.name);
 
 	FLiveLinkSubjectKey Key = FLiveLinkSubjectKey(SourceGuid, virtualProductionObject.name);
@@ -508,6 +532,14 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 
 void FVirtualProductionSource::HandleFace(TArray<FFace> faces) 
 {
+	//verify(Client != nullptr);
+
+	if (Client == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client was null!!!!!!"));
+		return;
+	}
+
 	//UE_LOG(LogTemp, Warning, TEXT("Handling faces %d"), faces.Num());
 	existingFaces.Empty();
 	notExistingSubjects.Empty();
@@ -627,6 +659,14 @@ void FVirtualProductionSource::HandleFace(TArray<FFace> faces)
 
 void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubject> subjects)
 {
+	//verify(Client != nullptr);
+
+	if (Client == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client was null!!!!!!"));
+		return;
+	}
+
 	existingSubjects.Empty();
 	notExistingSubjects.Empty();
 
