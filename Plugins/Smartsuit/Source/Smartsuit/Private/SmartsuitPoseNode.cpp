@@ -374,6 +374,8 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 
 	FLiveLinkSubjectFrameData SubjectFrameData;
 
+	FLiveLinkSubjectName LiveLinkSubjectName = GetLiveLinkSubjectName();
+
 	TSubclassOf<ULiveLinkRole> SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole(LiveLinkSubjectName);
 	if (SubjectRole)
 	{
@@ -860,6 +862,7 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	ApplySmartsuitRotation(BoneMap.rightLittleTip, rightLittleTipQuat * rightLittleTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 }
 PRAGMA_ENABLE_OPTIMIZATION
+
 bool FSmartsuitPoseNode::IsValidToEvaluate(const USkeleton* Skeleton, const FBoneContainer& RequiredBones)
 {
 	// if both bones are valid
@@ -1071,6 +1074,11 @@ void FSmartsuitPoseNode::InitializeBoneReferences(const FBoneContainer& Required
 	BoneMap.rightLittleMedial.Initialize(RequiredBones);
 	BoneMap.rightLittleDistal.Initialize(RequiredBones);
 	BoneMap.rightLittleTip.Initialize(RequiredBones);
+}
+
+FLiveLinkSubjectName FSmartsuitPoseNode::GetLiveLinkSubjectName()
+{
+	return FName("actor:" + RokokoActorName.ToString() + ":body");
 }
 
 USmartsuitBodyMapData::USmartsuitBodyMapData()

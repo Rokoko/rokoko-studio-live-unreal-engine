@@ -421,7 +421,7 @@ struct FSuitData
 
 	FName GetSubjectName()
 	{
-		return FName(*suitname);
+		return FName("actor:" + suitname + ":body");
 	}
 };
 

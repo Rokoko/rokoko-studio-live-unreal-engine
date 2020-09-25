@@ -219,7 +219,7 @@ uint32 VPStreamingNetwork::Run()
 								if (SuitData.hasFace)
 								{
 									auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
-									auto FaceData = FFace(JSONObjectface);
+									auto FaceData = FFace(JSONObjectface, SuitData.suitname);
 									SuitData.faceId = FaceData.faceId;
 									VPFrame.faces.Add(FaceData);
 								}
@@ -247,7 +247,7 @@ uint32 VPStreamingNetwork::Run()
 								if (SuitData.hasFace)
 								{
 									auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
-									auto FaceData = FFace(JSONObjectface);
+									auto FaceData = FFace(JSONObjectface, SuitData.suitname);
 									SuitData.faceId = FaceData.faceId;
 									VPFrame.faces.Add(FaceData);
 								}

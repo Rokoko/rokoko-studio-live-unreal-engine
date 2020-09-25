@@ -166,7 +166,7 @@ struct FProp {
 	FVirtualProductionSubject GetSubject() {
 		FQuat quat = FQuat(rotation.Z, rotation.X, rotation.Y, rotation.W);
 		FVector pos = UPosition();
-		return FVirtualProductionSubject(pos, quat, FName(*(FString("prop:") + FString(isLive ? "L:" : "P:") + FString(name))));
+		return FVirtualProductionSubject(pos, quat, FName(*(FString("prop:") + /*FString(isLive ? "L:" : "P:") +*/ FString(name))));
 	}
 };
 
@@ -247,7 +247,7 @@ struct FFace
 	GENERATED_USTRUCT_BODY()
 
 	FFace() {}
-	FFace(TSharedPtr<FJsonObject> jsonObject);
+	FFace(TSharedPtr<FJsonObject> jsonObject, const FString& InActorName);
 
 	UPROPERTY(BlueprintReadOnly)
 	FString profileName;
@@ -257,6 +257,8 @@ struct FFace
 	FString provider;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's ID."))
 	FString faceId;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's ID."))
+	FString actorName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
 	float eyeBlinkLeft;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
@@ -364,7 +366,7 @@ struct FFace
 
 	FName GetSubjectName() 
 	{
-		return FName(*faceId);
+		return FName("actor:" + actorName + ":face");
 	}
 };
 

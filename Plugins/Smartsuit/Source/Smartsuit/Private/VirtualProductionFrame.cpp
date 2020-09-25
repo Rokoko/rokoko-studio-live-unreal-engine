@@ -70,13 +70,14 @@ FTracker::FTracker(TSharedPtr<FJsonObject> jsonObject)
 	battery = jsonObject->GetNumberField("battery");
 }
 
-FFace::FFace(TSharedPtr<FJsonObject> jsonObject)
+FFace::FFace(TSharedPtr<FJsonObject> jsonObject, const FString& InActorName)
 {
 
 	//profileName = jsonObject->GetStringField("profileName");
 	//version = jsonObject->GetIntegerField("version");
 	//provider = jsonObject->GetStringField("provider");
 	faceId = jsonObject->GetStringField("faceId");
+	actorName = InActorName;
 	if (!jsonObject->TryGetStringField("profileName", profileName))
 	{
 		profileName = "NOPROFILENAME for " + faceId;
