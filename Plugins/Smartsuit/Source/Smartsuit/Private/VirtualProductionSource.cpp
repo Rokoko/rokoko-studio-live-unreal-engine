@@ -584,10 +584,10 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 			}
 		}
 
-		FTimer timer;
+		//FTimer timer;
 		FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
 		FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
-		AnimFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+		AnimFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 
 		TArray<FTransform> transforms;
 		transforms.Reset(60);
@@ -741,10 +741,10 @@ void FVirtualProductionSource::HandleFace(TArray<FFace> faces)
 			}
 		}
 
-		FTimer timer;
+		//FTimer timer;
 		FLiveLinkFrameDataStruct FrameData(FLiveLinkAnimationFrameData::StaticStruct());
 		FLiveLinkAnimationFrameData& AnimFrameData = *FrameData.Cast<FLiveLinkAnimationFrameData>();
-		AnimFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+		AnimFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 
 
 
@@ -879,10 +879,10 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 
 			if (testval.StartsWith("Camera"))
 			{
-				FTimer timer;
+				//FTimer timer;
 				FLiveLinkFrameDataStruct FrameData1(FLiveLinkCameraFrameData::StaticStruct());
 				FLiveLinkCameraFrameData& CameraFrameData = *FrameData1.Cast<FLiveLinkCameraFrameData>();
-				CameraFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+				CameraFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 				CameraFrameData.Transform = hardCodedTransform;
 				CameraFrameData.AspectRatio = 1.11f;
 				CameraFrameData.FieldOfView = 130.f;
@@ -892,10 +892,10 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 			else
 			if (testval.StartsWith("light"))
 			{
-				FTimer timer;
+				//FTimer timer;
 				FLiveLinkFrameDataStruct FrameData1(FLiveLinkLightFrameData::StaticStruct());
 				FLiveLinkLightFrameData& LightFrameData = *FrameData1.Cast<FLiveLinkLightFrameData>();
-				LightFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+				LightFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 				LightFrameData.Transform = hardCodedTransform;
 				//CameraFrameData.LightColor = FColor::Green;
 
@@ -904,10 +904,10 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 			}
 			else
 			{
-				FTimer timer;
+				//FTimer timer;
 				FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
 				FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
-				AnimFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+				AnimFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 				AnimFrameData.Transforms.Add(hardCodedTransform);
 
 				Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.name), MoveTemp(FrameData1));
@@ -916,10 +916,10 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 		else
 		//if (subject.name.ToString().StartsWith("tracker"))
 		{
-			FTimer timer;
+			//FTimer timer;
 			FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
 			FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
-			AnimFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
+			AnimFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 			AnimFrameData.Transforms.Add(hardCodedTransform);
 
 			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.name), MoveTemp(FrameData1));
