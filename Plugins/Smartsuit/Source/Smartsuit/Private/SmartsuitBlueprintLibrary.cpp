@@ -62,12 +62,16 @@ FVector USmartsuitBlueprintLibrary::GetVectorField(TSharedPtr<FJsonObject> jsonO
 
 FColor USmartsuitBlueprintLibrary::GetColorField(TSharedPtr<FJsonObject> jsonObject)
 {
-	TArray<TSharedPtr<FJsonValue>> ColorArray = jsonObject->GetArrayField("color");
-
+	//TArray<TSharedPtr<FJsonValue>> ColorArray = jsonObject->GetArrayField("color");
+	const TArray<TSharedPtr<FJsonValue>>* ColorArray = nullptr;
+	
 	FColor Color;
-	Color.R = ColorArray[0]->AsNumber();
-	Color.G = ColorArray[1]->AsNumber();
-	Color.B = ColorArray[2]->AsNumber();
+	if(jsonObject->TryGetArrayField("color", ColorArray))
+	{
+		Color.R = (*ColorArray)[0]->AsNumber();
+		Color.G = (*ColorArray)[1]->AsNumber();
+		Color.B = (*ColorArray)[2]->AsNumber();
+	}
 
 	return Color;
 }

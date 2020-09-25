@@ -224,29 +224,79 @@ void FVirtualProductionSource::HandleSuitData(FSuitData suit)
 
 	TArray<FName> boneNames;
 	boneNames.Add("Base");
-	boneNames.Add("Hips");
-	boneNames.Add("Spine");
-	boneNames.Add("Spine2");
-	boneNames.Add("Neck");
-	boneNames.Add("Head");
+	boneNames.Add("hip");
+	boneNames.Add("spine");
+	boneNames.Add("chest");
+	boneNames.Add("neck");
+	boneNames.Add("head");
 
-	boneNames.Add("LeftShoulder");
-	boneNames.Add("LeftArm");
-	boneNames.Add("LeftForeArm");
-	boneNames.Add("LeftHand");
+	boneNames.Add("leftShoulder");
+	boneNames.Add("leftUpperArm");
+	boneNames.Add("leftLowerArm");
+	boneNames.Add("leftHand");
 	
-	boneNames.Add("RightShoulder");
-	boneNames.Add("RightArm");
-	boneNames.Add("RightForeArm");
-	boneNames.Add("RightHand");
+	boneNames.Add("rightShoulder");
+	boneNames.Add("rightUpperArm");
+	boneNames.Add("rightLowerArm");
+	boneNames.Add("rightHand");
 
-	boneNames.Add("LeftUpLeg");
-	boneNames.Add("LeftLeg");
-	boneNames.Add("LeftFoot");
+	boneNames.Add("leftUpLeg");
+	boneNames.Add("leftLeg");
+	boneNames.Add("leftFoot");
 
-	boneNames.Add("RightUpLeg");
-	boneNames.Add("RightLeg");
-	boneNames.Add("RightFoot");
+	boneNames.Add("rightUpLeg");
+	boneNames.Add("rightLeg");
+	boneNames.Add("rightFoot");
+
+	boneNames.Add("leftThumbProximal");
+	boneNames.Add("leftThumbMedial");
+	boneNames.Add("leftThumbDistal");
+	boneNames.Add("leftThumbTip");
+
+	boneNames.Add("leftIndexProximal");
+	boneNames.Add("leftIndexMedial");
+	boneNames.Add("leftIndexDistal");
+	boneNames.Add("leftIndexTip");
+
+	boneNames.Add("leftMiddleProximal");
+	boneNames.Add("leftMiddleMedial");
+	boneNames.Add("leftMiddleDistal");
+	boneNames.Add("leftMiddleTip");
+
+	boneNames.Add("leftRingProximal");
+	boneNames.Add("leftRingMedial");
+	boneNames.Add("leftRingDistal");
+	boneNames.Add("leftRingTip");
+
+	boneNames.Add("leftLittleProximal");
+	boneNames.Add("leftLittleMedial");
+	boneNames.Add("leftLittleDistal");
+	boneNames.Add("leftLittleTip");
+
+	boneNames.Add("rightThumbProximal");
+	boneNames.Add("rightThumbMedial");
+	boneNames.Add("rightThumbDistal");
+	boneNames.Add("rightThumbTip");
+
+	boneNames.Add("rightIndexProximal");
+	boneNames.Add("rightIndexMedial");
+	boneNames.Add("rightIndexDistal");
+	boneNames.Add("rightIndexTip");
+
+	boneNames.Add("rightMiddleProximal");
+	boneNames.Add("rightMiddleMedial");
+	boneNames.Add("rightMiddleDistal");
+	boneNames.Add("rightMiddleTip");
+
+	boneNames.Add("rightRingProximal");
+	boneNames.Add("rightRingMedial");
+	boneNames.Add("rightRingDistal");
+	boneNames.Add("rightRingTip");
+
+	boneNames.Add("rightLittleProximal");
+	boneNames.Add("rightLittleMedial");
+	boneNames.Add("rightLittleDistal");
+	boneNames.Add("rightLittleTip");
 
 
 	TArray<int32> boneParents;
@@ -275,6 +325,56 @@ void FVirtualProductionSource::HandleSuitData(FSuitData suit)
 	boneParents.Add(17); //18 - RightLeg
 	boneParents.Add(18); //19 - RightFoot
 
+	boneParents.Add(9); //20 - leftThumbProximal
+	boneParents.Add(20); //21 - leftThumbMedial
+	boneParents.Add(21); //22 - leftThumbDistal
+	boneParents.Add(22); //23 - leftThumbTip
+
+	boneParents.Add(9); //24 - leftIndexProximal
+	boneParents.Add(24); //25 - leftIndexMedial
+	boneParents.Add(25); //26 - leftIndexDistal
+	boneParents.Add(26); //27 - leftIndexTip
+
+	boneParents.Add(9); //28 - leftMiddleProximal
+	boneParents.Add(28); //29 - leftMiddleMedial
+	boneParents.Add(29); //30 - leftMiddleDistal
+	boneParents.Add(30); //31 - leftMiddleTip
+
+	boneParents.Add(9); //32 - leftRingProximal
+	boneParents.Add(32); //33 - leftRingMedial
+	boneParents.Add(33); //34 - leftRingDistal
+	boneParents.Add(34); //35 - leftRingTip
+
+	boneParents.Add(9); //36 - leftLittleProximal
+	boneParents.Add(36); //37 - leftLittleMedial
+	boneParents.Add(37); //38 - leftLittleDistal
+	boneParents.Add(38); //39 - leftLittleTip
+
+	boneParents.Add(13); //40 - rightThumbProximal
+	boneParents.Add(40); //41 - rightThumbMedial
+	boneParents.Add(41); //42 - rightThumbDistal
+	boneParents.Add(42); //43 - rightThumbTip
+
+	boneParents.Add(13); //44 - rightIndexProximal
+	boneParents.Add(44); //45 - rightIndexMedial
+	boneParents.Add(45); //46 - rightIndexDistal
+	boneParents.Add(46); //47 - rightIndexTip
+
+	boneParents.Add(13); //48 - rightMiddleProximal
+	boneParents.Add(48); //49 - rightMiddleMedial
+	boneParents.Add(49); //50 - rightMiddleDistal
+	boneParents.Add(50); //51 - rightMiddleTip
+
+	boneParents.Add(13); //52 - rightRingProximal
+	boneParents.Add(52); //53 - rightRingMedial
+	boneParents.Add(53); //54 - rightRingDistal
+	boneParents.Add(54); //55 - rightRingTip
+
+	boneParents.Add(13); //56 - rightLittleProximal
+	boneParents.Add(56); //57 - rightLittleMedial
+	boneParents.Add(57); //58 - rightLittleDistal
+	boneParents.Add(58); //59 - rightLittleTip
+
 	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
 	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
 	SkeletonData->SetBoneNames(boneNames);
@@ -295,64 +395,64 @@ void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32
 		transforms[transformIndex].SetRotation(FQuat::Identity);
 		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
 	}
-	else if (parent)
-	{
-		FQuat parentRealRotation;
-		if (index == -1)
-		{
-			parentRealRotation = parent->Uquaternion() * FQuat::MakeFromEuler(FVector(0, 0, 180));
-		}
-		else
-		{
-			parentRealRotation = parent->Uquaternion();
-		}
+	//else if (parent)
+	//{
+	//	FQuat parentRealRotation;
+	//	if (index == -1)
+	//	{
+	//		parentRealRotation = parent->Uquaternion() * FQuat::MakeFromEuler(FVector(0, 0, 180));
+	//	}
+	//	else
+	//	{
+	//		parentRealRotation = parent->Uquaternion();
+	//	}
 
-		//FVector realSensorPosition;
-		//float chestOffset = 20;
-		//if (sensor->addr == SENSOR_NECK) {
-		//	realSensorPosition
-		//
-		//} else if (sensor->addr == SENSOR_LEFT_SHOULDER || sensor->addr == SENSOR_RIGHT_SHOULDER) {
-		//	FVector direction = sensor->UPosition();
-		//	direction.Normalize();
-		//	realSensorPosition = sensor->UPosition() + (direction * (-chestOffset));
-		//}
-		//else {
-		//	realSensorPosition = sensor->UPosition();
-		//}
+	//	//FVector realSensorPosition;
+	//	//float chestOffset = 20;
+	//	//if (sensor->addr == SENSOR_NECK) {
+	//	//	realSensorPosition
+	//	//
+	//	//} else if (sensor->addr == SENSOR_LEFT_SHOULDER || sensor->addr == SENSOR_RIGHT_SHOULDER) {
+	//	//	FVector direction = sensor->UPosition();
+	//	//	direction.Normalize();
+	//	//	realSensorPosition = sensor->UPosition() + (direction * (-chestOffset));
+	//	//}
+	//	//else {
+	//	//	realSensorPosition = sensor->UPosition();
+	//	//}
 
 
-		//FVector realParentPosition;
-		//if (parent->addr == SENSOR_CHEST) {
+	//	//FVector realParentPosition;
+	//	//if (parent->addr == SENSOR_CHEST) {
 
-		//}
-		//else {
-		//	realParentPosition = parent->UPosition();
-		//}
-		if (sensor->name == SmartsuitBones::neck)
-		{
-			transforms[transformIndex].SetLocation(FVector(0, 20.150345, 0));
-		}
-		else if (sensor->name == SmartsuitBones::rightShoulder)
-		{
-			transforms[transformIndex].SetLocation(FVector(7, 12.368073, 1.90378));
-		}
-		else if (sensor->name == SmartsuitBones::leftShoulder)
-		{
-			transforms[transformIndex].SetLocation(FVector(-7, 12.368073, 1.90378));
-		}
-		else
-		{
-			transforms[transformIndex].SetLocation(parentRealRotation.Inverse() * (sensor->UPosition() - parent->UPosition()));
-		}
-		transforms[transformIndex].SetRotation(parentRealRotation.Inverse() * sensor->Uquaternion());
-		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
-	}
+	//	//}
+	//	//else {
+	//	//	realParentPosition = parent->UPosition();
+	//	//}
+	//	if (sensor->name == SmartsuitBones::neck)
+	//	{
+	//		transforms[transformIndex].SetLocation(FVector(0, 20.150345, 0));
+	//	}
+	//	else if (sensor->name == SmartsuitBones::rightShoulder)
+	//	{
+	//		transforms[transformIndex].SetLocation(FVector(7, 12.368073, 1.90378));
+	//	}
+	//	else if (sensor->name == SmartsuitBones::leftShoulder)
+	//	{
+	//		transforms[transformIndex].SetLocation(FVector(-7, 12.368073, 1.90378));
+	//	}
+	//	else
+	//	{
+	//		transforms[transformIndex].SetLocation(parentRealRotation.Inverse() * (sensor->UPosition() - parent->UPosition()));
+	//	}
+	//	transforms[transformIndex].SetRotation(parentRealRotation.Inverse() * sensor->Uquaternion());
+	//	transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
+	//}
 	else
 	{
 		FQuat modifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
 		transforms[transformIndex].SetLocation(sensor->UPosition());
-		transforms[transformIndex].SetRotation(sensor->Uquaternion() * modifier);
+		transforms[transformIndex].SetRotation(sensor->Uquaternion() /** modifier*/);
 		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
 	}
 }
@@ -490,7 +590,7 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 		AnimFrameData.WorldTime = FLiveLinkWorldTime((double)(timer.GetCurrentTime()));
 
 		TArray<FTransform> transforms;
-		transforms.Reset(20);
+		transforms.Reset(60);
 		int32 transformIndex = transforms.AddUninitialized(1);
 		
 		transforms[transformIndex].SetLocation(FVector(0, 0, 0));
@@ -522,6 +622,55 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightUpLeg), subject.GetBoneByName(SmartsuitBones::rightLeg));
 		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightLeg), subject.GetBoneByName(SmartsuitBones::rightFoot));
 		
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftHand), subject.GetBoneByName(SmartsuitBones::leftThumbProximal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftThumbProximal), subject.GetBoneByName(SmartsuitBones::leftThumbMedial));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftThumbMedial), subject.GetBoneByName(SmartsuitBones::leftThumbDistal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftThumbDistal), subject.GetBoneByName(SmartsuitBones::leftThumbTip));
+
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftHand), subject.GetBoneByName(SmartsuitBones::leftIndexProximal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftIndexProximal), subject.GetBoneByName(SmartsuitBones::leftIndexMedial));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftIndexMedial), subject.GetBoneByName(SmartsuitBones::leftIndexDistal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftIndexDistal), subject.GetBoneByName(SmartsuitBones::leftIndexTip));
+
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftHand), subject.GetBoneByName(SmartsuitBones::leftMiddleProximal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftMiddleProximal), subject.GetBoneByName(SmartsuitBones::leftMiddleMedial));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftMiddleMedial), subject.GetBoneByName(SmartsuitBones::leftMiddleDistal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftMiddleDistal), subject.GetBoneByName(SmartsuitBones::leftMiddleTip));
+
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftHand), subject.GetBoneByName(SmartsuitBones::leftRingProximal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftRingProximal), subject.GetBoneByName(SmartsuitBones::leftRingMedial));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftRingMedial), subject.GetBoneByName(SmartsuitBones::leftRingDistal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftRingDistal), subject.GetBoneByName(SmartsuitBones::leftRingTip));
+
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftHand), subject.GetBoneByName(SmartsuitBones::leftLittleProximal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftLittleProximal), subject.GetBoneByName(SmartsuitBones::leftLittleMedial));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftLittleMedial), subject.GetBoneByName(SmartsuitBones::leftLittleDistal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftLittleDistal), subject.GetBoneByName(SmartsuitBones::leftLittleTip));
+
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightHand), subject.GetBoneByName(SmartsuitBones::rightThumbProximal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightThumbProximal), subject.GetBoneByName(SmartsuitBones::rightThumbMedial));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightThumbMedial), subject.GetBoneByName(SmartsuitBones::rightThumbDistal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightThumbDistal), subject.GetBoneByName(SmartsuitBones::rightThumbTip));
+
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightHand), subject.GetBoneByName(SmartsuitBones::rightIndexProximal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightIndexProximal), subject.GetBoneByName(SmartsuitBones::rightIndexMedial));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightIndexMedial), subject.GetBoneByName(SmartsuitBones::rightIndexDistal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightIndexDistal), subject.GetBoneByName(SmartsuitBones::rightIndexTip));
+
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightHand), subject.GetBoneByName(SmartsuitBones::rightMiddleProximal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightMiddleProximal), subject.GetBoneByName(SmartsuitBones::rightMiddleMedial));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightMiddleMedial), subject.GetBoneByName(SmartsuitBones::rightMiddleDistal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightMiddleDistal), subject.GetBoneByName(SmartsuitBones::rightMiddleTip));
+
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightHand), subject.GetBoneByName(SmartsuitBones::rightRingProximal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightRingProximal), subject.GetBoneByName(SmartsuitBones::rightRingMedial));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightRingMedial), subject.GetBoneByName(SmartsuitBones::rightRingDistal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightRingDistal), subject.GetBoneByName(SmartsuitBones::rightRingTip));
+
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightHand), subject.GetBoneByName(SmartsuitBones::rightLittleProximal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightLittleProximal), subject.GetBoneByName(SmartsuitBones::rightLittleMedial));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightLittleMedial), subject.GetBoneByName(SmartsuitBones::rightLittleDistal));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightLittleDistal), subject.GetBoneByName(SmartsuitBones::rightLittleTip));
 
 		AnimFrameData.Transforms.Append(transforms);
 

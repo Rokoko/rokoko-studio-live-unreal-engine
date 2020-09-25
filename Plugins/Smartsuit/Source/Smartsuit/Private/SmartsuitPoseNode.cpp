@@ -5,7 +5,7 @@
 #include "AnimationRuntime.h"
 #include "SmartsuitDefinitions.h"
 #include "Animation/AnimInstanceProxy.h"
-
+#include "Roles/LiveLinkAnimationRole.h"
 
 
 
@@ -17,7 +17,7 @@ FSmartsuitPoseNode::FSmartsuitPoseNode()
 	//UE_LOG(LogTemp, Warning, TEXT("Smartsuit Pose Node: Initializing..."));
 	//TPose = new SmartsuitTPose();
 
-	Controller = nullptr;
+	//Controller = nullptr;
 	//RelativeToStart = false;
 	//ScaleBones = false;
 
@@ -312,6 +312,35 @@ FVector GetPosition2(const FName& BoneName, FSuitData* suitdata)
 
 	return FVector::ZeroVector;
 }
+
+FQuat GetRotation3(const FName& BoneName, FLiveLinkSubjectFrameData &InSubjectFrameData)
+{
+	FLiveLinkSkeletonStaticData* SkeletonData = InSubjectFrameData.StaticData.Cast<FLiveLinkSkeletonStaticData>();
+	FLiveLinkAnimationFrameData* FrameData = InSubjectFrameData.FrameData.Cast<FLiveLinkAnimationFrameData>();
+
+	int32 index = -1;
+	if (auto SmartsuitBone = SkeletonData->BoneNames.Find(BoneName, index))
+	{
+		return FrameData->Transforms[index].GetRotation();
+	}
+
+	return FQuat::Identity;
+}
+
+FVector GetPosition3(const FName& BoneName, FLiveLinkSubjectFrameData &InSubjectFrameData)
+{
+	FLiveLinkSkeletonStaticData* SkeletonData = InSubjectFrameData.StaticData.Cast<FLiveLinkSkeletonStaticData>();
+	FLiveLinkAnimationFrameData* FrameData = InSubjectFrameData.FrameData.Cast<FLiveLinkAnimationFrameData>();
+
+	int32 index = -1;
+	if (auto SmartsuitBone = SkeletonData->BoneNames.Find(BoneName, index))
+	{
+		return FrameData->Transforms[index].GetLocation();
+	}
+
+	return FVector::ZeroVector;
+}
+
 PRAGMA_DISABLE_OPTIMIZATION
 void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseContext& Output, TArray<FBoneTransform>& OutBoneTransforms)
 {
@@ -319,10 +348,10 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	FCSPose<FCompactPose>& MeshBases = Output.Pose;
 
 	check(OutBoneTransforms.Num() == 0);
-	if (!Controller/* || !Controller->SupportsWiFi()*/) 
-	{
-		return;
-	}
+	//if (!Controller/* || !Controller->SupportsWiFi()*/) 
+	//{
+	//	return;
+	//}
 
 	ASmartsuitReceiver *receiver = GetReceiver();
 	if (!receiver) 
@@ -330,12 +359,56 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 		//UE_LOG(LogTemp, Warning, TEXT("No receiver"));
 		return;
 	}
-	FSuitData* data = receiver->GetSmartsuit(Controller->suitname);
+	FSuitData* data = nullptr;//receiver->GetSmartsuit(Controller->suitname);
 	if (!data) 
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("No data for %s"), *Controller->suitname);
+		//return;
+	}
+
+	if (!LiveLinkClient_AnyThread)
+	{
 		return;
 	}
+
+
+	FLiveLinkSubjectFrameData SubjectFrameData;
+
+	TSubclassOf<ULiveLinkRole> SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole(LiveLinkSubjectName);
+	if (SubjectRole)
+	{
+		if (SubjectRole->IsChildOf(ULiveLinkAnimationRole::StaticClass()))
+		{
+			//Process animation data if the subject is from that type
+			if (LiveLinkClient_AnyThread->EvaluateFrame_AnyThread(LiveLinkSubjectName, ULiveLinkAnimationRole::StaticClass(), SubjectFrameData))
+			{
+
+			}
+			else
+			{
+				return;
+			}
+		}
+		else
+		{
+			return;
+		}
+	}
+	else
+	{
+		return;
+	}
+
+
+	FLiveLinkSkeletonStaticData* SkeletonData = SubjectFrameData.StaticData.Cast<FLiveLinkSkeletonStaticData>();
+	FLiveLinkAnimationFrameData* FrameData = SubjectFrameData.FrameData.Cast<FLiveLinkAnimationFrameData>();
+	check(SkeletonData);
+	check(FrameData);
+
+
+
+	//SkeletonData->PropertyNames.Find()
+
 
 	EBoneControlSpace TestBoneControlSpace = BCS_ComponentSpace;
 
@@ -459,67 +532,130 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	//FQuat rightLegQuat = GetRotation(SENSOR_RIGHT_LOWER_LEG, data->sensors, 19);
 	//FQuat rightFootQuat = GetRotation(SENSOR_RIGHT_FOOT, data->sensors, 19);
 
-	FQuat hipQuat = GetRotation2(SmartsuitBones::hip, data);// *modifier;
-	FVector hipPosition = GetPosition2(SmartsuitBones::hip, data);
-	FQuat stomachQuat = GetRotation2(SmartsuitBones::spine, data);
-	FQuat chestQuat = GetRotation2(SmartsuitBones::chest, data);
-	FQuat neckQuat = GetRotation2(SmartsuitBones::neck, data);
-	FQuat headQuat = GetRotation2(SmartsuitBones::head, data);
-	FQuat leftShoulderQuat = GetRotation2(SmartsuitBones::leftShoulder, data);
-	FQuat leftArmQuat = GetRotation2(SmartsuitBones::leftUpperArm, data);
-	FQuat leftForearmQuat = GetRotation2(SmartsuitBones::leftLowerArm, data);
-	FQuat leftHandQuat = GetRotation2(SmartsuitBones::leftHand, data);
-	FQuat rightShoulderQuat = GetRotation2(SmartsuitBones::rightShoulder, data);
-	FQuat rightArmQuat = GetRotation2(SmartsuitBones::rightUpperArm, data);
-	FQuat rightForearmQuat = GetRotation2(SmartsuitBones::rightLowerArm, data);
-	FQuat rightHandQuat = GetRotation2(SmartsuitBones::rightHand, data);
-	FQuat leftUpLegQuat = GetRotation2(SmartsuitBones::leftUpLeg, data);
-	FQuat leftLegQuat = GetRotation2(SmartsuitBones::leftLeg, data);
-	FQuat leftFootQuat = GetRotation2(SmartsuitBones::leftFoot, data);
-	FQuat rightUpLegQuat = GetRotation2(SmartsuitBones::rightUpLeg, data);
-	FQuat rightLegQuat = GetRotation2(SmartsuitBones::rightLeg, data);
-	FQuat rightFootQuat = GetRotation2(SmartsuitBones::rightFoot, data);
+	//FQuat hipQuat = GetRotation2(SmartsuitBones::hip, data);// *modifier;
+	//FVector hipPosition = GetPosition2(SmartsuitBones::hip, data);
+	//FQuat stomachQuat = GetRotation2(SmartsuitBones::spine, data);
+	//FQuat chestQuat = GetRotation2(SmartsuitBones::chest, data);
+	//FQuat neckQuat = GetRotation2(SmartsuitBones::neck, data);
+	//FQuat headQuat = GetRotation2(SmartsuitBones::head, data);
+	//FQuat leftShoulderQuat = GetRotation2(SmartsuitBones::leftShoulder, data);
+	//FQuat leftArmQuat = GetRotation2(SmartsuitBones::leftUpperArm, data);
+	//FQuat leftForearmQuat = GetRotation2(SmartsuitBones::leftLowerArm, data);
+	//FQuat leftHandQuat = GetRotation2(SmartsuitBones::leftHand, data);
+	//FQuat rightShoulderQuat = GetRotation2(SmartsuitBones::rightShoulder, data);
+	//FQuat rightArmQuat = GetRotation2(SmartsuitBones::rightUpperArm, data);
+	//FQuat rightForearmQuat = GetRotation2(SmartsuitBones::rightLowerArm, data);
+	//FQuat rightHandQuat = GetRotation2(SmartsuitBones::rightHand, data);
+	//FQuat leftUpLegQuat = GetRotation2(SmartsuitBones::leftUpLeg, data);
+	//FQuat leftLegQuat = GetRotation2(SmartsuitBones::leftLeg, data);
+	//FQuat leftFootQuat = GetRotation2(SmartsuitBones::leftFoot, data);
+	//FQuat rightUpLegQuat = GetRotation2(SmartsuitBones::rightUpLeg, data);
+	//FQuat rightLegQuat = GetRotation2(SmartsuitBones::rightLeg, data);
+	//FQuat rightFootQuat = GetRotation2(SmartsuitBones::rightFoot, data);
 
-	FQuat leftThumbProximalQuat = GetRotation2(SmartsuitBones::leftThumbProximal, data);
-	FQuat leftThumbMedialQuat = GetRotation2(SmartsuitBones::leftThumbMedial, data);
-	FQuat leftThumbDistalQuat = GetRotation2(SmartsuitBones::leftThumbDistal, data);
-	FQuat leftThumbTipQuat = GetRotation2(SmartsuitBones::leftThumbTip, data);
-	FQuat leftIndexProximalQuat = GetRotation2(SmartsuitBones::leftIndexProximal, data);
-	FQuat leftIndexMedialQuat = GetRotation2(SmartsuitBones::leftIndexMedial, data);
-	FQuat leftIndexDistalQuat = GetRotation2(SmartsuitBones::leftIndexDistal, data);
-	FQuat leftIndexTipQuat = GetRotation2(SmartsuitBones::leftIndexTip, data);
-	FQuat leftMiddleProximalQuat = GetRotation2(SmartsuitBones::leftMiddleProximal, data);
-	FQuat leftMiddleMedialQuat = GetRotation2(SmartsuitBones::leftMiddleMedial, data);
-	FQuat leftMiddleDistalQuat = GetRotation2(SmartsuitBones::leftMiddleDistal, data);
-	FQuat leftMiddleTipQuat = GetRotation2(SmartsuitBones::leftMiddleTip, data);
-	FQuat leftRingProximalQuat = GetRotation2(SmartsuitBones::leftRingProximal, data);
-	FQuat leftRingMedialQuat = GetRotation2(SmartsuitBones::leftRingMedial, data);
-	FQuat leftRingDistalQuat = GetRotation2(SmartsuitBones::leftRingDistal, data);
-	FQuat leftRingTipQuat = GetRotation2(SmartsuitBones::leftRingTip, data);
-	FQuat leftLittleProximalQuat = GetRotation2(SmartsuitBones::leftLittleProximal, data);
-	FQuat leftLittleMedialQuat = GetRotation2(SmartsuitBones::leftLittleMedial, data);
-	FQuat leftLittleDistalQuat = GetRotation2(SmartsuitBones::leftLittleDistal, data);
-	FQuat leftLittleTipQuat = GetRotation2(SmartsuitBones::leftLittleTip, data);
-	FQuat rightThumbProximalQuat = GetRotation2(SmartsuitBones::rightThumbProximal, data);
-	FQuat rightThumbMedialQuat = GetRotation2(SmartsuitBones::rightThumbMedial, data);
-	FQuat rightThumbDistalQuat = GetRotation2(SmartsuitBones::rightThumbDistal, data);
-	FQuat rightThumbTipQuat = GetRotation2(SmartsuitBones::rightThumbTip, data);
-	FQuat rightIndexProximalQuat = GetRotation2(SmartsuitBones::rightIndexProximal, data);
-	FQuat rightIndexMedialQuat = GetRotation2(SmartsuitBones::rightIndexMedial, data);
-	FQuat rightIndexDistalQuat = GetRotation2(SmartsuitBones::rightIndexDistal, data);
-	FQuat rightIndexTipQuat = GetRotation2(SmartsuitBones::rightIndexTip, data);
-	FQuat rightMiddleProximalQuat = GetRotation2(SmartsuitBones::rightMiddleProximal, data);
-	FQuat rightMiddleMedialQuat = GetRotation2(SmartsuitBones::rightMiddleMedial, data);
-	FQuat rightMiddleDistalQuat = GetRotation2(SmartsuitBones::rightMiddleDistal, data);
-	FQuat rightMiddleTipQuat = GetRotation2(SmartsuitBones::rightMiddleTip, data);
-	FQuat rightRingProximalQuat = GetRotation2(SmartsuitBones::rightRingProximal, data);
-	FQuat rightRingMedialQuat = GetRotation2(SmartsuitBones::rightRingMedial, data);
-	FQuat rightRingDistalQuat = GetRotation2(SmartsuitBones::rightRingDistal, data);
-	FQuat rightRingTipQuat = GetRotation2(SmartsuitBones::rightRingTip, data);
-	FQuat rightLittleProximalQuat = GetRotation2(SmartsuitBones::rightLittleProximal, data);
-	FQuat rightLittleMedialQuat = GetRotation2(SmartsuitBones::rightLittleMedial, data);
-	FQuat rightLittleDistalQuat = GetRotation2(SmartsuitBones::rightLittleDistal, data);
-	FQuat rightLittleTipQuat = GetRotation2(SmartsuitBones::rightLittleTip, data);
+	//FQuat leftThumbProximalQuat = GetRotation2(SmartsuitBones::leftThumbProximal, data);
+	//FQuat leftThumbMedialQuat = GetRotation2(SmartsuitBones::leftThumbMedial, data);
+	//FQuat leftThumbDistalQuat = GetRotation2(SmartsuitBones::leftThumbDistal, data);
+	//FQuat leftThumbTipQuat = GetRotation2(SmartsuitBones::leftThumbTip, data);
+	//FQuat leftIndexProximalQuat = GetRotation2(SmartsuitBones::leftIndexProximal, data);
+	//FQuat leftIndexMedialQuat = GetRotation2(SmartsuitBones::leftIndexMedial, data);
+	//FQuat leftIndexDistalQuat = GetRotation2(SmartsuitBones::leftIndexDistal, data);
+	//FQuat leftIndexTipQuat = GetRotation2(SmartsuitBones::leftIndexTip, data);
+	//FQuat leftMiddleProximalQuat = GetRotation2(SmartsuitBones::leftMiddleProximal, data);
+	//FQuat leftMiddleMedialQuat = GetRotation2(SmartsuitBones::leftMiddleMedial, data);
+	//FQuat leftMiddleDistalQuat = GetRotation2(SmartsuitBones::leftMiddleDistal, data);
+	//FQuat leftMiddleTipQuat = GetRotation2(SmartsuitBones::leftMiddleTip, data);
+	//FQuat leftRingProximalQuat = GetRotation2(SmartsuitBones::leftRingProximal, data);
+	//FQuat leftRingMedialQuat = GetRotation2(SmartsuitBones::leftRingMedial, data);
+	//FQuat leftRingDistalQuat = GetRotation2(SmartsuitBones::leftRingDistal, data);
+	//FQuat leftRingTipQuat = GetRotation2(SmartsuitBones::leftRingTip, data);
+	//FQuat leftLittleProximalQuat = GetRotation2(SmartsuitBones::leftLittleProximal, data);
+	//FQuat leftLittleMedialQuat = GetRotation2(SmartsuitBones::leftLittleMedial, data);
+	//FQuat leftLittleDistalQuat = GetRotation2(SmartsuitBones::leftLittleDistal, data);
+	//FQuat leftLittleTipQuat = GetRotation2(SmartsuitBones::leftLittleTip, data);
+	//FQuat rightThumbProximalQuat = GetRotation2(SmartsuitBones::rightThumbProximal, data);
+	//FQuat rightThumbMedialQuat = GetRotation2(SmartsuitBones::rightThumbMedial, data);
+	//FQuat rightThumbDistalQuat = GetRotation2(SmartsuitBones::rightThumbDistal, data);
+	//FQuat rightThumbTipQuat = GetRotation2(SmartsuitBones::rightThumbTip, data);
+	//FQuat rightIndexProximalQuat = GetRotation2(SmartsuitBones::rightIndexProximal, data);
+	//FQuat rightIndexMedialQuat = GetRotation2(SmartsuitBones::rightIndexMedial, data);
+	//FQuat rightIndexDistalQuat = GetRotation2(SmartsuitBones::rightIndexDistal, data);
+	//FQuat rightIndexTipQuat = GetRotation2(SmartsuitBones::rightIndexTip, data);
+	//FQuat rightMiddleProximalQuat = GetRotation2(SmartsuitBones::rightMiddleProximal, data);
+	//FQuat rightMiddleMedialQuat = GetRotation2(SmartsuitBones::rightMiddleMedial, data);
+	//FQuat rightMiddleDistalQuat = GetRotation2(SmartsuitBones::rightMiddleDistal, data);
+	//FQuat rightMiddleTipQuat = GetRotation2(SmartsuitBones::rightMiddleTip, data);
+	//FQuat rightRingProximalQuat = GetRotation2(SmartsuitBones::rightRingProximal, data);
+	//FQuat rightRingMedialQuat = GetRotation2(SmartsuitBones::rightRingMedial, data);
+	//FQuat rightRingDistalQuat = GetRotation2(SmartsuitBones::rightRingDistal, data);
+	//FQuat rightRingTipQuat = GetRotation2(SmartsuitBones::rightRingTip, data);
+	//FQuat rightLittleProximalQuat = GetRotation2(SmartsuitBones::rightLittleProximal, data);
+	//FQuat rightLittleMedialQuat = GetRotation2(SmartsuitBones::rightLittleMedial, data);
+	//FQuat rightLittleDistalQuat = GetRotation2(SmartsuitBones::rightLittleDistal, data);
+	//FQuat rightLittleTipQuat = GetRotation2(SmartsuitBones::rightLittleTip, data);
+
+
+	FQuat hipQuat = GetRotation3(SmartsuitBones::hip, SubjectFrameData);// *modifier;
+	FVector hipPosition = GetPosition3(SmartsuitBones::hip, SubjectFrameData);
+	FQuat stomachQuat = GetRotation3(SmartsuitBones::spine, SubjectFrameData);
+	FQuat chestQuat = GetRotation3(SmartsuitBones::chest, SubjectFrameData);
+	FQuat neckQuat = GetRotation3(SmartsuitBones::neck, SubjectFrameData);
+	FQuat headQuat = GetRotation3(SmartsuitBones::head, SubjectFrameData);
+	FQuat leftShoulderQuat = GetRotation3(SmartsuitBones::leftShoulder, SubjectFrameData);
+	FQuat leftArmQuat = GetRotation3(SmartsuitBones::leftUpperArm, SubjectFrameData);
+	FQuat leftForearmQuat = GetRotation3(SmartsuitBones::leftLowerArm, SubjectFrameData);
+	FQuat leftHandQuat = GetRotation3(SmartsuitBones::leftHand, SubjectFrameData);
+	FQuat rightShoulderQuat = GetRotation3(SmartsuitBones::rightShoulder, SubjectFrameData);
+	FQuat rightArmQuat = GetRotation3(SmartsuitBones::rightUpperArm, SubjectFrameData);
+	FQuat rightForearmQuat = GetRotation3(SmartsuitBones::rightLowerArm, SubjectFrameData);
+	FQuat rightHandQuat = GetRotation3(SmartsuitBones::rightHand, SubjectFrameData);
+	FQuat leftUpLegQuat = GetRotation3(SmartsuitBones::leftUpLeg, SubjectFrameData);
+	FQuat leftLegQuat = GetRotation3(SmartsuitBones::leftLeg, SubjectFrameData);
+	FQuat leftFootQuat = GetRotation3(SmartsuitBones::leftFoot, SubjectFrameData);
+	FQuat rightUpLegQuat = GetRotation3(SmartsuitBones::rightUpLeg, SubjectFrameData);
+	FQuat rightLegQuat = GetRotation3(SmartsuitBones::rightLeg, SubjectFrameData);
+	FQuat rightFootQuat = GetRotation3(SmartsuitBones::rightFoot, SubjectFrameData);
+
+	FQuat leftThumbProximalQuat = GetRotation3(SmartsuitBones::leftThumbProximal, SubjectFrameData);
+	FQuat leftThumbMedialQuat = GetRotation3(SmartsuitBones::leftThumbMedial, SubjectFrameData);
+	FQuat leftThumbDistalQuat = GetRotation3(SmartsuitBones::leftThumbDistal, SubjectFrameData);
+	FQuat leftThumbTipQuat = GetRotation3(SmartsuitBones::leftThumbTip, SubjectFrameData);
+	FQuat leftIndexProximalQuat = GetRotation3(SmartsuitBones::leftIndexProximal, SubjectFrameData);
+	FQuat leftIndexMedialQuat = GetRotation3(SmartsuitBones::leftIndexMedial, SubjectFrameData);
+	FQuat leftIndexDistalQuat = GetRotation3(SmartsuitBones::leftIndexDistal, SubjectFrameData);
+	FQuat leftIndexTipQuat = GetRotation3(SmartsuitBones::leftIndexTip, SubjectFrameData);
+	FQuat leftMiddleProximalQuat = GetRotation3(SmartsuitBones::leftMiddleProximal, SubjectFrameData);
+	FQuat leftMiddleMedialQuat = GetRotation3(SmartsuitBones::leftMiddleMedial, SubjectFrameData);
+	FQuat leftMiddleDistalQuat = GetRotation3(SmartsuitBones::leftMiddleDistal, SubjectFrameData);
+	FQuat leftMiddleTipQuat = GetRotation3(SmartsuitBones::leftMiddleTip, SubjectFrameData);
+	FQuat leftRingProximalQuat = GetRotation3(SmartsuitBones::leftRingProximal, SubjectFrameData);
+	FQuat leftRingMedialQuat = GetRotation3(SmartsuitBones::leftRingMedial, SubjectFrameData);
+	FQuat leftRingDistalQuat = GetRotation3(SmartsuitBones::leftRingDistal, SubjectFrameData);
+	FQuat leftRingTipQuat = GetRotation3(SmartsuitBones::leftRingTip, SubjectFrameData);
+	FQuat leftLittleProximalQuat = GetRotation3(SmartsuitBones::leftLittleProximal, SubjectFrameData);
+	FQuat leftLittleMedialQuat = GetRotation3(SmartsuitBones::leftLittleMedial, SubjectFrameData);
+	FQuat leftLittleDistalQuat = GetRotation3(SmartsuitBones::leftLittleDistal, SubjectFrameData);
+	FQuat leftLittleTipQuat = GetRotation3(SmartsuitBones::leftLittleTip, SubjectFrameData);
+	FQuat rightThumbProximalQuat = GetRotation3(SmartsuitBones::rightThumbProximal, SubjectFrameData);
+	FQuat rightThumbMedialQuat = GetRotation3(SmartsuitBones::rightThumbMedial, SubjectFrameData);
+	FQuat rightThumbDistalQuat = GetRotation3(SmartsuitBones::rightThumbDistal, SubjectFrameData);
+	FQuat rightThumbTipQuat = GetRotation3(SmartsuitBones::rightThumbTip, SubjectFrameData);
+	FQuat rightIndexProximalQuat = GetRotation3(SmartsuitBones::rightIndexProximal, SubjectFrameData);
+	FQuat rightIndexMedialQuat = GetRotation3(SmartsuitBones::rightIndexMedial, SubjectFrameData);
+	FQuat rightIndexDistalQuat = GetRotation3(SmartsuitBones::rightIndexDistal, SubjectFrameData);
+	FQuat rightIndexTipQuat = GetRotation3(SmartsuitBones::rightIndexTip, SubjectFrameData);
+	FQuat rightMiddleProximalQuat = GetRotation3(SmartsuitBones::rightMiddleProximal, SubjectFrameData);
+	FQuat rightMiddleMedialQuat = GetRotation3(SmartsuitBones::rightMiddleMedial, SubjectFrameData);
+	FQuat rightMiddleDistalQuat = GetRotation3(SmartsuitBones::rightMiddleDistal, SubjectFrameData);
+	FQuat rightMiddleTipQuat = GetRotation3(SmartsuitBones::rightMiddleTip, SubjectFrameData);
+	FQuat rightRingProximalQuat = GetRotation3(SmartsuitBones::rightRingProximal, SubjectFrameData);
+	FQuat rightRingMedialQuat = GetRotation3(SmartsuitBones::rightRingMedial, SubjectFrameData);
+	FQuat rightRingDistalQuat = GetRotation3(SmartsuitBones::rightRingDistal, SubjectFrameData);
+	FQuat rightRingTipQuat = GetRotation3(SmartsuitBones::rightRingTip, SubjectFrameData);
+	FQuat rightLittleProximalQuat = GetRotation3(SmartsuitBones::rightLittleProximal, SubjectFrameData);
+	FQuat rightLittleMedialQuat = GetRotation3(SmartsuitBones::rightLittleMedial, SubjectFrameData);
+	FQuat rightLittleDistalQuat = GetRotation3(SmartsuitBones::rightLittleDistal, SubjectFrameData);
+	FQuat rightLittleTipQuat = GetRotation3(SmartsuitBones::rightLittleTip, SubjectFrameData);
 
 
 
@@ -791,6 +927,13 @@ bool FSmartsuitPoseNode::IsValidToEvaluate(const USkeleton* Skeleton, const FBon
 		BoneMap.rightLeg.IsValid(RequiredBones) && BoneMap.rightFoot.IsValid(RequiredBones) &&
 		BoneMap.leftToe.IsValid(RequiredBones) && BoneMap.rightToe.IsValid(RequiredBones));
 #endif
+}
+
+void FSmartsuitPoseNode::PreUpdate(const UAnimInstance* InAnimInstance)
+{
+	Super::PreUpdate(InAnimInstance);
+
+	LiveLinkClient_AnyThread = LiveLinkClient_GameThread.GetClient();
 }
 
 void FSmartsuitPoseNode::InitializeBoneReferences(const FBoneContainer& RequiredBones)

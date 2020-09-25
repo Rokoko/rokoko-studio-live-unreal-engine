@@ -6,11 +6,13 @@
 //#include "Engine.h"
 //#include "AnimNode_SkeletalControlBase.h"
 #include "Runtime/AnimGraphRuntime/Public/BoneControllers/AnimNode_SkeletalControlBase.h"
+#include "LiveLinkClientReference.h"
 #include "SmartsuitReceiver.h"
 #include "SmartsuitController.h"
 #include "SmartsuitTPose.h"
 #include "SmartsuitPoseNode.generated.h"
 
+class ILiveLinkClient;
 
 /*! \brief Bone reference mapping that is used to map bones between Smartsuit sensors and skeleton.*/
 USTRUCT(BlueprintType)
@@ -433,8 +435,11 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 	USmartsuitBodyMapData* BoneMapOverride;
 
 	/** The smartsuit controller to use. This defines which Smartsuit to use for the animation. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SmartsuitAnimationSetup, meta = (AlwaysAsPin, ToolTip = "The SmartsuitController that will be used to animate this character. This is required for the animation to work."))
-	ASmartsuitController *Controller;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SmartsuitAnimationSetup, meta = (AlwaysAsPin, ToolTip = "The SmartsuitController that will be used to animate this character. This is required for the animation to work."))
+	//ASmartsuitController *Controller;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SourceData, meta = (PinShownByDefault))
+	FLiveLinkSubjectName LiveLinkSubjectName;
 
 	///** Indicates weither the character should maintain it's XY position or override it from the position of the Smartsuit. If this is true then the character will have an offset from the actual Smartsuit position so he remains in the same position when the game begins. */
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SmartsuitAnimationSetup, meta = (PinHiddenByDefault, ToolTip = "When this is True the animation will keep the starting position in the XY-plane of the character when the game starts. This way the character will not jump out of his initial position. Its Z position however will be identical to the one received from the Smartsuit."))
@@ -460,6 +465,10 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 	
 	/// @private
 	virtual bool IsValidToEvaluate(const USkeleton* Skeleton, const FBoneContainer& RequiredBones) override;
+
+	virtual bool HasPreUpdate() const { return true; }
+
+	virtual void PreUpdate(const UAnimInstance* InAnimInstance) override;
 
 private:
 	//bool firstTime = true;
@@ -491,6 +500,7 @@ private:
 		return listener;
 	}
 
-
+	FLiveLinkClientReference LiveLinkClient_GameThread;
+	ILiveLinkClient* LiveLinkClient_AnyThread;
 
 };
