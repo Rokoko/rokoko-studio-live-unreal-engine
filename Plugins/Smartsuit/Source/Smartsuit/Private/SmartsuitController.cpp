@@ -25,17 +25,20 @@ void ASmartsuitController::BeginPlay()
 {
 	Super::BeginPlay();
 	realLife = true;
-	if (AutoConnect) {
+	if (AutoConnect) 
+	{
 		suitname = "autoconnect";
 	}
 }
 
-ASmartsuitReceiver* ASmartsuitController::GetReceiver() {
+ASmartsuitReceiver* ASmartsuitController::GetReceiver() 
+{
 	ASmartsuitReceiver * listener = nullptr;
 	// Find UObjects by type
 	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
 	{
-		if (It->enabled) {
+		if (It->enabled) 
+		{
 			listener = *It;
 			break;
 		}
@@ -49,36 +52,43 @@ void ASmartsuitController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	ASmartsuitReceiver * listener = GetReceiver();
-	if (!listener) {
+	if (!listener) 
+	{
 		return;
 	}
 
-	if (AutoConnect) {
-		TArray<FString> suits = listener->GetAvailableSmartsuits();
-		if (suits.Num() > 0) {
-			suitname = suits[0];
+	if (AutoConnect) 
+	{
+		TArray<FString> suitnames = listener->GetAvailableSmartsuitNames();
+		if (suitnames.Num() > 0)
+		{
+			suitname = suitnames[0];
 			AutoConnect = false;
 		}
 	}
-	if (AutoConnect) {
+	if (AutoConnect) 
+	{
 		return;
 	}
 
-	SuitData *data = listener->GetSmartsuit(suitname);
-	if (!data) {
+	FSuitData *data = listener->GetSmartsuit(suitname);
+	if (!data) 
+	{
 		return;
 	}
-	if (!hubInfoRequested) {
+	if (!hubInfoRequested) 
+	{
 		hubInfoRequested = true;
 		GetHubInfo();
 		return;
 	}
-	hasProfile = data->hasProfile;
-	isBroadcast = data->isBroadcasting;
-	fps = data->fps;
-	if (fps > 0 && profileToggleState != data->profileToggle) {
-		profileToggleState = data->profileToggle;
-	}
+	//hasProfile = data->hasProfile;
+	//isBroadcast = data->isBroadcasting;
+	//fps = data->fps;
+	//if (fps > 0 && profileToggleState != data->profileToggle) 
+	//{
+	//	profileToggleState = data->profileToggle;
+	//}
 }
 
 //void ASmartsuitController::SendCommand(unsigned char cmd, uint8 *customData = nullptr, int customDataLength = 0) {
@@ -133,7 +143,8 @@ void ASmartsuitController::GetHubInfo() {
 	//SendCommand(SMARTSUIT_COMMAND_READ_HUB_INFO);
 }
 
-uint8 ASmartsuitController::GetByte(uint32 value, int i) {
+uint8 ASmartsuitController::GetByte(uint32 value, int i) 
+{
 	switch (i) {
 	case 0:
 		return 0xff & (value >> 24);

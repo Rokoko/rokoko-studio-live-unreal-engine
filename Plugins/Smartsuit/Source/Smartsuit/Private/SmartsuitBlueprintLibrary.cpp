@@ -60,14 +60,33 @@ FVector USmartsuitBlueprintLibrary::GetVectorField(TSharedPtr<FJsonObject> jsonO
 	return ReturnVal;
 }
 
-FColor USmartsuitBlueprintLibrary::GetFColorField(TSharedPtr<FJsonObject> jsonObject)
+FColor USmartsuitBlueprintLibrary::GetColorField(TSharedPtr<FJsonObject> jsonObject)
+{
+	//TArray<TSharedPtr<FJsonValue>> ColorArray = jsonObject->GetArrayField("color");
+	const TArray<TSharedPtr<FJsonValue>>* ColorArray = nullptr;
+	
+	FColor Color;
+	if(jsonObject->TryGetArrayField("color", ColorArray))
+	{
+		Color.R = (*ColorArray)[0]->AsNumber();
+		Color.G = (*ColorArray)[1]->AsNumber();
+		Color.B = (*ColorArray)[2]->AsNumber();
+	}
+
+	return Color;
+}
+
+FLinearColor USmartsuitBlueprintLibrary::GetFLinearColorField(TSharedPtr<FJsonObject> jsonObject)
 {
 	FLinearColor LinearColor;
 	LinearColor.R = jsonObject->GetNumberField("x");
 	LinearColor.G = jsonObject->GetNumberField("y");
 	LinearColor.B = jsonObject->GetNumberField("z");
+
+	//this is so we can properly convert the color to srgb
+	FColor NewColor = LinearColor.QuantizeRound();
 	
-	return LinearColor.ToFColor(true);
+	return FLinearColor(NewColor);
 }
 
 FQuat USmartsuitBlueprintLibrary::GetQuaternionField(TSharedPtr<FJsonObject> jsonObject)

@@ -8,7 +8,8 @@ public class SmartsuitEditor : ModuleRules
     public SmartsuitEditor(ReadOnlyTargetRules Target) : base(Target)
     {
         MinFilesUsingPrecompiledHeaderOverride = 1;
-        bFasterWithoutUnity = true;
+        //bFasterWithoutUnity = true;
+        bUseUnity = false;
 
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
@@ -55,7 +56,8 @@ public class SmartsuitEditor : ModuleRules
                 "SlateCore",
                 "Slate",
 
-                "LiveLinkInterface"
+                "LiveLinkInterface",
+                "ToolMenus"
             }
             );
 

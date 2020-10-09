@@ -40,30 +40,58 @@ void USmartsuitPose::CheckForWarnings(FString name, FBoneReference bone, USkelet
 
 void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, FCompilerResultsLog& MessageLog)
 {
+	if (Node.BoneMapOverride->IsValidLowLevel())
+	{
+		Node.BoneMap.hip =				Node.BoneMapOverride->hip;
+		Node.BoneMap.stomach =			Node.BoneMapOverride->stomach;
+		Node.BoneMap.chest =			Node.BoneMapOverride->chest;
+		Node.BoneMap.neck =				Node.BoneMapOverride->neck;
+		Node.BoneMap.head =				Node.BoneMapOverride->head;
+		//Node.BoneMap.headTop =		Node.BoneMapOverride->headTop;
+		Node.BoneMap.leftShoulder =		Node.BoneMapOverride->leftShoulder;
+		Node.BoneMap.leftArm =			Node.BoneMapOverride->leftArm;
+		Node.BoneMap.leftForearm =		Node.BoneMapOverride->leftForearm;
+		Node.BoneMap.leftHand =			Node.BoneMapOverride->leftHand;
+		//Node.BoneMap.leftFingerTip =	Node.BoneMapOverride->leftFingerTip;
+		Node.BoneMap.rightShoulder =	Node.BoneMapOverride->rightShoulder;
+		Node.BoneMap.rightArm =			Node.BoneMapOverride->rightArm;
+		Node.BoneMap.rightForearm =		Node.BoneMapOverride->rightForearm;
+		Node.BoneMap.rightHand =		Node.BoneMapOverride->rightHand;
+		//Node.BoneMap.rightFingerTip =	Node.BoneMapOverride->rightFingerTip;
+		Node.BoneMap.leftUpleg =		Node.BoneMapOverride->leftUpleg;
+		Node.BoneMap.leftLeg =			Node.BoneMapOverride->leftLeg;
+		Node.BoneMap.leftFoot =			Node.BoneMapOverride->leftFoot;
+		//Node.BoneMap.leftToe =		Node.BoneMapOverride->leftToe;
+		Node.BoneMap.rightUpleg =		Node.BoneMapOverride->rightUpleg;
+		Node.BoneMap.rightLeg =			Node.BoneMapOverride->rightLeg;
+		Node.BoneMap.rightFoot =		Node.BoneMapOverride->rightFoot;
+		//Node.BoneMap.rightToe =		Node.BoneMapOverride->rightToe;
+	}
+
 	CheckForWarnings("Hip", Node.BoneMap.hip, ForSkeleton, MessageLog);
 	CheckForWarnings("Stomach", Node.BoneMap.stomach, ForSkeleton, MessageLog);
 	CheckForWarnings("Chest", Node.BoneMap.chest, ForSkeleton, MessageLog);
 	CheckForWarnings("Neck", Node.BoneMap.neck, ForSkeleton, MessageLog);
 	CheckForWarnings("Head", Node.BoneMap.head, ForSkeleton, MessageLog);
-	CheckForWarnings("HeadTop", Node.BoneMap.headTop, ForSkeleton, MessageLog);
+	//CheckForWarnings("HeadTop", Node.BoneMap.headTop, ForSkeleton, MessageLog);
 	CheckForWarnings("Left Shoulder", Node.BoneMap.leftShoulder, ForSkeleton, MessageLog);
 	CheckForWarnings("Left Arm", Node.BoneMap.leftArm, ForSkeleton, MessageLog);
 	CheckForWarnings("Left Forearm", Node.BoneMap.leftForearm, ForSkeleton, MessageLog);
 	CheckForWarnings("Left Hand", Node.BoneMap.leftHand, ForSkeleton, MessageLog);
-	CheckForWarnings("Left Finger Tip", Node.BoneMap.leftFingerTip, ForSkeleton, MessageLog);
+	//CheckForWarnings("Left Finger Tip", Node.BoneMap.leftFingerTip, ForSkeleton, MessageLog);
 	CheckForWarnings("RightShoulder", Node.BoneMap.rightShoulder, ForSkeleton, MessageLog);
 	CheckForWarnings("Right Arm", Node.BoneMap.rightArm, ForSkeleton, MessageLog);
 	CheckForWarnings("Right Forearm", Node.BoneMap.rightForearm, ForSkeleton, MessageLog);
 	CheckForWarnings("Right Hand", Node.BoneMap.rightHand, ForSkeleton, MessageLog);
-	CheckForWarnings("Right Finger Tip", Node.BoneMap.rightFingerTip, ForSkeleton, MessageLog);
+	//CheckForWarnings("Right Finger Tip", Node.BoneMap.rightFingerTip, ForSkeleton, MessageLog);
 	CheckForWarnings("Left Up Leg", Node.BoneMap.leftUpleg, ForSkeleton, MessageLog);
 	CheckForWarnings("Left Leg", Node.BoneMap.leftLeg, ForSkeleton, MessageLog);
 	CheckForWarnings("Left Foot", Node.BoneMap.leftFoot, ForSkeleton, MessageLog);
-	CheckForWarnings("Left Toe", Node.BoneMap.leftToe, ForSkeleton, MessageLog);
+	//CheckForWarnings("Left Toe", Node.BoneMap.leftToe, ForSkeleton, MessageLog);
 	CheckForWarnings("Right Up Leg", Node.BoneMap.rightUpleg, ForSkeleton, MessageLog);
 	CheckForWarnings("Right Leg", Node.BoneMap.rightLeg, ForSkeleton, MessageLog);
 	CheckForWarnings("Right Foot", Node.BoneMap.rightFoot, ForSkeleton, MessageLog);
-	CheckForWarnings("Right Toe", Node.BoneMap.rightToe, ForSkeleton, MessageLog);
+	//CheckForWarnings("Right Toe", Node.BoneMap.rightToe, ForSkeleton, MessageLog);
 	MessageLog.Note(*LOCTEXT("UsageNote", "@@ - For this animation node to work properly the character needs to be in T-pose when this node is evaluating the pose and all bones in Bone Map need to be specified. This node will change the body position of the character to match that of the Smartsuit, assuming the character is in TPose, which means it will set an absolute position of the character. If you want to change the position of the character is better to do it after this node. The alpha value of this node is ignored at the moment.").ToString(), this);
 	//if (Node.Controller == NULL) {
 	//	MessageLog.Warning(*LOCTEXT("NoSmartsuit", "@@ - Smartsuit Controller is not set.").ToString(), this);
@@ -73,7 +101,7 @@ void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, F
 
 FText USmartsuitPose::GetControllerDescription() const
 {
-	return LOCTEXT("SmartsuitPose", "Smartsuit body pose");
+	return LOCTEXT("SmartsuitPose", "Rokoko body pose");
 }
 
 FText USmartsuitPose::GetTooltipText() const

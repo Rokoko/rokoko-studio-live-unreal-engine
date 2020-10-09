@@ -104,6 +104,12 @@ public class Smartsuit : ModuleRules
 #endif
 
         LoadSmartsuitMagic(Target);
+
+        //PublicDefinitions.Add("LZ4F_STATIC_LINKING_ONLY");
+
+	    LoadLZ4(Target);
+
+
     }
 
     public bool LoadSmartsuitMagic(ReadOnlyTargetRules Target)
@@ -145,6 +151,41 @@ public class Smartsuit : ModuleRules
         {
             // Include path
             PublicIncludePaths.Add(Path.Combine(SmartsuitLibPath, "V8", "Includes"));
+        }
+
+#if UE_4_19_OR_LATER
+        PublicDefinitions.Add(string.Format("WITH_BOBS_MAGIC_BINDING={0}", isLibrarySupported ? 1 : 0));
+#else
+        Definitions.Add(string.Format("WITH_BOBS_MAGIC_BINDING={0}", isLibrarySupported ? 1 : 0));
+#endif
+        return isLibrarySupported;
+    }
+
+    public bool LoadLZ4(ReadOnlyTargetRules Target)
+    {
+        bool isLibrarySupported = false;
+
+        if (Target.Platform == UnrealTargetPlatform.Win64)
+        {
+            isLibrarySupported = true;
+
+            string LibrariesPath = Path.Combine(SmartsuitLibPath, "lz4_win64_v1_9_2", "static");
+
+            PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, "liblz4_static.lib"));
+        }
+        else if (Target.Platform == UnrealTargetPlatform.Mac)
+        {
+            isLibrarySupported = true;
+
+            string LibrariesPath = Path.Combine(SmartsuitLibPath, "lz4_win64_v1_9_2", "static");
+
+            PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, "liblz4_static.a"));
+        }
+
+        if (isLibrarySupported)
+        {
+            // Include path
+            PublicIncludePaths.Add(Path.Combine(SmartsuitLibPath, "lz4_win64_v1_9_2", "include"));
         }
 
 #if UE_4_19_OR_LATER

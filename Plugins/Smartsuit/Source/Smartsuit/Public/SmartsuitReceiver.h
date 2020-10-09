@@ -46,6 +46,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Rokoko")
 		void StopListener();
 
+	UFUNCTION(BlueprintCallable)
+	FFace GetFaceByFaceID(FString faceName);
+
+	UFUNCTION(BlueprintCallable)
+	FFace GetFaceByProfileName(const FString& faceName, bool& found);
+
+	UFUNCTION(BlueprintCallable)
+	TArray<FFace> GetAllFaces();
+
+	UFUNCTION(BlueprintCallable)
+	TArray<FFace> GetFacesNotAssociatedWithActor();
+
 	/**
 	* This function returns the last frame of data received from a Smartsuit with the given name.
 	* If there is no data for the given name, then nullptr will return.
@@ -53,7 +65,10 @@ public:
 	* @param suitName The smartsuit name to get the last data for.
 	* @return Returns the last frame received for the smartsuit with name suitName. If no frame is found, it will return nullptr.
 	*/
-	SuitData* GetSmartsuit(FString suitName);
+	FSuitData* GetSmartsuit(FString suitName);
+
+	UFUNCTION(BlueprintCallable)
+	bool GetSmartsuitByName(const FString& suitName, FSuitData& SuitData);
 
 	/**
 	* Lists the names of all known Smartsuits connected to this computer.
@@ -61,7 +76,11 @@ public:
 	*
 	* @return Returns an array with all the available in the network Smartsuit names.
 	*/
-	TArray<FString> GetAvailableSmartsuits();
+	UFUNCTION(BlueprintCallable)
+	TArray<FString> GetAvailableSmartsuitNames();
+
+	UFUNCTION(BlueprintCallable)
+	TArray<FSuitData> GetAllSmartsuits();
 
 	/**
 	* The port number used to listen for the streaming data of Smartsuits.
@@ -78,72 +97,84 @@ public:
 	FProp* GetPropByNameFromVP(FString name, bool isLive);
 	FTracker* GetTrackerByNameFromVP(FString name, bool isLive);
 
+	UFUNCTION(BlueprintPure, Category = "VirtualProduction")
+	FTracker GetTrackerByConnectionIDFromVP(const FString& name, bool isLive, bool& found);
+
 	/// @cond nodoc
 	//Body* CheckForBodyCommand(FString suitname);
 	//HubInfo* CheckForHubInfo(FString suitname);
 	void SetSupportsWiFiAPI(FString suitname);
 	
-	static TArray<FProp> GetAllProps() {
-		TArray<FProp> result;
-		UE_LOG(LogTemp, Display, TEXT("Yeeee1"));
-		bool found = false;
-		int i = 0;
-		for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
-		{
-			UE_LOG(LogTemp, Display, TEXT("Looking up receiver %d"), i);
-			i++;
-			if (It->realLife) {
-				found = true;
-				UE_LOG(LogTemp, Display, TEXT("Real life!"));
-				result = It->VPlistener.GetAllProps();
-			}
-		}
-		if (!found) {
-			UE_LOG(LogTemp, Display, TEXT("not Real life..."));
-		}
-		UE_LOG(LogTemp, Display, TEXT("Yeeee2 %d"), result.Num());
-		return result;
-	}
+	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve all props."))
+	static TArray<FProp> GetAllProps(); 
+	//{
+	//	TArray<FProp> result;
+	//	//UE_LOG(LogTemp, Display, TEXT("Yeeee1"));
+	//	bool found = false;
+	//	int i = 0;
+	//	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	//	{
+	//		//UE_LOG(LogTemp, Display, TEXT("Looking up receiver %d"), i);
+	//		i++;
+	//		if (It->realLife) 
+	//		{
+	//			found = true;
+	//			//UE_LOG(LogTemp, Display, TEXT("Real life!"));
+	//			result = It->VPlistener.GetAllProps();
+	//		}
+	//	}
+	//	if (!found)
+	//	{
+	//		//UE_LOG(LogTemp, Display, TEXT("not Real life..."));
+	//	}
+	//	//UE_LOG(LogTemp, Display, TEXT("Yeeee2 %d"), result.Num());
+	//	return result;
+	//}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a prop by name."))
-	static FProp GetProp(FString name, bool isLive) {
-		FProp result;
-		for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
-		{
-			if (It->realLife) {
-				result = *It->GetPropByNameFromVP(name, isLive);
-			}
-		}
-		return result;
-	}
+	bool GetProp(FString name, bool isLive, FProp& OutProp);
+	//{
+	//	FProp result;
+	//	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	//	{
+	//		if (It->realLife) 
+	//		{
+	//			result = *It->GetPropByNameFromVP(name, isLive);
+	//		}
+	//	}
+	//	return result;
+	//}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a tracker by name."))
-	static FTracker GetTracker(FString name, bool isLive) {
-		FTracker result;
-		for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
-		{
-			if (It->realLife) {
-				result = *It->GetTrackerByNameFromVP(name, isLive);
-			}
-		}
-		return result;
-	}
+	static FTracker GetTracker(FString name, bool isLive);
+	//{
+	//	FTracker result;
+	//	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	//	{
+	//		if (It->realLife) {
+	//			result = *It->GetTrackerByNameFromVP(name, isLive);
+	//		}
+	//	}
+	//	return result;
+	//}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Converts Quaternions into rotators."))
-	static FRotator FQuatToRotator(FQuat rotation) {
+	static FRotator FQuatToRotator(FQuat rotation) 
+	{
 		FQuat result(rotation.Z, rotation.X, rotation.Y, rotation.W);
 		FRotator Rotator = result.Rotator();
 		return Rotator;
 	}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Converts position into Unreal position."))
-	static FVector UPosition(FVector position) {
+	static FVector UPosition(FVector position) 
+	{
 		return FVector(100.0f*position.Z, 100.0f*position.X, 100.0f*position.Y);
 	}
 	/// @endcond
 
 private:
-	SmartsuitStreamingNetwork listener;
+	//SmartsuitStreamingNetwork listener;
 	VPStreamingNetwork VPlistener;
 
 protected:

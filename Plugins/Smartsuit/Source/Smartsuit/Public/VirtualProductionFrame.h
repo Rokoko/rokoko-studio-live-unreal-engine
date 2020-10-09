@@ -6,6 +6,7 @@
 #include "Dom/JsonValue.h"
 #include "Dom/JsonObject.h"
 //#include "SmartsuitBlueprintLibrary.h"
+#include "SmartsuitDefinitions.h"
 #include "VirtualProductionFrame.generated.h"
 
 
@@ -57,7 +58,8 @@ struct FReferencePoint {
 };
 
 USTRUCT(BlueprintType, meta = (ToolTip = "Contains all information about a prop's profile."))
-struct FProfile {
+struct FProfile 
+{
 
 	GENERATED_USTRUCT_BODY()
 
@@ -75,7 +77,7 @@ struct FProfile {
 
 	/** Holds information about the color. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Profile's color."))
-	FColor color;
+	FLinearColor color;
 
 	/** Tracker offset position and rotation. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Tracker Offset."))
@@ -120,6 +122,9 @@ struct FProp {
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Prop's name."))
 	FString name;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Rotation information."))
+	FColor color;
+
 	/** ID of the prop. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Prop's id."))
 	FString id;
@@ -141,7 +146,7 @@ struct FProp {
 
 	FProp() {}
 
-	FProp(TSharedPtr<FJsonObject> jsonObject);
+	FProp(bool InIsLive, TSharedPtr<FJsonObject> jsonObject);
 
 	///**
 	//* Get sensor position in Unreal coordinate system.
@@ -161,7 +166,7 @@ struct FProp {
 	FVirtualProductionSubject GetSubject() {
 		FQuat quat = FQuat(rotation.Z, rotation.X, rotation.Y, rotation.W);
 		FVector pos = UPosition();
-		return FVirtualProductionSubject(pos, quat, FName(*(FString("prop:") + FString(isLive ? "L:" : "P:") + FString(name))));
+		return FVirtualProductionSubject(pos, quat, FName(*(FString("prop:") + /*FString(isLive ? "L:" : "P:") +*/ FString(name))));
 	}
 };
 
@@ -242,12 +247,18 @@ struct FFace
 	GENERATED_USTRUCT_BODY()
 
 	FFace() {}
-	FFace(TSharedPtr<FJsonObject> jsonObject);
+	FFace(TSharedPtr<FJsonObject> jsonObject, const FString& InActorName);
 
+	UPROPERTY(BlueprintReadOnly)
+	FString profileName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's version."))
 	int version;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's provider."))
 	FString provider;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's ID."))
+	FString faceId;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's ID."))
+	FString actorName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
 	float eyeBlinkLeft;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
@@ -353,8 +364,9 @@ struct FFace
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
 	float tongueOut;
 
-	FName GetSubjectName() {
-		return FName(*provider);
+	FName GetSubjectName() 
+	{
+		return FName("actor:" + actorName + ":face");
 	}
 };
 
@@ -378,6 +390,10 @@ struct FVirtualProductionFrame {
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "List of faces."))
 	TArray<FFace> faces;
+
+	UPROPERTY()
+	TArray<FSuitData> suits;
+
 	//FVirtualProductionFrame (){}
 };
 

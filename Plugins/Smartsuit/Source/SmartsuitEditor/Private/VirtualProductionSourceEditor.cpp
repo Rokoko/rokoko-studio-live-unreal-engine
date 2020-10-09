@@ -97,7 +97,7 @@ void SVirtualProductionSourceEditor::Tick(const FGeometry& AllottedGeometry, con
 	const double CurrentTickTime = FPlatformTime::Seconds();
 	if (CurrentTickTime - LastTickTime > 1.f)
 	{
-		FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString("Studio"), FString(""));
+		FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString("Studio"), FString(""), 0.0);
 		FProviderPollResultPtr *poll = new FProviderPollResultPtr(result);
 		PollData.Empty();
 		if (!FVirtualProductionSource::Get()) {
