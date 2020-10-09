@@ -1,7 +1,3 @@
-<img src="Images/newtonHandTop.PNG">
-
-<img src="Images/newtonHandTop.PNG">
-
 <h2 align="center"> Rokoko Studio - Sample project for Unreal Engine</h1>
 
 [Rokoko Studio](https://www.rokoko.com/en/products/studio) is A powerful and intuitive software for recording, visualizing and exporting motion capture.
@@ -28,7 +24,7 @@ Before importing your model into Unreal Engine. Make sure that the character's h
 
 Live link supports up to a 4 finger joint setup: Metacarpal, Proximal, Medial and Distal finger joint.
 
-<img src="Images/newtonHandTop.PNG">
+<img src="Images/newtonHandTop.png">
 
 **Getting the plugin to work manualy**
 
@@ -40,15 +36,15 @@ _Note: If your unreal project doesn't have a plugins folder, then create a folde
 
 Now when you open your project a pop-up error will appear. Click yes to it and wait for it to build. If the building fails, you need to go into **Visual Studio Installer.**
 
-<img src="Images/errorMessege.PNG">
+<img src="Images/errorMessege.png">
 
 Open up Visual Studio Installer and click on Individual Components. Then search for Unreal Engine Installer and install that. Now open the Demo project again and say yes to the pop-up and it should built.
 
-<img src="Images/visualInstaller.PNG">
+<img src="Images/visualInstaller.png">
 
 If it still doesn't work install theise optional packages under **desktop development with C++.**
 
-<img src="Images/visualInstallerDownload.PNG">
+<img src="Images/visualInstallerDownload.png">
 
 When the unreal project is open, go into settings → Plugins and search for **Rokoko Studio Live** and make sure the enable mark is on. If you clicked enable you have to restart the urneal project. 
 
@@ -58,19 +54,19 @@ When the character is imported into Unreal Engine. Right-click on the **characte
 
 Inside the anim blueprint create a "**Rokoko body pose**", "**Component to local**" and a "**Rokoko Face Pose**" node. Connect them in that order and then to the **Output Pose.**
 
-<img src="Images/animBPSetup.PNG">
+<img src="Images/animBPSetup.png">
 
 Now click on the **plus** next to variables and change the variable type to **Name** and the variable name to **Rokoko Actor Name**. Then drag it out into the animGraph and chose **Get Rokoko Actor Name**. Connect it to Rokoko Body Pose and the Rokoko Face Pose.
 
-<img src="Images/animBPVariable.PNG">
+<img src="Images/animBPVariable.png">
 
 Right-click on the content browser and navigate to miscellaneous and create a **Data Asse**. Name it something like **character_BoneMap.** Now open it and write the names of the corresponding joints in the hierarchy. (If you use the same joint naming on more characters you can reuse this data asset)
 
-<img src="Images/dataAsset.PNG">
+<img src="Images/dataAsset.png">
 
 When the BoneMap is done open the AnimBP again and click on Rokoko Body Pose. Then you can click on the **Bone** **Map Overwrite** and chose your Data Asset.
 
-<img src="Images/boneMapOverwrite.PNG">
+<img src="Images/boneMapOverwrite.png">
 
 Now add the character skeletal mesh to the scene and navigate to the details panel and pick your animBlueprint under **Animation → Anim Class.** Then under Place Actors search for **Smartsuit controller** and **Smartsuit Reciever** and drag them into the scene. Click on the S**martsuit Receiver** in the **world outliner** and change the Streaming Data Port to **14043.**
 
@@ -94,7 +90,7 @@ In the content browser, click on **View Options** and enable **Show Plugins Cont
 
 Inside Unreal Engine click **Play** and the suit and gloves should be setup with live link 2.0, from Rokoko Studio.
 
-<img src="Images/fingerShowcase.PNG">
+<img src="Images/fingerShowcase.png">
 
 ## Issues
 
