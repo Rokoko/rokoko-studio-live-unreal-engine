@@ -12,17 +12,17 @@ To learn more about how to use Virtual Production in Rokoko Studio, read our gui
 
 ## Documentation
 
-### Finger animation setup on character's with Live link 2.0 and Smartgloves
+### Finger animation setup on character's with Studio Live and Smartgloves
 
-Live link 2.0 now supports the new Rokoko Smartgloves in Unreal Engine 4.25 and Rokoko Studio version 1.18.0b(234)
+Studio Live now supports the new Rokoko Smartgloves in Unreal Engine 4.25.3 and Rokoko Studio version 1.18.0b(234)
 
-**Making sure the model is ready for live link 2.0**
+**Making sure the model is ready for Studio Live**
 
 Before importing your model into Unreal Engine. Make sure that the character's hands and fingers are modeled as close to the Newton model as possible, to get the best possible retargeting of finger animation. The fingers should be straight and the thumb pointing 45 degrees away from the other fingers.
 
 <img src="Images/newtonHand.PNG">
 
-Live link supports up to a 4 finger joint setup: Metacarpal, Proximal, Medial and Distal finger joint.
+Studio Live supports up to a 4 finger joint setup: Metacarpal, Proximal, Medial and Distal finger joint.
 
 <img src="Images/newtonHandTop.png">
 
@@ -30,7 +30,7 @@ Live link supports up to a 4 finger joint setup: Metacarpal, Proximal, Medial an
 
 For the plugin to work at its current state you need this development buid of Rokoko Studio: [https://developer.cloud.unity3d.com/share/share.html?shareId=-koPxa5S4I](https://developer.cloud.unity3d.com/share/share.html?shareId=-koPxa5S4I)
 
-Then you need to download the Live link 2.0 plugin and install it manualy by moving it into your Unreal project's **plugins folder:** [https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins](https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins)
+Then you need to download the Studio Live plugin and install it manualy by moving it into your Unreal project's **plugins folder:** [https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins](https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins)
 
 _Note: If your unreal project doesn't have a plugins folder, then create a folder called "Plugins"._
 
@@ -72,11 +72,11 @@ Now add the character skeletal mesh to the scene and navigate to the details pan
 
 <img src="Images/smartSuitReciverSetup.PNG">
 
-To enable Rokoko Studio, go to Window → Live Link and under **Source** click on R**okoko Studio Source** and choose **Studio**.
+To enable Rokoko Studio, go to Window → Studio Live and under **Source** click on R**okoko Studio Source** and choose **Studio**.
 
 <img src="Images/UELivelinkTap.PNG">
 
-**Setting up Rokoko studio for live link 2.0** 
+**Setting up Rokoko studio for Studio Live** 
 When the scene is open and the suit is paired up with a profile. Go to **Start Live Stream.**
 Then navigate to **Custom** and click on the cogwheel. 
 Now change the port to **14045** and change the Data format to **JSON v3**. Then click on the little slider beside the port number.
@@ -88,7 +88,7 @@ In the content browser, click on **View Options** and enable **Show Plugins Cont
 
 <img src="Images/recordingWidget.PNG">
 
-Inside Unreal Engine click **Play** and the suit and gloves should be setup with live link 2.0, from Rokoko Studio.
+Inside Unreal Engine click **Play** and the suit and gloves should be setup with Studio Live, from Rokoko Studio.
 
 <img src="Images/fingerShowcase.png">
 
