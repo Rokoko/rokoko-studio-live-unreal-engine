@@ -8,7 +8,7 @@ This sample project for Unreal Engine contains necessary means to get you starte
 
 ## Getting Started
 
-To learn more about how to use Virtual Production in Rokoko Studio, read our guide [here](https://rokoko.atlassian.net/servicedesk/customer/kb/view/861208607)
+To learn more about how to use Virtual Production in Rokoko Studio, read our guide [here](https://help.rokoko.com/support/solutions/47000518297)
 
 ## Documentation
 
