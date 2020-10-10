@@ -44,5 +44,5 @@ public:
 	AActor* parent;
 
 private:
-	ASmartsuitReceiver* GetReceiver();
+	ARokokoReceiver* GetReceiver();
 };

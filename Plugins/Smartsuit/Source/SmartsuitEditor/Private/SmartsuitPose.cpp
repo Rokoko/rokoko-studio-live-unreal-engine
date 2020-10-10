@@ -101,7 +101,7 @@ void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, F
 
 FText USmartsuitPose::GetControllerDescription() const
 {
-	return LOCTEXT("SmartsuitPose", "Rokoko body pose");
+	return LOCTEXT("SmartsuitPose", "Rokoko Body Pose");
 }
 
 FText USmartsuitPose::GetTooltipText() const

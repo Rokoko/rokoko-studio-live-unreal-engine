@@ -12,16 +12,16 @@
 
 /*! \brief This AActor class implements the network layer between unreal and the SmartsuitPro.
  *
- * It is necessary to have one instance of this ASmartsuitReceiver in your level in order for Unreal Engine to be able to listen to Smartsuits.
+ * It is necessary to have one instance of this ARokokoReceiver in your level in order for Unreal Engine to be able to listen to Smartsuits.
  */
 UCLASS(meta = (ToolTip = "A SmartsuitReceiver implements the network interface between Smartsuit and Unreal. This is required for SmartsuitController to work properly. You can have only one SmartsuitReceiver at the same time."))
-class SMARTSUIT_API ASmartsuitReceiver : public AActor
+class SMARTSUIT_API ARokokoReceiver : public AActor
 {
 	GENERATED_BODY()
 	
 public:
 	/// @private Sets default values for this actor's properties
-	ASmartsuitReceiver();
+	ARokokoReceiver();
 
 	/// @private Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -85,14 +85,17 @@ public:
 	/**
 	* The port number used to listen for the streaming data of Smartsuits.
 	*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Smartsuit)
-		int streamingDataPort = 14041;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Smartsuit)
+	//int streamingDataPort = 14041;
 
 	/**
 	* The port number used to listen for trackers and props data.
 	*/
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
+	//int VPListenPort = 14045;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
-		int VPListenPort = 14045;
+	int RokokoPortNumber;
 
 	FProp* GetPropByNameFromVP(FString name, bool isLive);
 	FTracker* GetTrackerByNameFromVP(FString name, bool isLive);
@@ -112,7 +115,7 @@ public:
 	//	//UE_LOG(LogTemp, Display, TEXT("Yeeee1"));
 	//	bool found = false;
 	//	int i = 0;
-	//	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	//	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
 	//	{
 	//		//UE_LOG(LogTemp, Display, TEXT("Looking up receiver %d"), i);
 	//		i++;
@@ -135,7 +138,7 @@ public:
 	bool GetProp(FString name, bool isLive, FProp& OutProp);
 	//{
 	//	FProp result;
-	//	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	//	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
 	//	{
 	//		if (It->realLife) 
 	//		{
@@ -149,7 +152,7 @@ public:
 	static FTracker GetTracker(FString name, bool isLive);
 	//{
 	//	FTracker result;
-	//	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	//	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
 	//	{
 	//		if (It->realLife) {
 	//			result = *It->GetTrackerByNameFromVP(name, isLive);

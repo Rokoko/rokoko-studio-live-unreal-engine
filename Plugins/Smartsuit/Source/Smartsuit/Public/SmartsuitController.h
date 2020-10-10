@@ -127,7 +127,7 @@ struct FBodyModel
 * ASmartsuitController provides information about the Smartsuit like FPS, Network status if the smartsuit is broadcasting or unicasting and BodyModel information running in the Smartsuit.
 * Additionally provides methods to aestart, A-pose calibrate, make the Smartsuit broadcast or unicast, get and set the BodyModel running in the Smartsuit. 
 * 
-* For this controller to work you need to have one reference of ASmartsuitReceiver in the level.
+* For this controller to work you need to have one reference of ARokokoReceiver in the level.
 */
 UCLASS(meta = (ToolTip = "A SmartsuitController provides functionality to connect with a Smartsuit, send and receive commands. You need to define one SmartsuitController per Smartsuit you waant to support in your game. For example if you have one Smartsuit, you need one SmartsuitController that will bind to the Smartsuit. This component will work only if one SmartsuitReceiver is in the level."))
 class SMARTSUIT_API ASmartsuitController : public AActor
@@ -303,7 +303,7 @@ public:
 
 	bool IsRealLife() { return realLife; }
 private:
-	ASmartsuitReceiver* GetReceiver();
+	ARokokoReceiver* GetReceiver();
 	uint32 GetLocalIP();
     uint32 GetLocalMacIP();
 	uint8 GetByte(uint32 val, int i);

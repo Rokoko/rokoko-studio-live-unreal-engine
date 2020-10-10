@@ -54,4 +54,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Smartsuit")
 	static void CreateVirtualProductionSource();
+
+	static FTransform GetWorldSpaceTransform(FReferenceSkeleton RefSkel, int32 BoneIdx);
+
+	static FTransform GetRefPoseBoneTransform(USkeletalMeshComponent* SkelMesh, FName BoneName);
+
+	static FTransform GetBoneTransform(USkeletalMeshComponent* SkelMesh, FName BoneName);
 };
