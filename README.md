@@ -56,9 +56,11 @@ Inside the anim blueprint create a "**Rokoko body pose**", "**Component to local
 
 <img src="Images/animBPSetup.png">
 
-Now click on the **plus** next to variables and change the variable type to **Name** and the variable name to **Rokoko Actor Name**. Then drag it out into the animGraph and chose **Get Rokoko Actor Name**. Connect it to Rokoko Body Pose and the Rokoko Face Pose.
+Now click on the **plus** next to variables and change the variable type to **Name** and the variable name to **Rokoko Actor Name**. Then drag it out into the animGraph and chose **Get Rokoko Actor Name**. Connect it to Rokoko Body Pose and the Rokoko Face Pose. Then click on the **Rokoko Actor Name** and type in the Rokoko Actor Name from Studio. Hit apply and compile the blueprint. 
 
 <img src="Images/animBPVariable.png">
+
+<img src="Images/ActorNameStudio.PNG"> <img src="Images/ActorName.PNG">
 
 Right-click on the content browser and navigate to miscellaneous and create a **Data Asse**. Name it something like **character_BoneMap.** Now open it and write the names of the corresponding joints in the hierarchy. (If you use the same joint naming on more characters you can reuse this data asset)
 
