@@ -84,7 +84,7 @@ void UAnimGraphNode_ModifyFaceCurves::GetNodeContextMenuActions(UToolMenu* Menu,
 		if (Context->Pin != NULL)
 		{
 			// Get proeprty from pin
-			UProperty* AssociatedProperty;
+			FProperty* AssociatedProperty;
 			int32 ArrayIndex;
 			GetPinAssociatedProperty(GetFNodeType(), Context->Pin, /*out*/ AssociatedProperty, /*out*/ ArrayIndex);
 			FName PinPropertyName = AssociatedProperty->GetFName();

@@ -148,7 +148,7 @@ uint32 VPStreamingNetwork::Run()
 				//}
 
 				
-				IFileManager* FileManager = &IFileManager::Get();
+				//IFileManager* FileManager = &IFileManager::Get();
 				uint32 WriteFlags = 0;
 
 				//FString path = "C:/GitHub/rokoko-studio-live-unreal-engine_JSONV3/test12345678.lz4";
