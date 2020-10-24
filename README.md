@@ -56,7 +56,7 @@ Inside the anim blueprint create a "**Rokoko body pose**", "**Component to local
 
 <img src="Images/animBPSetup.png">
 
-Now click on the **plus** next to variables and change the variable type to **Name** and the variable name to **Rokoko Actor Name**. Then drag it out into the animGraph and chose **Get Rokoko Actor Name**. Connect it to Rokoko Body Pose and the Rokoko Face Pose. Then click on the **Rokoko Actor Name** and type in the Rokoko Actor Name from Studio. Hit apply and compile the blueprint. 
+Now click on the **plus** next to variables and change the variable type to **Name** and the variable name to **Rokoko Actor Name**. Then drag it out into the animGraph and chose **Get Rokoko Actor Name**. Connect it to Rokoko Body Pose and the Rokoko Face Pose. Then click on the **Rokoko Actor Name** and type in the Actor Name from Studio. Hit apply and compile the blueprint. 
 
 <img src="Images/animBPVariable.png">
 
