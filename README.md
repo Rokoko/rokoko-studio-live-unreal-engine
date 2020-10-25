@@ -39,6 +39,10 @@ Studio Live supports up to a 4 finger joint setup: Metacarpal, Proximal, Medial 
 
 **Getting the plugin to work manualy**
 
+_Note: You can skip this step by getting the plugin from the Unreal Engine marketplace:
+
+https://unrealengine.com/marketplace/en-US/product/smartsuit-plugin
+
 For the plugin to work at its current state you need this development buid of Rokoko Studio: [https://developer.cloud.unity3d.com/share/share.html?shareId=-koPxa5S4I](https://developer.cloud.unity3d.com/share/share.html?shareId=-koPxa5S4I)
 
 Then you need to download the Studio Live plugin and install it manualy by moving it into your Unreal project's **plugins folder:** [https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins](https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins)
