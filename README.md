@@ -24,9 +24,7 @@ To learn more about how to use Virtual Production in Rokoko Studio, read our gui
 
 # Documentation
 
-### Finger animation setup on character's with Studio Live and Smartgloves
-
-Unreal Engine 4.25.3 and Rokoko Studio version 1.18.0b(234)
+### Setting up Studio Live for Unreal Engine streaming
 
 **Making sure the model is ready for Studio Live**
 
