@@ -39,7 +39,7 @@ Studio Live supports up to a 4 finger joint setup: Metacarpal, Proximal, Medial 
 
 **Getting the plugin to work manualy**
 
-_Note: You can skip this step by getting the plugin from the Unreal Engine marketplace:
+_Note: You can skip this step by getting the plugin from the Unreal Engine marketplace:_
 
 https://unrealengine.com/marketplace/en-US/product/smartsuit-plugin
 
