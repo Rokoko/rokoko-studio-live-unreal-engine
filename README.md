@@ -1,8 +1,19 @@
-<h2 align="center"> Rokoko Studio Live - Sample project for Unreal Engine</h1>
+<h2 align="center"> Rokoko Studio Live plugin for Unreal Engine</h1>
+
+This plugin let's you stream animation data from Rokoko Studio into Unreal Engine to preview and work with all your motion capture data easily and intuitively.
+
+It supports the following types of data:
+* Up to five actors that can all include both body, face (52 blendshapes) and finger data at the same time.
+* Camera data
+* Props data
+
+Unreal Engine versions supported: 4.25.4
+Rokoko Studio version supported: 1.18.0b
+
+Unreal Engine Demo project including a character already set up for live streaming from Rokoko Studio:
+https://github.com/Rokoko/Unreal-Demo-Project
 
 [Rokoko Studio](https://www.rokoko.com/en/products/studio) is A powerful and intuitive software for recording, visualizing and exporting motion capture.
-
-This sample project for Unreal Engine contains necessary means to get you started with your application.
 
 ---
 
@@ -10,11 +21,11 @@ This sample project for Unreal Engine contains necessary means to get you starte
 
 To learn more about how to use Virtual Production in Rokoko Studio, read our guide [here](https://help.rokoko.com/support/solutions/47000518297)
 
-## Documentation
+# Documentation
 
 ### Finger animation setup on character's with Studio Live and Smartgloves
 
-Studio Live now supports the new Rokoko Smartgloves in Unreal Engine 4.25.3 and Rokoko Studio version 1.18.0b(234)
+Unreal Engine 4.25.3 and Rokoko Studio version 1.18.0b(234)
 
 **Making sure the model is ready for Studio Live**
 
