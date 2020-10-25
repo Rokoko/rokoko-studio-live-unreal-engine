@@ -200,19 +200,19 @@ uint32 VPStreamingNetwork::Run()
 					//VPFrame.timestamp = JsonObject->GetNumberField("timestamp");
 					//VPFrame.playbackTimestamp = JsonObject->GetNumberField("");
 
-					//LIVE
+					//SCENE
 					{
-						TSharedPtr<FJsonObject> LiveObj = JsonObject->GetObjectField("live");
-						TArray<TSharedPtr<FJsonValue>> Livepropsarray = LiveObj->GetArrayField("props");
+						TSharedPtr<FJsonObject> SceneObj = JsonObject->GetObjectField("scene");
+						TArray<TSharedPtr<FJsonValue>> Livepropsarray = SceneObj->GetArrayField("props");
 
 						for (auto& currentprop : Livepropsarray)
 						{
 							VPFrame.props.Add(FProp(true, currentprop->AsObject()));
 						}
 
-						if (LiveObj->HasField("actors"))
+						if (SceneObj->HasField("actors"))
 						{
-							TArray<TSharedPtr<FJsonValue>> Livesuitsarray = LiveObj->GetArrayField("actors");
+							TArray<TSharedPtr<FJsonValue>> Livesuitsarray = SceneObj->GetArrayField("actors");
 							for (auto& currentsuit : Livesuitsarray)
 							{
 								auto SuitData = FSuitData(true, currentsuit->AsObject());
@@ -228,33 +228,66 @@ uint32 VPStreamingNetwork::Run()
 						}
 					}
 
-					//PLAYBACK
-					{
-						TSharedPtr<FJsonObject> PlaybackObj = JsonObject->GetObjectField("playback");
-						TArray<TSharedPtr<FJsonValue>> Playbackpropsarray = PlaybackObj->GetArrayField("props");
+					////LIVE
+					//{
+					//	TSharedPtr<FJsonObject> LiveObj = JsonObject->GetObjectField("live");
+					//	TArray<TSharedPtr<FJsonValue>> Livepropsarray = LiveObj->GetArrayField("props");
 
-						for (auto& currentprop : Playbackpropsarray)
-						{
-							VPFrame.props.Add(FProp(false, currentprop->AsObject()));
-						}
+					//	for (auto& currentprop : Livepropsarray)
+					//	{
+					//		VPFrame.props.Add(FProp(true, currentprop->AsObject()));
+					//	}
 
-						if (PlaybackObj->HasField("actors"))
-						{
-							TArray<TSharedPtr<FJsonValue>> Playbacksuitsarray = PlaybackObj->GetArrayField("actors");
-							for (auto& currentsuit : Playbacksuitsarray)
-							{
-								auto SuitData = FSuitData(false, currentsuit->AsObject());
-								if (SuitData.hasFace)
-								{
-									auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
-									auto FaceData = FFace(JSONObjectface, SuitData.suitname);
-									SuitData.faceId = FaceData.faceId;
-									VPFrame.faces.Add(FaceData);
-								}
-								VPFrame.suits.Add(SuitData);
-							}
-						}
-					}
+					//	if (LiveObj->HasField("actors"))
+					//	{
+					//		TArray<TSharedPtr<FJsonValue>> Livesuitsarray = LiveObj->GetArrayField("actors");
+					//		for (auto& currentsuit : Livesuitsarray)
+					//		{
+					//			auto SuitData = FSuitData(true, currentsuit->AsObject());
+					//			if (SuitData.hasFace)
+					//			{
+					//				auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
+					//				auto FaceData = FFace(JSONObjectface, SuitData.suitname);
+					//				SuitData.faceId = FaceData.faceId;
+					//				VPFrame.faces.Add(FaceData);
+					//			}
+					//			VPFrame.suits.Add(SuitData);
+					//		}
+					//	}
+					//}
+
+					////PLAYBACK
+					//{
+					//	TSharedPtr<FJsonObject> PlaybackObj = JsonObject->GetObjectField("playback");
+					//	TArray<TSharedPtr<FJsonValue>> Playbackpropsarray = PlaybackObj->GetArrayField("props");
+
+					//	for (auto& currentprop : Playbackpropsarray)
+					//	{
+					//		VPFrame.props.Add(FProp(false, currentprop->AsObject()));
+					//	}
+
+					//	if (PlaybackObj->HasField("actors"))
+					//	{
+					//		TArray<TSharedPtr<FJsonValue>> Playbacksuitsarray = PlaybackObj->GetArrayField("actors");
+					//		for (auto& currentsuit : Playbacksuitsarray)
+					//		{
+					//			auto SuitData = FSuitData(false, currentsuit->AsObject());
+					//			if (SuitData.hasFace)
+					//			{
+					//				auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
+					//				auto FaceData = FFace(JSONObjectface, SuitData.suitname);
+					//				SuitData.faceId = FaceData.faceId;
+					//				VPFrame.faces.Add(FaceData);
+					//			}
+					//			VPFrame.suits.Add(SuitData);
+					//		}
+					//	}
+					//}
+
+
+
+
+
 				}
 
 				
