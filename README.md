@@ -13,11 +13,12 @@ Rokoko Studio version supported: 1.18.0b
 Unreal Engine Demo project including a character already set up for live streaming from Rokoko Studio:
 https://github.com/Rokoko/Unreal-Demo-Project
 
-[Rokoko Studio](https://www.rokoko.com/en/products/studio) is A powerful and intuitive software for recording, visualizing and exporting motion capture.
 
 ---
 
 ## Getting Started
+
+[Rokoko Studio](https://www.rokoko.com/en/products/studio) is A powerful and intuitive software for recording, visualizing and exporting motion capture.
 
 To learn more about how to use Virtual Production in Rokoko Studio, read our guide [here](https://help.rokoko.com/support/solutions/47000518297)
 
