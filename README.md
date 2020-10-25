@@ -8,6 +8,7 @@ It supports the following types of data:
 * Props data
 
 Unreal Engine versions supported: 4.25.4
+
 Rokoko Studio version supported: 1.18.0b
 
 Unreal Engine Demo project including a character already set up for live streaming from Rokoko Studio:
