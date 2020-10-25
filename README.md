@@ -26,7 +26,7 @@ To learn more about how to use Virtual Production in Rokoko Studio, read our gui
 
 ### Setting up Studio Live for Unreal Engine streaming
 
-**Making sure the model is ready for Studio Live**
+**Make sure the model is ready for Studio Live**
 
 Before importing your model into Unreal Engine. Make sure that the character's hands and fingers are modeled as close to the Newton model as possible, to get the best possible retargeting of finger animation. The fingers should be straight and the thumb pointing 45 degrees away from the other fingers.
 
