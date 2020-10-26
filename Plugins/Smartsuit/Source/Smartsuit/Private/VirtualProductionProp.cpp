@@ -21,11 +21,11 @@ void UVirtualProductionProp::BeginPlay()
 	CurrentLocation = parent->GetActorLocation();
 }
 
-ASmartsuitReceiver* UVirtualProductionProp::GetReceiver() 
+ARokokoReceiver* UVirtualProductionProp::GetReceiver()
 {
-	ASmartsuitReceiver* listener = nullptr;
+	ARokokoReceiver* listener = nullptr;
 	
-	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
 	{
 		if (It->enabled) 
 		{
@@ -40,7 +40,7 @@ void UVirtualProductionProp::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	ASmartsuitReceiver* listener = GetReceiver();
+	ARokokoReceiver* listener = GetReceiver();
 	if (!listener) 
 	{
 		return;

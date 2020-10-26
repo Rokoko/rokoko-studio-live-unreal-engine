@@ -6,6 +6,7 @@
 #include "SmartsuitDefinitions.h"
 #include "Animation/AnimInstanceProxy.h"
 #include "Roles/LiveLinkAnimationRole.h"
+#include "SmartsuitBlueprintLibrary.h"
 
 
 
@@ -353,7 +354,7 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	//	return;
 	//}
 
-	ASmartsuitReceiver *receiver = GetReceiver();
+	ARokokoReceiver *receiver = GetReceiver();
 	if (!receiver) 
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("No receiver"));
@@ -685,8 +686,107 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	*/
 
 
+	auto& ref1 = SkelComp->SkeletalMesh->RefSkeleton;
+	//FTransform transform1 = ref1.GetRefBonePose()[ref1.FindBoneIndex(BoneMapOverride->leftThumbProximal)];
+	//FQuat rotation3 = transform1.GetRotation();
 
 
+	FQuat rotation1 = SMARTSUIT_TPOSE_LEFT_THUMB_PROXIMAL;
+	FQuat rotation2 = TPose.Pose.leftThumbProximal.GetRotation();
+
+	FQuat wtf = rotation2;
+	wtf.X *= -1;
+	wtf.Y *= -1;
+	wtf.Z *= -1;
+	wtf.W *= -1;
+
+
+	FQuat test1 = SMARTSUIT_TPOSE_LEFT_THUMB_PROXIMAL.Inverse() * TPose.Pose.leftThumbProximal.GetRotation();
+	FQuat test2 = wtf.Inverse() * rotation2;
+	FQuat test3 = rotation1.Inverse() * rotation2;
+
+
+	FQuat wtfinverse = wtf.Inverse();
+	FQuat rotation1Inverse = rotation1.Inverse();
+
+	FQuat test4 = wtfinverse * rotation2;
+	FQuat test5 = rotation1Inverse * rotation2;
+
+
+	FQuat test6;
+	test6.X = -0.461940169;
+	test6.Y = -0.800103784;
+	test6.Z = 0.191340715;
+	test6.W = 0.331411898;
+
+	FQuat test7;
+	test7.X = -0.461940199;
+	test7.Y = -0.800103784;
+	test7.Z = 0.191340595;
+	test7.W = 0.331411868;
+
+	FQuat test8 = test6 * rotation2;
+	FQuat test9 = test7 * rotation2;
+
+	FRotator rotator8 = test8.Rotator();
+	FRotator rotator9 = test9.Rotator();
+
+	//FRotator rotation3rotator = rotation3.Rotator();
+
+
+FTransform transform2 = USmartsuitBlueprintLibrary::GetWorldSpaceTransform(ref1, ref1.FindBoneIndex(BoneMapOverride->leftThumbProximal));
+FQuat transform2quat = transform2.GetRotation();
+FRotator transform2rotator = transform2quat.Rotator();
+
+
+	//UE_LOG(LogTemp, Warning, TEXT("test1: %s"), *rotation1.Rotator().ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("test2: %s"), *rotation2.Rotator().ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("test3: %s"), *rotation3.Rotator().ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("test4: %s"), *rotation3rotator.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("test5: %s"), *transform2rotator.ToString());
+
+	auto CalculateExpected = [&ref1](FQuat InRotation, FName InBoneName) {
+		FTransform localtransform = USmartsuitBlueprintLibrary::GetWorldSpaceTransform(ref1, ref1.FindBoneIndex(InBoneName));
+		FQuat localRotation = localtransform.GetRotation();
+		
+		FQuat local = localRotation.Inverse() * localRotation;
+		return local;
+	};
+
+	//FQuat hipExpected = CalculateExpected(TPose.Pose.hip.GetRotation(), BoneMapOverride->hip);
+	//FQuat stomachExpected = CalculateExpected(TPose.Pose.stomach.GetRotation(), BoneMapOverride->stomach);
+	//FQuat chestExpected = CalculateExpected(TPose.Pose.chest.GetRotation(), BoneMapOverride->chest);
+	//FQuat neckExpected = CalculateExpected(TPose.Pose.neck.GetRotation(), BoneMapOverride->neck);
+	//FQuat headExpected = CalculateExpected(TPose.Pose.head.GetRotation(), BoneMapOverride->head);
+	//FQuat leftShoulderExpected = CalculateExpected(TPose.Pose.leftShoulder.GetRotation(), BoneMapOverride->leftShoulder);
+	//FQuat leftArmExpected = CalculateExpected(TPose.Pose.leftArm.GetRotation(), BoneMapOverride->leftArm);
+	//FQuat leftForearmExpected = CalculateExpected(TPose.Pose.leftForearm.GetRotation(), BoneMapOverride->leftForearm);
+	//FQuat leftHandExpected = CalculateExpected(TPose.Pose.leftHand.GetRotation(), BoneMapOverride->leftHand);
+	//FQuat rightShoulderExpected = CalculateExpected(TPose.Pose.rightShoulder.GetRotation(), BoneMapOverride->leftShoulder);
+	//FQuat rightArmExpected = CalculateExpected(TPose.Pose.rightArm.GetRotation(), BoneMapOverride->rightArm);
+	//FQuat rightForearmExpected = CalculateExpected(TPose.Pose.rightForearm.GetRotation(), BoneMapOverride->rightForearm);
+	//FQuat rightHandExpected = CalculateExpected(TPose.Pose.rightHand.GetRotation(), BoneMapOverride->rightHand);
+	//FQuat leftUpLegExpected = CalculateExpected(TPose.Pose.leftUpLeg.GetRotation(), BoneMapOverride->leftUpleg);
+	//FQuat leftLegExpected = CalculateExpected(TPose.Pose.leftLeg.GetRotation(), BoneMapOverride->leftLeg);
+	//FQuat leftFootExpected = CalculateExpected(TPose.Pose.leftFoot.GetRotation(), BoneMapOverride->leftFoot);
+	//FQuat rightUpLegExpected = CalculateExpected(TPose.Pose.rightUpLeg.GetRotation(), BoneMapOverride->rightUpleg);
+	//FQuat rightLegExpected = CalculateExpected(TPose.Pose.rightLeg.GetRotation(), BoneMapOverride->rightLeg);
+	//FQuat rightFootExpected = CalculateExpected(TPose.Pose.rightFoot.GetRotation(), BoneMapOverride->rightFoot);
+
+	FQuat smartsuittposehip = SMARTSUIT_TPOSE_HIP;
+	FQuat tposehip = TPose.Pose.hip.GetRotation();
+
+	FQuat smartsuittposestomach = SMARTSUIT_TPOSE_STOMACH;
+	FQuat tposestomach = TPose.Pose.stomach.GetRotation();
+
+	FQuat smartsuittposechest = SMARTSUIT_TPOSE_CHEST;
+	FQuat tposechest = TPose.Pose.chest.GetRotation();
+
+	FQuat smartsuittposeneck = SMARTSUIT_TPOSE_NECK;
+	FQuat tposeneck = TPose.Pose.neck.GetRotation();
+
+	FQuat smartsuittposehead = SMARTSUIT_TPOSE_HEAD;
+	FQuat tposehead = TPose.Pose.head.GetRotation();
 
 	FQuat hipExpected = SMARTSUIT_TPOSE_HIP.Inverse() * TPose.Pose.hip.GetRotation();
 	FQuat stomachExpected = SMARTSUIT_TPOSE_STOMACH.Inverse() * TPose.Pose.stomach.GetRotation();
@@ -801,24 +901,24 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 
 
 
-	ApplySmartsuitRotation(BoneMap.stomach, stomachQuat * stomachExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.chest, chestQuat * chestExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.neck, neckQuat * neckExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.head, headQuat * headExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftShoulder, leftShoulderQuat * leftShoulderExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftArm, leftArmQuat * leftArmExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftForearm, leftForearmQuat * leftForearmExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftHand, leftHandQuat * leftHandExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightShoulder, rightShoulderQuat * rightShoulderExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightArm, rightArmQuat * rightArmExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightForearm, rightForearmQuat * rightForearmExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightHand, rightHandQuat * rightHandExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftUpleg, leftUpLegQuat * leftUpLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftLeg, leftLegQuat * leftLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftFoot, leftFootQuat * leftFootExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightUpleg, rightUpLegQuat * rightUpLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightLeg, rightLegQuat * rightLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightFoot, rightFootQuat * rightFootExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.stomach, stomachQuat* stomachExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.chest, chestQuat* chestExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.neck, neckQuat* neckExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.head, headQuat* headExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftShoulder, leftShoulderQuat* leftShoulderExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftArm, leftArmQuat* leftArmExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftForearm, leftForearmQuat* leftForearmExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftHand, leftHandQuat* leftHandExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightShoulder, rightShoulderQuat* rightShoulderExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightArm, rightArmQuat* rightArmExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightForearm, rightForearmQuat* rightForearmExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightHand, rightHandQuat* rightHandExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftUpleg, leftUpLegQuat* leftUpLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftLeg, leftLegQuat* leftLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftFoot, leftFootQuat* leftFootExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightUpleg, rightUpLegQuat* rightUpLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightLeg, rightLegQuat* rightLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightFoot, rightFootQuat* rightFootExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 
 	ApplySmartsuitRotation(BoneMap.leftThumbProximal, leftThumbProximalQuat * leftThumbProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 	ApplySmartsuitRotation(BoneMap.leftThumbMedial, leftThumbMedialQuat * leftThumbMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);

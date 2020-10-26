@@ -1,36 +1,51 @@
-<h2 align="center"> Rokoko Studio plugin for Unreal Engine</h1>
+<h2 align="center"> Rokoko Studio Live plugin for Unreal Engine</h1>
 
-[Rokoko Studio](https://www.rokoko.com/en/products/studio) is A powerful and intuitive software for recording, visualizing and exporting motion capture.
+This plugin let's you stream animation data from Rokoko Studio into Unreal Engine to preview and work with all your motion capture data easily and intuitively.
 
-This sample project for Unreal Engine contains necessary means to get you started with your application.
+It supports the following types of data:
+* Up to five actors that can all include both body, face (52 blendshapes) and finger data at the same time.
+* Camera data
+* Props data
+
+Unreal Engine versions supported: 4.25.4
+
+Rokoko Studio version supported: 1.18.0b
+
+Unreal Engine Demo project including a character already set up for live streaming from Rokoko Studio:
+https://github.com/Rokoko/Unreal-Demo-Project
+
 
 ---
 
 ## Getting Started
 
+[Rokoko Studio](https://www.rokoko.com/en/products/studio) is A powerful and intuitive software for recording, visualizing and exporting motion capture.
+
 To learn more about how to use Virtual Production in Rokoko Studio, read our guide [here](https://help.rokoko.com/support/solutions/47000518297)
 
-## Documentation
+# Documentation
 
-### Finger animation setup on character's with Live link 2.0 and Smartgloves
+### Setting up Studio Live for Unreal Engine streaming
 
-Live link 2.0 now supports the new Rokoko Smartgloves in Unreal Engine 4.25 and Rokoko Studio version 1.18.0b(234)
-
-**Making sure the model is ready for live link 2.0**
+**Make sure the model is ready for Studio Live**
 
 Before importing your model into Unreal Engine. Make sure that the character's hands and fingers are modeled as close to the Newton model as possible, to get the best possible retargeting of finger animation. The fingers should be straight and the thumb pointing 45 degrees away from the other fingers.
 
 <img src="Images/newtonHand.PNG">
 
-Live link supports up to a 4 finger joint setup: Metacarpal, Proximal, Medial and Distal finger joint.
+Studio Live supports up to a 4 finger joint setup: Metacarpal, Proximal, Medial and Distal finger joint.
 
 <img src="Images/newtonHandTop.png">
 
 **Getting the plugin to work manualy**
 
+_Note: You can skip this step by getting the plugin from the Unreal Engine marketplace:_
+
+https://unrealengine.com/marketplace/en-US/product/smartsuit-plugin
+
 For the plugin to work at its current state you need this development buid of Rokoko Studio: [https://developer.cloud.unity3d.com/share/share.html?shareId=-koPxa5S4I](https://developer.cloud.unity3d.com/share/share.html?shareId=-koPxa5S4I)
 
-Then you need to download the Live link 2.0 plugin and install it manualy by moving it into your Unreal project's **plugins folder:** [https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins](https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins)
+Then you need to download the Studio Live plugin and install it manualy by moving it into your Unreal project's **plugins folder:** [https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins](https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins)
 
 _Note: If your unreal project doesn't have a plugins folder, then create a folder called "Plugins"._
 
@@ -56,9 +71,11 @@ Inside the anim blueprint create a "**Rokoko body pose**", "**Component to local
 
 <img src="Images/animBPSetup.png">
 
-Now click on the **plus** next to variables and change the variable type to **Name** and the variable name to **Rokoko Actor Name**. Then drag it out into the animGraph and chose **Get Rokoko Actor Name**. Connect it to Rokoko Body Pose and the Rokoko Face Pose.
+Now click on the **plus** next to variables and change the variable type to **Name** and the variable name to **Rokoko Actor Name**. Then drag it out into the animGraph and chose **Get Rokoko Actor Name**. Connect it to Rokoko Body Pose and the Rokoko Face Pose. Then click on the **Rokoko Actor Name** and type in the Actor Name from Studio. Hit apply and compile the blueprint. 
 
 <img src="Images/animBPVariable.png">
+
+<img src="Images/ActorNameStudio.PNG"> <img src="Images/ActorName.PNG">
 
 Right-click on the content browser and navigate to miscellaneous and create a **Data Asse**. Name it something like **character_BoneMap.** Now open it and write the names of the corresponding joints in the hierarchy. (If you use the same joint naming on more characters you can reuse this data asset)
 
@@ -72,11 +89,11 @@ Now add the character skeletal mesh to the scene and navigate to the details pan
 
 <img src="Images/smartSuitReciverSetup.PNG">
 
-To enable Rokoko Studio, go to Window → Live Link and under **Source** click on R**okoko Studio Source** and choose **Studio**.
+To enable Rokoko Studio, go to Window → Studio Live and under **Source** click on R**okoko Studio Source** and choose **Studio**.
 
 <img src="Images/UELivelinkTap.PNG">
 
-**Setting up Rokoko studio for live link 2.0** 
+**Setting up Rokoko studio for Studio Live** 
 When the scene is open and the suit is paired up with a profile. Go to **Start Live Stream.**
 Then navigate to **Custom** and click on the cogwheel. 
 Now change the port to **14045** and change the Data format to **JSON v3**. Then click on the little slider beside the port number.
@@ -88,7 +105,7 @@ In the content browser, click on **View Options** and enable **Show Plugins Cont
 
 <img src="Images/recordingWidget.PNG">
 
-Inside Unreal Engine click **Play** and the suit and gloves should be setup with live link 2.0, from Rokoko Studio.
+Inside Unreal Engine click **Play** and the suit and gloves should be setup with Studio Live, from Rokoko Studio.
 
 <img src="Images/fingerShowcase.png">
 

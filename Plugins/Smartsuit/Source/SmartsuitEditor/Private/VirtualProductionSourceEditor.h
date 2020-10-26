@@ -75,7 +75,7 @@ private:
 	// Time since our UI was last ticked, allow us to refresh if we haven't been onscreen for a while
 	double LastTickTime;
 
-	ASmartsuitReceiver *receiver;
+	ARokokoReceiver *receiver;
 	VPStreamingNetwork *VPnet;
 	FVirtualProductionFrame *VPFrame;
 };

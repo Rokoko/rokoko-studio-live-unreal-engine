@@ -6,14 +6,15 @@
 
 
 // Sets default values
-ASmartsuitReceiver::ASmartsuitReceiver()
+ARokokoReceiver::ARokokoReceiver()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	RokokoPortNumber = 14045;
 }
 
 // Called when the game starts or when spawned
-void ASmartsuitReceiver::BeginPlay()
+void ARokokoReceiver::BeginPlay()
 {
 	Super::BeginPlay();
 	StartListener();
@@ -21,39 +22,39 @@ void ASmartsuitReceiver::BeginPlay()
 	realLife = true;
 }
 
-void ASmartsuitReceiver::BeginDestroy() 
+void ARokokoReceiver::BeginDestroy()
 {
 	Super::BeginDestroy();
 	StopListener();
 }
 
 // Called every frame
-void ASmartsuitReceiver::Tick(float DeltaTime)
+void ARokokoReceiver::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
 
-void ASmartsuitReceiver::StartListener()
+void ARokokoReceiver::StartListener()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Listening..."));
 	//listener.Start(streamingDataPort);
-	VPlistener.Start(VPListenPort);
+	VPlistener.Start(RokokoPortNumber);
 }
 
-void ASmartsuitReceiver::StopListener() 
+void ARokokoReceiver::StopListener()
 {
 	//listener.Stop();
 	VPlistener.Stop();
 	UE_LOG(LogTemp, Warning, TEXT("Not listening..."));
 }
 
-FFace ASmartsuitReceiver::GetFaceByFaceID(FString faceId)
+FFace ARokokoReceiver::GetFaceByFaceID(FString faceId)
 {
 	return VPlistener.GetFaceByFaceID(faceId);
 }
 
-FFace ASmartsuitReceiver::GetFaceByProfileName(const FString& faceName, bool& found)
+FFace ARokokoReceiver::GetFaceByProfileName(const FString& faceName, bool& found)
 {
 	//return *VPlistener.GetFaceByProfileName(faceName);
 
@@ -70,12 +71,12 @@ FFace ASmartsuitReceiver::GetFaceByProfileName(const FString& faceName, bool& fo
 	return returnval;
 }
 
-TArray<FFace> ASmartsuitReceiver::GetAllFaces()
+TArray<FFace> ARokokoReceiver::GetAllFaces()
 {
 	return VPlistener.GetAllFaces();
 }
 
-TArray<FFace> ASmartsuitReceiver::GetFacesNotAssociatedWithActor()
+TArray<FFace> ARokokoReceiver::GetFacesNotAssociatedWithActor()
 {
 	TArray<FFace> FacesNotPairedWithSuit;
 	for (auto CurrentFace : GetAllFaces())
@@ -98,12 +99,12 @@ TArray<FFace> ASmartsuitReceiver::GetFacesNotAssociatedWithActor()
 	return FacesNotPairedWithSuit;
 }
 
-FSuitData* ASmartsuitReceiver::GetSmartsuit(FString suitName)
+FSuitData* ARokokoReceiver::GetSmartsuit(FString suitName)
 {
 	return VPlistener.GetSmartsuitByName(suitName);
 }
 
-bool ASmartsuitReceiver::GetSmartsuitByName(const FString& suitName, FSuitData& SuitData)
+bool ARokokoReceiver::GetSmartsuitByName(const FString& suitName, FSuitData& SuitData)
 {
 	//return *VPlistener.GetSmartsuitByName(suitName);
 
@@ -116,29 +117,29 @@ bool ASmartsuitReceiver::GetSmartsuitByName(const FString& suitName, FSuitData& 
 	return false;
 }
 
-TArray<FSuitData> ASmartsuitReceiver::GetAllSmartsuits()
+TArray<FSuitData> ARokokoReceiver::GetAllSmartsuits()
 {
 	return VPlistener.GetAllSmartsuits();
 }
 
-TArray<FString> ASmartsuitReceiver::GetAvailableSmartsuitNames()
+TArray<FString> ARokokoReceiver::GetAvailableSmartsuitNames()
 {
 	return VPlistener.GetAvailableSmartsuitNames();
 }
 
 
-FProp* ASmartsuitReceiver::GetPropByNameFromVP(FString name, bool isLive) 
+FProp* ARokokoReceiver::GetPropByNameFromVP(FString name, bool isLive)
 {
 	return VPlistener.GetPropByName(name, isLive);
 }
 PRAGMA_DISABLE_OPTIMIZATION
-TArray<FProp> ASmartsuitReceiver::GetAllProps()
+TArray<FProp> ARokokoReceiver::GetAllProps()
 {
 	TArray<FProp> result;
 	//UE_LOG(LogTemp, Display, TEXT("Yeeee1"));
 	bool found = false;
 	int i = 0;
-	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
 	{
 		//UE_LOG(LogTemp, Display, TEXT("Looking up receiver %d"), i);
 		i++;
@@ -157,10 +158,10 @@ TArray<FProp> ASmartsuitReceiver::GetAllProps()
 	return result;
 }
 PRAGMA_ENABLE_OPTIMIZATION
-bool ASmartsuitReceiver::GetProp(FString name, bool isLive, FProp& OutProp)
+bool ARokokoReceiver::GetProp(FString name, bool isLive, FProp& OutProp)
 {
 	//FProp result;
-	//for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	//for (TObjectIterator<ARokokoReceiver> It; It; ++It)
 	//{
 	//	if (It->realLife)
 	//	{
@@ -178,15 +179,15 @@ bool ASmartsuitReceiver::GetProp(FString name, bool isLive, FProp& OutProp)
 	return false;
 }
 
-FTracker* ASmartsuitReceiver::GetTrackerByNameFromVP(FString name, bool isLive) 
+FTracker* ARokokoReceiver::GetTrackerByNameFromVP(FString name, bool isLive)
 {
 	return VPlistener.GetTrackerByName(name, isLive);
 }
 
-FTracker ASmartsuitReceiver::GetTracker(FString name, bool isLive)
+FTracker ARokokoReceiver::GetTracker(FString name, bool isLive)
 {
 	FTracker result;
-	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
 	{
 		if (It->realLife)
 		{
@@ -196,7 +197,7 @@ FTracker ASmartsuitReceiver::GetTracker(FString name, bool isLive)
 	return result;
 }
 
-FTracker ASmartsuitReceiver::GetTrackerByConnectionIDFromVP(const FString& name, bool isLive, bool& found)
+FTracker ARokokoReceiver::GetTrackerByConnectionIDFromVP(const FString& name, bool isLive, bool& found)
 {
 	found = false;
 	FTracker returnval;
@@ -209,7 +210,7 @@ FTracker ASmartsuitReceiver::GetTrackerByConnectionIDFromVP(const FString& name,
 	return returnval;
 }
 
-void ASmartsuitReceiver::SetSupportsWiFiAPI(FString suitname) 
+void ARokokoReceiver::SetSupportsWiFiAPI(FString suitname)
 {
 	//listener.wifiSupportedSuits.Add(suitname);
 }

@@ -31,11 +31,11 @@ void ASmartsuitController::BeginPlay()
 	}
 }
 
-ASmartsuitReceiver* ASmartsuitController::GetReceiver() 
+ARokokoReceiver* ASmartsuitController::GetReceiver() 
 {
-	ASmartsuitReceiver * listener = nullptr;
+	ARokokoReceiver* listener = nullptr;
 	// Find UObjects by type
-	for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
 	{
 		if (It->enabled) 
 		{
@@ -51,7 +51,7 @@ ASmartsuitReceiver* ASmartsuitController::GetReceiver()
 void ASmartsuitController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	ASmartsuitReceiver * listener = GetReceiver();
+	ARokokoReceiver* listener = GetReceiver();
 	if (!listener) 
 	{
 		return;
@@ -99,7 +99,7 @@ void ASmartsuitController::Tick(float DeltaTime)
 //	
 //	uint32 myIp = GetLocalIP();
 //
-//	ASmartsuitReceiver * receiver = GetReceiver();
+//	ARokokoReceiver * receiver = GetReceiver();
 //	if (receiver && myIp != 0) {
 //		if (customData != nullptr) {
 //			//receiver->SendCommand(suitname, customData, customDataLength);
@@ -161,7 +161,7 @@ uint8 ASmartsuitController::GetByte(uint32 value, int i)
 
 //uint32 ASmartsuitController::GetLocalIP() {
 //	
-//	ASmartsuitReceiver *receiver = GetReceiver();
+//	ARokokoReceiver *receiver = GetReceiver();
 //	if (!receiver) {
 //		return 0;
 //	}

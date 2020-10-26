@@ -491,10 +491,10 @@ private:
 	void ApplyAllBonePositions(FBoneReference bone, float hipWidth, TArray<FTransform> transforms, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases);
 	// End of FAnimNode_SkeletalControlBase interface
 
-	ASmartsuitReceiver* GetReceiver() {
-		ASmartsuitReceiver * listener = nullptr;
+	ARokokoReceiver* GetReceiver() {
+		ARokokoReceiver * listener = nullptr;
 		// Find UObjects by type
-		for (TObjectIterator<ASmartsuitReceiver> It; It; ++It)
+		for (TObjectIterator<ARokokoReceiver> It; It; ++It)
 		{
 			if (It->enabled) {
 				listener = *It;
