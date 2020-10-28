@@ -1,29 +1,31 @@
-<h2 align="center"> Rokoko Studio Live plugin for Unreal Engine</h1>
+<h1 align="center">Rokoko Studio Live Plugin for Unreal Engine</h1>
+
+[Rokoko Studio](https://www.rokoko.com/en/products/studio) is a powerful and intuitive software for recording, visualizing and exporting motion capture.
 
 This plugin let's you stream animation data from Rokoko Studio into Unreal Engine to preview and work with all your motion capture data easily and intuitively.
 
-It supports the following types of data:
-* Up to five actors that can all include both body, face (52 blendshapes) and finger data at the same time.
-* Camera data
-* Props data
-
-Unreal Engine versions supported: 4.25.4
-
-Rokoko Studio version supported: 1.18.0b
-
-Unreal Engine Demo project including a character already set up for live streaming from Rokoko Studio:
-https://github.com/Rokoko/Unreal-Demo-Project
-
-
 ---
 
-## Getting Started
+## Requirements
+- Unreal Engine 4.25.4
+- Rokoko Studio 1.18.0b
 
-[Rokoko Studio](https://www.rokoko.com/en/products/studio) is A powerful and intuitive software for recording, visualizing and exporting motion capture.
+## Features
+- Live stream data:
+  * Up to five actors that can all include both body, face (52 blendshapes) and finger data at the same time.
+  * Camera data
+  * Props data
+- Control Rokoko Studio from within Unreal Engine
+ 
+Unreal Engine Demo project including a character already set up for live streaming from Rokoko Studio:
+https://github.com/Rokoko/Unreal-Demo-Project
+ 
+---
+
+## Getting Started for Streaming
 
 To learn more about how to use Virtual Production in Rokoko Studio, read our guide [here](https://help.rokoko.com/support/solutions/47000518297)
 
-# Documentation
 
 ### Setting up Studio Live for Unreal Engine streaming
 
@@ -75,7 +77,7 @@ Now click on the **plus** next to variables and change the variable type to **Na
 
 <img src="Images/animBPVariable.png">
 
-<img src="Images/ActorNameStudio.PNG"> <img src="Images/ActorName.PNG">
+<img src="Images/ActorProfileName.PNG"> <img src="Images/ActorName.PNG">
 
 Right-click on the content browser and navigate to miscellaneous and create a **Data Asse**. Name it something like **character_BoneMap.** Now open it and write the names of the corresponding joints in the hierarchy. (If you use the same joint naming on more characters you can reuse this data asset)
 
