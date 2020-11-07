@@ -428,7 +428,7 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 	GENERATED_USTRUCT_BODY()
 
 	/** Bone mapping between Smartsuit sensors and character's humanoid bones. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SmartsuitAnimationSetup, meta = (ToolTip = "A mapping between the Smartsuit expected bone names and the bones that will animate from the Smartsuit component. Every bone is required for the animation to work properly."))
+	UPROPERTY(/*EditAnywhere, BlueprintReadWrite, Category = SmartsuitAnimationSetup, meta = (NeverAsPin, ToolTip = "A mapping between the Smartsuit expected bone names and the bones that will animate from the Smartsuit component. Every bone is required for the animation to work properly.")*/)
 	FSmartsuitBodyMap BoneMap;
 
 	UPROPERTY(EditAnywhere, Category = SmartsuitAnimationSetup)
