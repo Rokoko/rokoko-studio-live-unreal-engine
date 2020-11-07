@@ -61,7 +61,7 @@ public:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Default)
 	FString IPAddress;
 
 	UPROPERTY()
@@ -73,10 +73,10 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnDisconnected OnDisconnected;
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = Default)
 	FString GetCommandAPIKey();
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = Default)
 	int32 GetCommandAPIPort();
 
 	TSharedPtr<FInternetAddr> RemoteAddr;
