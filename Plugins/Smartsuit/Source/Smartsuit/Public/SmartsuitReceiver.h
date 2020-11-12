@@ -135,7 +135,7 @@ public:
 	//}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a prop by name."))
-	bool GetProp(FString name, bool isLive, FProp& OutProp);
+	bool GetProp(FString name, /*bool isLive, */FProp& OutProp);
 	//{
 	//	FProp result;
 	//	for (TObjectIterator<ARokokoReceiver> It; It; ++It)

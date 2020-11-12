@@ -60,4 +60,10 @@ public:
 	static FTransform GetRefPoseBoneTransform(USkeletalMeshComponent* SkelMesh, FName BoneName);
 
 	static FTransform GetBoneTransform(USkeletalMeshComponent* SkelMesh, FName BoneName);
+
+	UFUNCTION(BlueprintPure)
+	static FVector GetPropLocation(FProp InProp);
+
+	UFUNCTION(BlueprintPure)
+	static FRotator GetPropRotation(FProp InProp);
 };

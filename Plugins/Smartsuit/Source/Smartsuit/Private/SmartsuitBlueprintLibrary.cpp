@@ -162,3 +162,13 @@ FTransform USmartsuitBlueprintLibrary::GetBoneTransform(USkeletalMeshComponent* 
 
 	return BoneTransform;
 }
+
+FVector USmartsuitBlueprintLibrary::GetPropLocation(FProp InProp)
+{
+	return InProp.UPosition();
+}
+
+FRotator USmartsuitBlueprintLibrary::GetPropRotation(FProp InProp)
+{
+	return InProp.FQuatToRotator();
+}
