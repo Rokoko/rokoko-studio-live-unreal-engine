@@ -28,7 +28,11 @@ void URokokoStudioCommandAPI::Restart(const FRokokoCommandAPI_IPInfo& IPInfo, co
 	FString TrimmedUrl = URLPath;
 	TrimmedUrl.TrimStartAndEndInline();
 
+#if BUILT_MINOR_VERSION >= 26
+	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
+#else
 	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+#endif
 	HttpRequest->SetURL(TrimmedUrl);
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
@@ -51,7 +55,11 @@ void URokokoStudioCommandAPI::Calibrate(const FRokokoCommandAPI_IPInfo& IPInfo, 
 	FString TrimmedUrl = URLPath;
 	TrimmedUrl.TrimStartAndEndInline();
 
+#if BUILT_MINOR_VERSION >= 26
+	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
+#else
 	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+#endif
 	HttpRequest->SetURL(TrimmedUrl);
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
@@ -73,7 +81,11 @@ void URokokoStudioCommandAPI::StartRecording(const FRokokoCommandAPI_IPInfo& IPI
 	FString TrimmedUrl = URLPath;
 	TrimmedUrl.TrimStartAndEndInline();
 
+#if BUILT_MINOR_VERSION >= 26
+	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
+#else
 	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+#endif
 	HttpRequest->SetURL(TrimmedUrl);
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
@@ -89,7 +101,11 @@ void URokokoStudioCommandAPI::StopRecording(const FRokokoCommandAPI_IPInfo& IPIn
 	FString TrimmedUrl = URLPath;
 	TrimmedUrl.TrimStartAndEndInline();
 
+#if BUILT_MINOR_VERSION >= 26
+	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
+#else
 	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+#endif
 	HttpRequest->SetURL(TrimmedUrl);
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
