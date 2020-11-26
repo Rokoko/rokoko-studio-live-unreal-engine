@@ -158,8 +158,18 @@ TArray<FProp> ARokokoReceiver::GetAllProps()
 	return result;
 }
 PRAGMA_ENABLE_OPTIMIZATION
-bool ARokokoReceiver::GetProp(FString name, bool isLive, FProp& OutProp)
+bool ARokokoReceiver::GetProp(FString name, /*bool isLive, */FProp& OutProp)
 {
+	//for (TObjectIterator<ARokokoReceiver> It; It; ++It)
+	//{
+	//	if (It->realLife)
+	//	{
+	//		OutProp = *It->GetPropByNameFromVP(name, true);
+	//		return true;
+	//	}
+	//}
+	//return false;
+
 	//FProp result;
 	//for (TObjectIterator<ARokokoReceiver> It; It; ++It)
 	//{
@@ -170,7 +180,7 @@ bool ARokokoReceiver::GetProp(FString name, bool isLive, FProp& OutProp)
 	//}
 	//return result;
 
-	if (FProp* prop = GetPropByNameFromVP(name, isLive))
+	if (FProp* prop = GetPropByNameFromVP(name, true))
 	{
 		OutProp = *prop;
 		return true;

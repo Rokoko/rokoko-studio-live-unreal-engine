@@ -377,34 +377,34 @@ struct FSuitData
 	void ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& BoneName);
 
 	/** The name of the Smartsuit. */
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category=Default)
 	FString suitname;
 
 	uint32_t timestamp;
 	
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category=Default)
 	FString id;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category=Default)
 	bool isLive;
 
 	/** The name of the profile. */
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = Default)
 	FString profileName;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = Default)
 	bool hasGloves;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = Default)
 	bool hasBody;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = Default)
 	bool hasFace;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = Default)
 	FString faceId;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = Default)
 	FLinearColor color;
 
 	TMap<FName, FSmartsuitBone> SmartsuitBones;

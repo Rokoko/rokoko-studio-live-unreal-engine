@@ -46,16 +46,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Rokoko")
 		void StopListener();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = Default)
 	FFace GetFaceByFaceID(FString faceName);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = Default)
 	FFace GetFaceByProfileName(const FString& faceName, bool& found);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = Default)
 	TArray<FFace> GetAllFaces();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = Default)
 	TArray<FFace> GetFacesNotAssociatedWithActor();
 
 	/**
@@ -67,7 +67,7 @@ public:
 	*/
 	FSuitData* GetSmartsuit(FString suitName);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = Default)
 	bool GetSmartsuitByName(const FString& suitName, FSuitData& SuitData);
 
 	/**
@@ -76,10 +76,10 @@ public:
 	*
 	* @return Returns an array with all the available in the network Smartsuit names.
 	*/
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = Default)
 	TArray<FString> GetAvailableSmartsuitNames();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = Default)
 	TArray<FSuitData> GetAllSmartsuits();
 
 	/**
@@ -135,7 +135,7 @@ public:
 	//}
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a prop by name."))
-	bool GetProp(FString name, bool isLive, FProp& OutProp);
+	bool GetProp(FString name, /*bool isLive, */FProp& OutProp);
 	//{
 	//	FProp result;
 	//	for (TObjectIterator<ARokokoReceiver> It; It; ++It)

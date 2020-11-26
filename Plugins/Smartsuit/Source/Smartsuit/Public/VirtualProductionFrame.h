@@ -249,7 +249,7 @@ struct FFace
 	FFace() {}
 	FFace(TSharedPtr<FJsonObject> jsonObject, const FString& InActorName);
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly, Category = "Virtual Production")
 	FString profileName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's version."))
 	int version;
