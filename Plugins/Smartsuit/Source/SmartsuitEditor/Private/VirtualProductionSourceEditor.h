@@ -18,7 +18,7 @@ public:
 #include "IMessageContext.h"
 #include "MessageEndpoint.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
-#include "VPStreamingNetwork.h"
+//#include "VPStreamingNetwork.h"
 #include "SmartsuitReceiver.h"
 #include "VirtualProductionFrame.h"
 #include "Misc/Guid.h"
@@ -76,6 +76,6 @@ private:
 	double LastTickTime;
 
 	ARokokoReceiver *receiver;
-	VPStreamingNetwork *VPnet;
+	//VPStreamingNetwork *VPnet;
 	FVirtualProductionFrame *VPFrame;
 };

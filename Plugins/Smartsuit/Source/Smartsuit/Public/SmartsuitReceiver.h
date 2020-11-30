@@ -4,7 +4,7 @@
 
 #include "GameFramework/Actor.h"
 #include "SmartsuitStreamingNetwork.h"
-#include "VPStreamingNetwork.h"
+//#include "VPStreamingNetwork.h"
 #include "VirtualProductionFrame.h"
 //#include "Engine.h"
 #include "UObject/UObjectIterator.h"
@@ -178,7 +178,7 @@ public:
 
 private:
 	//SmartsuitStreamingNetwork listener;
-	VPStreamingNetwork VPlistener;
+	//VPStreamingNetwork VPlistener;
 
 protected:
 	/*! \brief Indicates if this instance of the actor is in play mode and not an instance from the editor.*/

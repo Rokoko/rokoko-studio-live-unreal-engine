@@ -10,7 +10,33 @@
 #include "SmartsuitDefinitions.h"
 #include "Engine/DataAsset.h"
 #include "LiveLinkRemapAsset.h"
+
+
+#include "Runtime/Sockets/Public/Sockets.h"
+#include "Runtime/Sockets/Public/SocketSubsystem.h"
+#include "Runtime/Networking/Public/Common/UdpSocketBuilder.h"
+#include "Runtime/Core/Public/HAL/Runnable.h"
+#include "Runtime/Core/Public/HAL/RunnableThread.h"
+//#include "Runtime/Core/Public/Unix/UnixCriticalSection.h"
+#include <mutex>
+#include "VirtualProductionFrame.h"
+//#include "VirtualProductionSource.h"
+
+
+#define DEFAULT_ENDPOINT FIPv4Endpoint(FIPv4Address(127, 0, 0, 1), 5005)
+
+
+
 #include "VirtualProductionSource.generated.h"
+
+
+
+
+
+
+
+
+
 
 class ILiveLinkClient;
 struct FLiveLinkPongMessage;
@@ -599,15 +625,25 @@ public:
 /**
  * 
  */
-class SMARTSUIT_API FVirtualProductionSource : public ILiveLinkSource
+class SMARTSUIT_API FVirtualProductionSource : public ILiveLinkSource, public FRunnable
 {
 public:
-	FVirtualProductionSource(const FText& InSourceType, const FText& InSourceMachineName, const FMessageAddress& InConnectionAddress)
-		: SourceType(InSourceType)
-		, SourceMachineName(InSourceMachineName)
-	{
-		Client = nullptr;
-	}
+	FVirtualProductionSource(const FText& InSourceType, const FText& InSourceMachineName, const FMessageAddress& InConnectionAddress);
+	//	: SourceType(InSourceType)
+	//	, SourceMachineName(InSourceMachineName)
+	//{
+	//	Client = nullptr;
+	//	
+	//	int32 RokokoPort;
+	//	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
+	//	{
+	//		RokokoPort = It->RokokoPortNumber;
+	//		UE_LOG(LogTemp, Warning, TEXT("setting port to... %i"), RokokoPort);
+	//	}
+
+	//	InitSocket(RokokoPort);
+	//	StartRunnable(RokokoPort);
+	//}
 
 	FVirtualProductionSource()
 	{
@@ -663,5 +699,74 @@ private:
 	//singleton instance
 	//static FVirtualProductionSource *instance;
 	static TSharedPtr<FVirtualProductionSource> instance;
+
+public:
+	/// @private
+	virtual bool InitSocket(int port);
+
+	/// @private
+	virtual uint32 Run() override;
+
+	/**
+	* Checks whether the listener is listening for incoming connections.
+	*
+	* @return true if it is listening, false otherwise.
+	*/
+	bool IsActive() const
+	{
+		return (!Stopping);
+	}
+
+	/**
+	* Stop the Socket and the Thread which handles Smartsuit data streams.
+	*/
+	virtual void Stop() override
+	{
+		Stopping = true;
+	}
+
+	/**
+	* Starts the socket and the thread which handles Smarttsuit data streams.
+	*
+	* @param port The port number to bind.
+	*/
+	void StartRunnable(int port);
+
+	/// @private
+	virtual void Exit() override { }
+
+	FProp* GetPropByName(FString name, bool isLive);
+	TArray<FProp> GetAllProps();
+
+	FTracker* GetTrackerByName(FString name, bool isLive);
+	FTracker* GetTrackerByConnectionID(const FString& name, bool isLive);
+	TArray<FTracker> GetTrackersWithMatchingId(FString name, bool isLive);
+
+	FSuitData* GetSmartsuitByName(FString suitName);
+	TArray<FString> GetAvailableSmartsuitNames();
+	TArray<FSuitData> GetAllSmartsuits();
+
+	FFace GetFaceByFaceID(FString faceID);
+	FFace* GetFaceByProfileName(const FString& profileName);
+	TArray<FFace> GetAllFaces();
+
+
+private:
+	std::mutex mtx;
+	//FPThreadsCriticalSection FCriticalSection;
+	int streaming_port;
+	FSocket* Socket = NULL;
+	/** Used to tell that the thread is stopping */
+	bool Stopping;
+	//FVirtualProductionSource* livelink = FVirtualProductionSource::Get();
+	//TArray <FName> subjectNames;
+	/** Connection thread, used to not block the editor when waiting for connections */
+	FRunnableThread* Thread = NULL;
+	FVirtualProductionFrame GlobalVPFrame;
+	//TSharedPtr<FVirtualProductionSource> GetLiveLink() { return FVirtualProductionSource::Get(); }
+	TArray<FVirtualProductionSubject> subjects;
+	void SendToLiveLink(TArray<FVirtualProductionSubject> Subjects);
+	void SendFacesToLivelink(TArray<FFace> Subjects);
+	void SendSuitsToLiveLink(TArray<FSuitData> Smartsuits);
 
 };

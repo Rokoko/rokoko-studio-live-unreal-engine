@@ -370,7 +370,7 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	if (!receiver) 
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("No receiver"));
-		return;
+		//return;
 	}
 	FSuitData* data = nullptr;//receiver->GetSmartsuit(Controller->suitname);
 	if (!data) 
