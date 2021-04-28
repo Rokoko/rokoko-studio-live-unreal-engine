@@ -169,7 +169,7 @@ public class Smartsuit : ModuleRules
         {
             isLibrarySupported = true;
 
-            string LibrariesPath = Path.Combine(SmartsuitLibPath, "lz4_win64_v1_9_2", "static");
+            string LibrariesPath = Path.Combine(SmartsuitLibPath, "lz4", "static");
 
             PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, "liblz4_static.lib"));
         }
@@ -177,15 +177,15 @@ public class Smartsuit : ModuleRules
         {
             isLibrarySupported = true;
 
-            string LibrariesPath = Path.Combine(SmartsuitLibPath, "lz4_win64_v1_9_2", "static");
+            string LibrariesPath = Path.Combine(SmartsuitLibPath, "lz4", "static");
 
-            PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, "liblz4_static.a"));
+            PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, "liblz4.a"));
         }
 
         if (isLibrarySupported)
         {
             // Include path
-            PublicIncludePaths.Add(Path.Combine(SmartsuitLibPath, "lz4_win64_v1_9_2", "include"));
+            PublicIncludePaths.Add(Path.Combine(SmartsuitLibPath, "lz4", "include"));
         }
 
 #if UE_4_19_OR_LATER
