@@ -61,9 +61,9 @@ public:
 
 	static FTransform GetBoneTransform(USkeletalMeshComponent* SkelMesh, FName BoneName);
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Smartsuit")
 	static FVector GetPropLocation(FProp InProp);
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Smartsuit"
 	static FRotator GetPropRotation(FProp InProp);
 };
