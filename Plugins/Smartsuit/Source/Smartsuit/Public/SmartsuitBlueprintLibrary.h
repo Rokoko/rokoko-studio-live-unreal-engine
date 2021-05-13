@@ -64,6 +64,6 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Smartsuit")
 	static FVector GetPropLocation(FProp InProp);
 
-	UFUNCTION(BlueprintPure, Category = "Smartsuit"
+	UFUNCTION(BlueprintPure, Category = "Smartsuit")
 	static FRotator GetPropRotation(FProp InProp);
 };
