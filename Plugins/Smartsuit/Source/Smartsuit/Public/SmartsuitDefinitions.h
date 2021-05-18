@@ -43,12 +43,17 @@
 #define SMARTSUIT_TPOSE_LEFT_LEG			FQuat::MakeFromEuler(FVector(90.000107,0.000041,89.999878))
 /*! \brief Expected rotation of the left foot in T-Pose. */
 #define SMARTSUIT_TPOSE_LEFT_FOOT			FQuat::MakeFromEuler(FVector(179.999863,-0.000109,179.999802))
+
+#define SMARTSUIT_TPOSE_LEFT_TOE			FQuat::MakeFromEuler(FVector(179.999863,-0.000109,179.999802))
+
 /*! \brief Expected rotation of the right up leg in T-Pose. */
 #define SMARTSUIT_TPOSE_RIGHT_UP_LEG		FQuat::MakeFromEuler(FVector(89.999855,-0.000041,-89.999947))
 /*! \brief Expected rotation of the right leg in T-Pose. */
 #define SMARTSUIT_TPOSE_RIGHT_LEG			FQuat::MakeFromEuler(FVector(89.999825,-0.000041,-89.999962))
 /*! \brief Expected rotation of the right foot in T-Pose. */
 #define SMARTSUIT_TPOSE_RIGHT_FOOT			FQuat::MakeFromEuler(FVector(-179.999893,-0.000171,-179.999939))
+
+#define SMARTSUIT_TPOSE_RIGHT_TOE			FQuat::MakeFromEuler(FVector(-179.999893,-0.000171,-179.999939))
 
 #define SMARTSUIT_TPOSE_LEFT_THUMB_PROXIMAL		FQuat::MakeFromEuler(FVector(-179.999985,-44.999752,119.999985))		//(Pitch=-44.999752,Yaw=119.999985,Roll=-179.999985)
 #define SMARTSUIT_TPOSE_LEFT_THUMB_MEDIAL		FQuat::MakeFromEuler(FVector(179.999863,-44.999660,90.000114))			//(Pitch=-44.999660,Yaw=90.000114,Roll=179.999863)

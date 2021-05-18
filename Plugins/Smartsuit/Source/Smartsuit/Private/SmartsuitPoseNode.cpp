@@ -471,9 +471,11 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 		TPose.Pose.leftUpLeg =				OriginalTransform(BoneMap.leftUpleg, TestBoneControlSpace, SkelComp, MeshBases);
 		TPose.Pose.leftLeg =				OriginalTransform(BoneMap.leftLeg, TestBoneControlSpace, SkelComp, MeshBases);
 		TPose.Pose.leftFoot =				OriginalTransform(BoneMap.leftFoot, TestBoneControlSpace, SkelComp, MeshBases);
+		TPose.Pose.leftToe =				OriginalTransform(BoneMap.leftToe, TestBoneControlSpace, SkelComp, MeshBases);
 		TPose.Pose.rightUpLeg =				OriginalTransform(BoneMap.rightUpleg, TestBoneControlSpace, SkelComp, MeshBases);
 		TPose.Pose.rightLeg =				OriginalTransform(BoneMap.rightLeg, TestBoneControlSpace, SkelComp, MeshBases);
 		TPose.Pose.rightFoot =				OriginalTransform(BoneMap.rightFoot, TestBoneControlSpace, SkelComp, MeshBases);
+		TPose.Pose.rightToe =				OriginalTransform(BoneMap.rightToe, TestBoneControlSpace, SkelComp, MeshBases);
 
 		TPose.Pose.leftThumbProximal =		OriginalTransform(BoneMap.leftThumbProximal, TestBoneControlSpace, SkelComp, MeshBases);
 		TPose.Pose.leftThumbMedial =		OriginalTransform(BoneMap.leftThumbMedial, TestBoneControlSpace, SkelComp, MeshBases);
@@ -544,9 +546,11 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	FQuat leftUpLegQuat =				GetRotation3(SmartsuitBones::leftUpLeg, SubjectFrameData);
 	FQuat leftLegQuat =					GetRotation3(SmartsuitBones::leftLeg, SubjectFrameData);
 	FQuat leftFootQuat =				GetRotation3(SmartsuitBones::leftFoot, SubjectFrameData);
+	FQuat leftToeQuat =					GetRotation3(SmartsuitBones::leftToe, SubjectFrameData);
 	FQuat rightUpLegQuat =				GetRotation3(SmartsuitBones::rightUpLeg, SubjectFrameData);
 	FQuat rightLegQuat =				GetRotation3(SmartsuitBones::rightLeg, SubjectFrameData);
 	FQuat rightFootQuat =				GetRotation3(SmartsuitBones::rightFoot, SubjectFrameData);
+	FQuat rightToeQuat =				GetRotation3(SmartsuitBones::rightToe, SubjectFrameData);
 
 	FQuat leftThumbProximalQuat =		GetRotation3(SmartsuitBones::leftThumbProximal, SubjectFrameData);
 	FQuat leftThumbMedialQuat =			GetRotation3(SmartsuitBones::leftThumbMedial, SubjectFrameData);
@@ -609,9 +613,12 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	FQuat leftUpLegExpected = SMARTSUIT_TPOSE_LEFT_UP_LEG.Inverse() * TPose.Pose.leftUpLeg.GetRotation();
 	FQuat leftLegExpected = SMARTSUIT_TPOSE_LEFT_LEG.Inverse() * TPose.Pose.leftLeg.GetRotation();
 	FQuat leftFootExpected = SMARTSUIT_TPOSE_LEFT_FOOT.Inverse() * TPose.Pose.leftFoot.GetRotation();
+	FQuat leftToeExpected = SMARTSUIT_TPOSE_LEFT_TOE.Inverse() * TPose.Pose.leftToe.GetRotation();
+
 	FQuat rightUpLegExpected = SMARTSUIT_TPOSE_RIGHT_UP_LEG.Inverse() * TPose.Pose.rightUpLeg.GetRotation();
 	FQuat rightLegExpected = SMARTSUIT_TPOSE_RIGHT_LEG.Inverse() * TPose.Pose.rightLeg.GetRotation();
 	FQuat rightFootExpected = SMARTSUIT_TPOSE_RIGHT_FOOT.Inverse() * TPose.Pose.rightFoot.GetRotation();
+	FQuat rightToeExpected = SMARTSUIT_TPOSE_RIGHT_TOE.Inverse() * TPose.Pose.rightToe.GetRotation();
 
 	FQuat leftThumbProximalExpected = SMARTSUIT_TPOSE_LEFT_THUMB_PROXIMAL.Inverse() * TPose.Pose.leftThumbProximal.GetRotation();
 	FQuat leftThumbMedialExpected = SMARTSUIT_TPOSE_LEFT_THUMB_MEDIAL.Inverse() * TPose.Pose.leftThumbMedial.GetRotation();
@@ -721,9 +728,11 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	ApplySmartsuitRotation(BoneMap.leftUpleg, leftUpLegQuat* leftUpLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 	ApplySmartsuitRotation(BoneMap.leftLeg, leftLegQuat* leftLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 	ApplySmartsuitRotation(BoneMap.leftFoot, leftFootQuat* leftFootExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.leftToe, leftToeQuat* leftToeExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 	ApplySmartsuitRotation(BoneMap.rightUpleg, rightUpLegQuat* rightUpLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 	ApplySmartsuitRotation(BoneMap.rightLeg, rightLegQuat* rightLegExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 	ApplySmartsuitRotation(BoneMap.rightFoot, rightFootQuat* rightFootExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	ApplySmartsuitRotation(BoneMap.rightToe, rightToeQuat* rightToeExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 
 	ApplySmartsuitRotation(BoneMap.leftThumbProximal, leftThumbProximalQuat * leftThumbProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 	ApplySmartsuitRotation(BoneMap.leftThumbMedial, leftThumbMedialQuat * leftThumbMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
@@ -869,11 +878,11 @@ void FSmartsuitPoseNode::InitializeBoneReferences(const FBoneContainer& Required
 		BoneMap.leftUpleg = BoneMapOverride->leftUpleg;
 		BoneMap.leftLeg = BoneMapOverride->leftLeg;
 		BoneMap.leftFoot = BoneMapOverride->leftFoot;
-		//BoneMap.leftToe = BoneMapOverride->leftToe;
+		BoneMap.leftToe = BoneMapOverride->leftToe;
 		BoneMap.rightUpleg = BoneMapOverride->rightUpleg;
 		BoneMap.rightLeg = BoneMapOverride->rightLeg;
 		BoneMap.rightFoot = BoneMapOverride->rightFoot;
-		//BoneMap.rightToe = BoneMapOverride->rightToe;
+		BoneMap.rightToe = BoneMapOverride->rightToe;
 		BoneMap.leftThumbProximal = BoneMapOverride->leftThumbProximal;
 		BoneMap.leftThumbMedial = BoneMapOverride->leftThumbMedial;
 		BoneMap.leftThumbDistal = BoneMapOverride->leftThumbDistal;
@@ -935,11 +944,11 @@ void FSmartsuitPoseNode::InitializeBoneReferences(const FBoneContainer& Required
 	BoneMap.leftUpleg.Initialize(RequiredBones);
 	BoneMap.leftLeg.Initialize(RequiredBones);
 	BoneMap.leftFoot.Initialize(RequiredBones);
-	//BoneMap.leftToe.Initialize(RequiredBones);
+	BoneMap.leftToe.Initialize(RequiredBones);
 	BoneMap.rightUpleg.Initialize(RequiredBones);
 	BoneMap.rightLeg.Initialize(RequiredBones);
 	BoneMap.rightFoot.Initialize(RequiredBones);
-	//BoneMap.rightToe.Initialize(RequiredBones);
+	BoneMap.rightToe.Initialize(RequiredBones);
 
 	BoneMap.leftThumbProximal.Initialize(RequiredBones);
 	BoneMap.leftThumbMedial.Initialize(RequiredBones);
@@ -1009,11 +1018,11 @@ USmartsuitBodyMapData::USmartsuitBodyMapData()
 	leftUpleg = "leftUpleg";
 	leftLeg = "leftLeg";
 	leftFoot = "leftFoot";
-	//leftToe = "leftToe";
+	leftToe = "leftToe";
 	rightUpleg = "rightUpleg";
 	rightLeg = "rightLeg";
 	rightFoot = "rightFoot";
-	//rightToe = "rightToe";
+	rightToe = "rightToe";
 	leftThumbProximal = "leftThumbProximal";
 	leftThumbMedial = "leftThumbMedial";
 	leftThumbDistal = "leftThumbDistal";

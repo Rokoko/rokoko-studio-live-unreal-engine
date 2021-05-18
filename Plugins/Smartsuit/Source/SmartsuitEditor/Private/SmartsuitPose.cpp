@@ -62,11 +62,11 @@ void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, F
 		Node.BoneMap.leftUpleg =		Node.BoneMapOverride->leftUpleg;
 		Node.BoneMap.leftLeg =			Node.BoneMapOverride->leftLeg;
 		Node.BoneMap.leftFoot =			Node.BoneMapOverride->leftFoot;
-		//Node.BoneMap.leftToe =		Node.BoneMapOverride->leftToe;
+		Node.BoneMap.leftToe =		Node.BoneMapOverride->leftToe;
 		Node.BoneMap.rightUpleg =		Node.BoneMapOverride->rightUpleg;
 		Node.BoneMap.rightLeg =			Node.BoneMapOverride->rightLeg;
 		Node.BoneMap.rightFoot =		Node.BoneMapOverride->rightFoot;
-		//Node.BoneMap.rightToe =		Node.BoneMapOverride->rightToe;
+		Node.BoneMap.rightToe =		Node.BoneMapOverride->rightToe;
 
 		Node.BoneMap.leftThumbProximal = Node.BoneMapOverride->leftThumbProximal;
 		Node.BoneMap.leftThumbMedial = Node.BoneMapOverride->leftThumbMedial;
@@ -137,11 +137,11 @@ void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, F
 		CheckForWarnings("Left Up Leg", Node.BoneMap.leftUpleg, ForSkeleton, MessageLog);
 		CheckForWarnings("Left Leg", Node.BoneMap.leftLeg, ForSkeleton, MessageLog);
 		CheckForWarnings("Left Foot", Node.BoneMap.leftFoot, ForSkeleton, MessageLog);
-		//CheckForWarnings("Left Toe", Node.BoneMap.leftToe, ForSkeleton, MessageLog);
+		CheckForWarnings("Left Toe", Node.BoneMap.leftToe, ForSkeleton, MessageLog);
 		CheckForWarnings("Right Up Leg", Node.BoneMap.rightUpleg, ForSkeleton, MessageLog);
 		CheckForWarnings("Right Leg", Node.BoneMap.rightLeg, ForSkeleton, MessageLog);
 		CheckForWarnings("Right Foot", Node.BoneMap.rightFoot, ForSkeleton, MessageLog);
-		//CheckForWarnings("Right Toe", Node.BoneMap.rightToe, ForSkeleton, MessageLog);
+		CheckForWarnings("Right Toe", Node.BoneMap.rightToe, ForSkeleton, MessageLog);
 
 		CheckForWarnings("Left Thumb Proximal", Node.BoneMap.leftThumbProximal, ForSkeleton, MessageLog);
 		CheckForWarnings("Left Thumb Medial", Node.BoneMap.leftThumbMedial, ForSkeleton, MessageLog);
