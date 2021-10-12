@@ -20,9 +20,11 @@ struct TPose {
 	FTransform leftUpLeg;
 	FTransform leftLeg;
 	FTransform leftFoot;
+	FTransform leftToe;
 	FTransform rightUpLeg;
 	FTransform rightLeg;
 	FTransform rightFoot;
+	FTransform rightToe;
 	FTransform leftThumbProximal;
 	FTransform leftThumbMedial;
 	FTransform leftThumbDistal;

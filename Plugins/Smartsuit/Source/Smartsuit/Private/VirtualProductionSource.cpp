@@ -340,6 +340,8 @@ void FVirtualProductionSource::HandleSuitData(FSuitData suit)
 	boneNames.Add("rightLittleDistal");
 	boneNames.Add("rightLittleTip");
 
+	boneNames.Add("leftToe");
+	boneNames.Add("rightToe");
 
 	TArray<int32> boneParents;
 	boneParents.Add(0); //0 - root
@@ -416,6 +418,9 @@ void FVirtualProductionSource::HandleSuitData(FSuitData suit)
 	boneParents.Add(56); //57 - rightLittleMedial
 	boneParents.Add(57); //58 - rightLittleDistal
 	boneParents.Add(58); //59 - rightLittleTip
+
+	boneParents.Add(16); //60 - LeftToe
+	boneParents.Add(19); //61 - RightToe
 
 	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
 	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
@@ -632,7 +637,7 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 		AnimFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 
 		TArray<FTransform> transforms;
-		transforms.Reset(60);
+		transforms.Reset(62);
 		int32 transformIndex = transforms.AddUninitialized(1);
 		
 		transforms[transformIndex].SetLocation(FVector(0, 0, 0));
@@ -713,6 +718,9 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightLittleProximal), subject.GetBoneByName(SmartsuitBones::rightLittleMedial));
 		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightLittleMedial), subject.GetBoneByName(SmartsuitBones::rightLittleDistal));
 		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightLittleDistal), subject.GetBoneByName(SmartsuitBones::rightLittleTip));
+
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::leftFoot), subject.GetBoneByName(SmartsuitBones::leftToe));
+		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightFoot), subject.GetBoneByName(SmartsuitBones::rightToe));
 
 		AnimFrameData.Transforms.Append(transforms);
 
