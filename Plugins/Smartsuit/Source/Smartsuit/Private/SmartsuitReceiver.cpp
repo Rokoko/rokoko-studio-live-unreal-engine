@@ -127,6 +127,10 @@ FSuitData* ARokokoReceiver::GetSmartsuit(FString suitName)
 	{
 		ReturnValue = livelink->GetSmartsuitByName(suitName);
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+	}
 
 	return ReturnValue;
 }

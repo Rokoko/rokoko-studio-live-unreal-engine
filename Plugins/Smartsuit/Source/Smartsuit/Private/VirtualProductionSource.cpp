@@ -33,6 +33,8 @@ FVirtualProductionSource::FVirtualProductionSource(const FText& InSourceType, co
 		UE_LOG(LogTemp, Warning, TEXT("setting port to... %i"), RokokoPort);
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("Creating Virtual production source!!!"));
+
 	InitSocket(RokokoPort);
 	StartRunnable(RokokoPort);
 }
@@ -992,9 +994,9 @@ TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::CreateLiveLinkSou
 				if (LiveLinkClient.GetSourceType(SourceGuid).ToString() == "Studio")
 				{
 					//UE_LOG(LogTemp, Warning, TEXT("you can't add more than one instance of FVirtualProductionSource!!"));
-					//bDoesAlreadyExist = true;
+					bDoesAlreadyExist = true;
 
-					LiveLinkClient.RemoveSource(SourceGuid);
+					//LiveLinkClient.RemoveSource(SourceGuid);
 
 					break;
 				}
