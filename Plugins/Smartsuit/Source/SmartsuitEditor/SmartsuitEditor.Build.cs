@@ -8,8 +8,8 @@ public class SmartsuitEditor : ModuleRules
     public SmartsuitEditor(ReadOnlyTargetRules Target) : base(Target)
     {
         MinFilesUsingPrecompiledHeaderOverride = 1;
-        //bFasterWithoutUnity = true;
-        bUseUnity = false;
+        bFasterWithoutUnity = true;
+        //bUseUnity = false;
 
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
@@ -41,7 +41,8 @@ public class SmartsuitEditor : ModuleRules
                 "BlueprintGraph",
                 "AnimGraphRuntime",
                 "Smartsuit",
-                "LiveLinkInterface"
+                "LiveLinkInterface",
+                "LiveLink"
 				// ... add other public dependencies that you statically link with here ...
 			}
             );
@@ -56,8 +57,8 @@ public class SmartsuitEditor : ModuleRules
                 "SlateCore",
                 "Slate",
 
-                "LiveLinkInterface",
-                "ToolMenus"
+                "LiveLinkInterface"
+                //"ToolMenus"
             }
             );
 

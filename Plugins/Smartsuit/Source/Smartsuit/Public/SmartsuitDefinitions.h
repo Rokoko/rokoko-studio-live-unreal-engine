@@ -426,7 +426,12 @@ struct FSuitData
 
 	FName GetSubjectName()
 	{
-		return FName("actor:" + suitname + ":body");
+		FString TempSubjectName = "actor:" + suitname + ":body";
+#if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
+		return FName(TempSubjectName);
+		#else
+		return FName(*TempSubjectName);
+		#endif
 	}
 };
 

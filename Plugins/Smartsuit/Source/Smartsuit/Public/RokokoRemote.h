@@ -97,4 +97,10 @@ public:
 	void Recv(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt);
 
 	FRokokoRemoteInstance CurrentData;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Default)
+	int SenderPort;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Default)
+	int ReceiverPort;
 };
