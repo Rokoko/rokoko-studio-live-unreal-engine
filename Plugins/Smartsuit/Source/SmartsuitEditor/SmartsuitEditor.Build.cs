@@ -8,8 +8,8 @@ public class SmartsuitEditor : ModuleRules
     public SmartsuitEditor(ReadOnlyTargetRules Target) : base(Target)
     {
         MinFilesUsingPrecompiledHeaderOverride = 1;
-        bFasterWithoutUnity = true;
-        //bUseUnity = false;
+        //bFasterWithoutUnity = true;
+        bUseUnity = false;
 
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
