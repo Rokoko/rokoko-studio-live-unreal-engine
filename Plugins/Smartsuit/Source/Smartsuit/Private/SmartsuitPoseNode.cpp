@@ -674,6 +674,12 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 
 	const FBoneContainer& BoneContainer = MeshBases.GetPose().GetBoneContainer();
 	FCompactPoseBoneIndex CompactPoseBoneToModify = BoneMap.hip.GetCompactPoseIndex(BoneContainer);
+
+	if (CompactPoseBoneToModify == -1)
+	{
+		return;
+	}
+
 	FTransform NewBoneTM = MeshBases.GetLocalSpaceTransform(CompactPoseBoneToModify);//.GetComponentSpaceTransform(CompactPoseBoneToModify);
 
 	float testval1 = NewBoneTM.GetLocation().Size();
