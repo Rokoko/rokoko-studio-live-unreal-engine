@@ -7,8 +7,8 @@ This plugin let's you stream animation data from Rokoko Studio into Unreal Engin
 ---
 
 ## Requirements
-- Unreal Engine 4.25.4
-- Rokoko Studio 1.18.0b
+- Unreal Engine 4.27.2
+- Rokoko Studio 1.19.0b
 
 ## Features
 - Live stream data:
@@ -79,11 +79,13 @@ Now click on the **plus** next to variables and change the variable type to **Na
 
 <img src="Images/ActorProfileName.PNG"> <img src="Images/ActorName.PNG">
 
-Right-click on the content browser and navigate to miscellaneous and create a **Data Asse**. Name it something like **character_BoneMap.** Now open it and write the names of the corresponding joints in the hierarchy. (If you use the same joint naming on more characters you can reuse this data asset)
+Right-click on the content browser and create a blueprint of type RokokoBodyMapData. Name it something like **character_BoneMap.** Now open it and write the names of the corresponding joints in the hierarchy. (If you use the same joint naming on more characters you can reuse this asset)
 
-<img src="Images/dataAsset.png">
+When the BoneMap is done, click on the **plus** next to variables and change the variable type to **RokoBodyMapData** and the variable name to something such as **BodyMapRetargetAsset**. Then drag it out into the animGraph and chose **Get BodyMapRetargetAsset**, then connect it to the RetargetAsset pin on the Rokoko Body Pose node. Set the default value of this variable to the body remap asset you just created.
 
-When the BoneMap is done open the AnimBP again and click on Rokoko Body Pose. Then you can click on the **Bone** **Map Overwrite** and chose your Data Asset.
+Right-click on the content browser and create a blueprint of type RokokoFaceMapData. Name it something like **character_FaceMap.** Now open it and write the names of the blendshape names you'd like to override. (If you use the same blendshape names on more characters you can reuse this asset)
+
+When the face remapping asset is created, click on the **plus** next to variables and change the variable type to **RokoFaceMapData** and the variable name to something such as **FaceMapRetargetAsset**. Then drag it out into the animGraph and chose **Get FaceMapRetargetAsset**, then connect it to the RetargetAsset pin on the Rokoko Face Pose node. Set the default value of this variable to the face remap asset you just created.
 
 <img src="Images/boneMapOverwrite.png">
 
