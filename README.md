@@ -83,7 +83,7 @@ Right-click on the content browser and create a blueprint of type RokokoBodyMapD
 
 When the BoneMap is done, click on the **plus** next to variables and change the variable type to **RokoBodyMapData** and the variable name to something such as **BodyMapRetargetAsset**. Then drag it out into the animGraph and chose **Get BodyMapRetargetAsset**, then connect it to the RetargetAsset pin on the Rokoko Body Pose node. Set the default value of this variable to the body remap asset you just created.
 
-Right-click on the content browser and create a blueprint of type RokokoFaceMapData. Name it something like **character_FaceRemapMap.** Now open it and write the names of the blendshape names you'd like to override. (If you use the same blendshape names on more characters you can reuse this asset)
+Right-click on the content browser and create a blueprint of type RokokoFaceMapData. Name it something like **character_FaceMap.** Now open it and write the names of the blendshape names you'd like to override. (If you use the same blendshape names on more characters you can reuse this asset)
 
 When the face remapping asset is created, click on the **plus** next to variables and change the variable type to **RokoFaceMapData** and the variable name to something such as **FaceMapRetargetAsset**. Then drag it out into the animGraph and chose **Get FaceMapRetargetAsset**, then connect it to the RetargetAsset pin on the Rokoko Face Pose node. Set the default value of this variable to the face remap asset you just created.
 
