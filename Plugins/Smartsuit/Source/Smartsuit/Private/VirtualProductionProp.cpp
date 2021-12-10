@@ -27,7 +27,7 @@ ARokokoReceiver* UVirtualProductionProp::GetReceiver()
 	
 	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
 	{
-		if (It->enabled) 
+		//if (It->enabled) 
 		{
 			listener = *It;
 			break;
@@ -43,12 +43,14 @@ void UVirtualProductionProp::TickComponent(float DeltaTime, ELevelTick TickType,
 	ARokokoReceiver* listener = GetReceiver();
 	if (!listener) 
 	{
+		UE_LOG(LogTemp, Warning, TEXT("could not get receiver!!!"));
 		return;
 	}
 
 	FProp* prop = listener->GetPropByNameFromVP(name, isLive);
 	if (!prop) 
 	{
+		UE_LOG(LogTemp, Warning, TEXT("could not get prop!!!"));
 		return;
 	}
 

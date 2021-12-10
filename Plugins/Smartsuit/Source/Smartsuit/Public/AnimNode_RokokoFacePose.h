@@ -13,6 +13,7 @@
 
 
 class ILiveLinkClient;
+class URokokoFaceMapData;
 
 
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
@@ -38,7 +39,7 @@ public:
 //	FName SubjectName_DEPRECATED;
 //#endif
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, NoClear, Category = Retarget, meta = (NeverAsPin))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, NoClear, Category = Retarget, meta = (PinShownByDefault))
 	TSubclassOf<ULiveLinkRetargetAsset> RetargetAsset;
 
 	UPROPERTY(transient)

@@ -172,11 +172,6 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = SmartsuitReadOnly, meta = (ToolTip = "WiFi API Version of the Smartsuit hub."))
 	FString wifiApiVersion;
 
-	/* Enable this to see detected UI version based on macro added in Smartsuit.Build.cs
-	UPROPERTY(VisibleAnywhere, Category = SmartsuitReadOnly, meta = (ToolTip = "Detected UE Verssion."))
-	int detectedVersion;
-	*/
-
 	/// @private
 	bool profileToggleState;
 

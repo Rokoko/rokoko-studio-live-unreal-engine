@@ -41,7 +41,8 @@ public class SmartsuitEditor : ModuleRules
                 "BlueprintGraph",
                 "AnimGraphRuntime",
                 "Smartsuit",
-                "LiveLinkInterface"
+                "LiveLinkInterface",
+                "LiveLink"
 				// ... add other public dependencies that you statically link with here ...
 			}
             );
@@ -56,8 +57,8 @@ public class SmartsuitEditor : ModuleRules
                 "SlateCore",
                 "Slate",
 
-                "LiveLinkInterface",
-                "ToolMenus"
+                "LiveLinkInterface"
+                //"ToolMenus"
             }
             );
 

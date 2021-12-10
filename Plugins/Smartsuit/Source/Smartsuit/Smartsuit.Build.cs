@@ -95,14 +95,6 @@ public class Smartsuit : ModuleRules
 			}
             );
 
-        BuildVersion version;
-        if (BuildVersion.TryRead(BuildVersion.GetDefaultFileName(), out version))
-#if UE_4_19_OR_LATER
-            PublicDefinitions.Add(string.Format("BUILT_MINOR_VERSION={0}", version.MinorVersion));
-#else
-            Definitions.Add(string.Format("BUILT_MINOR_VERSION={0}", version.MinorVersion));
-#endif
-
         LoadSmartsuitMagic(Target);
 
         //PublicDefinitions.Add("LZ4F_STATIC_LINKING_ONLY");

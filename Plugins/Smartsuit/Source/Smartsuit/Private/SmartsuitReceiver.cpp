@@ -17,15 +17,15 @@ ARokokoReceiver::ARokokoReceiver()
 void ARokokoReceiver::BeginPlay()
 {
 	Super::BeginPlay();
-	StartListener();
-	enabled = true;
-	realLife = true;
+	//StartListener();
+	//enabled = true;
+	//realLife = true;
 }
 
 void ARokokoReceiver::BeginDestroy()
 {
 	Super::BeginDestroy();
-	StopListener();
+	//StopListener();
 }
 
 // Called every frame
@@ -37,43 +37,62 @@ void ARokokoReceiver::Tick(float DeltaTime)
 
 void ARokokoReceiver::StartListener()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Listening..."));
-	//listener.Start(streamingDataPort);
-	VPlistener.Start(RokokoPortNumber);
+	//UE_LOG(LogTemp, Warning, TEXT("Listening..."));
+	////listener.Start(streamingDataPort);
+	//VPlistener.Start(RokokoPortNumber);
 }
 
 void ARokokoReceiver::StopListener()
 {
-	//listener.Stop();
-	VPlistener.Stop();
-	UE_LOG(LogTemp, Warning, TEXT("Not listening..."));
+	////listener.Stop();
+	//VPlistener.Stop();
+	//UE_LOG(LogTemp, Warning, TEXT("Not listening..."));
 }
 
 FFace ARokokoReceiver::GetFaceByFaceID(FString faceId)
 {
-	return VPlistener.GetFaceByFaceID(faceId);
+	//return VPlistener.GetFaceByFaceID(faceId);
+
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		return livelink->GetFaceByFaceID(faceId);
+	}
+
+	return FFace();
 }
 
 FFace ARokokoReceiver::GetFaceByProfileName(const FString& faceName, bool& found)
 {
 	//return *VPlistener.GetFaceByProfileName(faceName);
 
-
-
 	found = false;
 	FFace returnval;
-	FFace* temp = VPlistener.GetFaceByProfileName(faceName);
-	if (temp)
-	{
-		returnval = *temp;
-		found = true;
+
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{ 
+		FFace* temp = livelink->GetFaceByProfileName(faceName);
+		if (temp)
+		{
+			returnval = *temp;
+			found = true;
+		}
 	}
 	return returnval;
 }
 
 TArray<FFace> ARokokoReceiver::GetAllFaces()
 {
-	return VPlistener.GetAllFaces();
+	//return VPlistener.GetAllFaces();
+	TArray<FFace> Faces;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		Faces =  livelink->GetAllFaces();
+	}
+
+	return Faces;
 }
 
 TArray<FFace> ARokokoReceiver::GetFacesNotAssociatedWithActor()
@@ -101,7 +120,19 @@ TArray<FFace> ARokokoReceiver::GetFacesNotAssociatedWithActor()
 
 FSuitData* ARokokoReceiver::GetSmartsuit(FString suitName)
 {
-	return VPlistener.GetSmartsuitByName(suitName);
+	//return VPlistener.GetSmartsuitByName(suitName);
+	FSuitData* ReturnValue = nullptr;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		ReturnValue = livelink->GetSmartsuitByName(suitName);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+	}
+
+	return ReturnValue;
 }
 
 bool ARokokoReceiver::GetSmartsuitByName(const FString& suitName, FSuitData& SuitData)
@@ -119,43 +150,78 @@ bool ARokokoReceiver::GetSmartsuitByName(const FString& suitName, FSuitData& Sui
 
 TArray<FSuitData> ARokokoReceiver::GetAllSmartsuits()
 {
-	return VPlistener.GetAllSmartsuits();
+	//return VPlistener.GetAllSmartsuits();
+
+	TArray<FSuitData> Smartsuits;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		Smartsuits = livelink->GetAllSmartsuits();
+	}
+
+	return Smartsuits;
 }
 
 TArray<FString> ARokokoReceiver::GetAvailableSmartsuitNames()
 {
-	return VPlistener.GetAvailableSmartsuitNames();
+	//return VPlistener.GetAvailableSmartsuitNames();
+	TArray<FString> SmartsuitNames;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		SmartsuitNames = livelink->GetAvailableSmartsuitNames();
+	}
+	return SmartsuitNames;
 }
 
 
 FProp* ARokokoReceiver::GetPropByNameFromVP(FString name, bool isLive)
 {
-	return VPlistener.GetPropByName(name, isLive);
+	//return VPlistener.GetPropByName(name, isLive);
+
+	FProp* ReturnValue = nullptr;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		ReturnValue = livelink->GetPropByName(name, isLive);
+	}
+
+	return ReturnValue;
 }
 PRAGMA_DISABLE_OPTIMIZATION
 TArray<FProp> ARokokoReceiver::GetAllProps()
 {
-	TArray<FProp> result;
-	//UE_LOG(LogTemp, Display, TEXT("Yeeee1"));
-	bool found = false;
-	int i = 0;
-	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
+	//TArray<FProp> result;
+	////UE_LOG(LogTemp, Display, TEXT("Yeeee1"));
+	//bool found = false;
+	//int i = 0;
+	//for (TObjectIterator<ARokokoReceiver> It; It; ++It)
+	//{
+	//	//UE_LOG(LogTemp, Display, TEXT("Looking up receiver %d"), i);
+	//	i++;
+	//	if (It->realLife)
+	//	{
+	//		found = true;
+	//		//UE_LOG(LogTemp, Display, TEXT("Real life!"));
+	//		result = It->VPlistener.GetAllProps();
+	//	}
+	//}
+	//if (!found)
+	//{
+	//	//UE_LOG(LogTemp, Display, TEXT("not Real life..."));
+	//}
+	////UE_LOG(LogTemp, Display, TEXT("Yeeee2 %d"), result.Num());
+	//return result;
+
+
+	TArray<FProp> AllProps;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
 	{
-		//UE_LOG(LogTemp, Display, TEXT("Looking up receiver %d"), i);
-		i++;
-		if (It->realLife)
-		{
-			found = true;
-			//UE_LOG(LogTemp, Display, TEXT("Real life!"));
-			result = It->VPlistener.GetAllProps();
-		}
+		AllProps = livelink->GetAllProps();
 	}
-	if (!found)
-	{
-		//UE_LOG(LogTemp, Display, TEXT("not Real life..."));
-	}
-	//UE_LOG(LogTemp, Display, TEXT("Yeeee2 %d"), result.Num());
-	return result;
+
+	return AllProps;
 }
 PRAGMA_ENABLE_OPTIMIZATION
 bool ARokokoReceiver::GetProp(FString name, /*bool isLive, */FProp& OutProp)
@@ -191,7 +257,15 @@ bool ARokokoReceiver::GetProp(FString name, /*bool isLive, */FProp& OutProp)
 
 FTracker* ARokokoReceiver::GetTrackerByNameFromVP(FString name, bool isLive)
 {
-	return VPlistener.GetTrackerByName(name, isLive);
+	//return VPlistener.GetTrackerByName(name, isLive);
+	FTracker* Tracker = nullptr;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		Tracker = livelink->GetTrackerByName(name, isLive);
+	}
+
+	return Tracker;
 }
 
 FTracker ARokokoReceiver::GetTracker(FString name, bool isLive)
@@ -211,7 +285,12 @@ FTracker ARokokoReceiver::GetTrackerByConnectionIDFromVP(const FString& name, bo
 {
 	found = false;
 	FTracker returnval;
-	FTracker* temp = VPlistener.GetTrackerByConnectionID(name, isLive);
+	FTracker* temp = nullptr;// = VPlistener.GetTrackerByConnectionID(name, isLive);
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		temp = livelink->GetTrackerByConnectionID(name, isLive);
+	}
 	if (temp)
 	{
 		returnval = *temp;

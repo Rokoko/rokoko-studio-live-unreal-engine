@@ -10,7 +10,12 @@
 #include "LiveLinkRemapAsset.h"
 #include "Roles/LiveLinkAnimationRole.h"
 #include "Roles/LiveLinkAnimationTypes.h"
+
+#include "VirtualProductionSource.h"
+
+#if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
 #include "Animation/AnimTrace.h"
+#endif
 
 FAnimNode_RokokoFacePose::FAnimNode_RokokoFacePose()
 	: RetargetAsset(ULiveLinkRemapAsset::StaticClass())
@@ -60,7 +65,9 @@ void FAnimNode_RokokoFacePose::Update_AnyThread(const FAnimationUpdateContext & 
 	// Accumulate Delta time from update
 	CachedDeltaTime += Context.GetDeltaTime();
 
+#if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
 	TRACE_ANIM_NODE_VALUE(Context, TEXT("SubjectName"), GetLiveLinkSubjectName().Name);
+#endif
 }
 
 void FAnimNode_RokokoFacePose::Evaluate_AnyThread(FPoseContext& Output)
@@ -127,7 +134,12 @@ void FAnimNode_RokokoFacePose::GatherDebugData(FNodeDebugData& DebugData)
 
 FLiveLinkSubjectName FAnimNode_RokokoFacePose::GetLiveLinkSubjectName()
 {
-	return FName("actor:" + RokokoActorName.ToString() + ":face");
+	FString TempSubjectName = "actor:" + RokokoActorName.ToString() + ":face";
+#if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
+	return FName(TempSubjectName);
+#else
+	return FName(*TempSubjectName);
+#endif
 }
 
 bool FAnimNode_RokokoFacePose::Serialize(FArchive& Ar)

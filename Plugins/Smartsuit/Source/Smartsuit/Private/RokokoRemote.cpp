@@ -19,6 +19,9 @@ ARokokoRemote::ARokokoRemote()
 	UDPReceiver = nullptr;
 
 	IPAddress = "192.168.1.133";
+
+	SenderPort = 55606;
+	ReceiverPort = 55606;
 }
 
 void ARokokoRemote::BeginPlay()
@@ -38,9 +41,9 @@ void ARokokoRemote::BeginPlay()
 	CurrentData.currentRecordingTime = 0.f;
 	CurrentData.numberOfLiveSuits = 1;
 
-	StartUDPSender("TESTSOCKETSENDER", IPAddress, 55606);
+	StartUDPSender("TESTSOCKETSENDER", IPAddress, SenderPort);
 	//StartUDPReceiver("TESTSOCKETLISTENER", "192.168.1.133", 55606);
-	StartUDPReceiver("TESTSOCKETLISTENER", "0.0.0.0", 55606);
+	StartUDPReceiver("TESTSOCKETLISTENER", "0.0.0.0", ReceiverPort);
 
 	GetWorld()->GetTimerManager().SetTimer(FTH_TestHandle, this, &ThisClass::SendData, 1.f, true);
 }
@@ -94,7 +97,7 @@ bool ARokokoRemote::Sender_SendData()
 	}
 	else
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Sent %d bytes"), BytesSent);
+		UE_LOG(LogTemp, Warning, TEXT("Sent %d bytes"), BytesSent);
 	}
 
 	return true;
@@ -195,7 +198,7 @@ FString testfunc(const uint8* SrcBuffer, const uint32 SrcSize)
 
 void ARokokoRemote::Recv(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Received bytes: %d"), ArrayReaderPtr->Num());
+	UE_LOG(LogTemp, Warning, TEXT("Received bytes: %d"), ArrayReaderPtr->Num());
 
 	FRokokoRemoteInstance Data2;
 
@@ -242,7 +245,7 @@ void ARokokoRemote::Recv(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpo
 		
 	}
 
-	//Data2.DisplayValues();
+	Data2.DisplayValues();
 }
 
 FString FRokokoRemoteInstance::Serialize()

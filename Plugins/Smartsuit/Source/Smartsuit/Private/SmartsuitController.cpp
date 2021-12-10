@@ -12,12 +12,6 @@ ASmartsuitController::ASmartsuitController()
 	hubInfoRequested = false;
 	bodyModelRequested = false;
 	hubInfo = nullptr;
-	
-/*#ifdef BUILT_MINOR_VERSION
-	detectedVersion = BUILT_MINOR_VERSION;
-#else
-	detectedVersion = -1;
-#endif*/
 }
 
 // Called when the game starts or when spawned
