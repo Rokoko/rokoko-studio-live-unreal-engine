@@ -931,6 +931,8 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 
 	FLiveLinkSubjectName GetLiveLinkSubjectName();
 
+	void CreateRetargetAsset(const UAnimInstance* InAnimInstance);
+
 private:
 	//bool firstTime = true;
 	// FAnimNode_SkeletalControlBase interface
