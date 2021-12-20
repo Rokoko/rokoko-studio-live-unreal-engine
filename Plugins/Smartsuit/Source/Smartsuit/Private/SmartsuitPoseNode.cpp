@@ -387,6 +387,11 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	}
 
 
+	if (!CurrentRetargetAsset->IsA(URokokoBodyMapData::StaticClass()))
+	{
+		return;
+	}
+
 	FLiveLinkSubjectFrameData SubjectFrameData;
 
 	FLiveLinkSubjectName LiveLinkSubjectName = GetLiveLinkSubjectName();
@@ -429,7 +434,7 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 
 	EBoneControlSpace TestBoneControlSpace = BCS_ComponentSpace;
 
-	if (!TPose.StoredTPose) 
+	if (!TPose.StoredTPose && CurrentRetargetAsset)
 	{
 		
 		//if (RelativeToStart)
@@ -848,6 +853,11 @@ void FSmartsuitPoseNode::PreUpdate(const UAnimInstance* InAnimInstance)
 
 	LiveLinkClient_AnyThread = LiveLinkClient_GameThread.GetClient();
 
+	CreateRetargetAsset(InAnimInstance);
+}
+
+void FSmartsuitPoseNode::CreateRetargetAsset(const UAnimInstance* InAnimInstance)
+{
 	// Protection as a class graph pin does not honor rules on abstract classes and NoClear
 	UClass* RetargetAssetPtr = RetargetAsset.Get();
 	if (!RetargetAssetPtr || RetargetAssetPtr->HasAnyClassFlags(CLASS_Abstract))
@@ -1148,7 +1158,7 @@ FLiveLinkSubjectName FSmartsuitPoseNode::GetLiveLinkSubjectName()
 
 void FSmartsuitPoseNode::OnInitializeAnimInstance(const FAnimInstanceProxy* InProxy, const UAnimInstance* InAnimInstance)
 {
-	CurrentRetargetAsset = nullptr;
+	//CurrentRetargetAsset = nullptr;
 
 	Super::OnInitializeAnimInstance(InProxy, InAnimInstance);
 }
