@@ -97,6 +97,8 @@ FSuitData::FSuitData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 
 	TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField("meta");
 	hasGloves = Meta->GetBoolField("hasGloves");
+	hasLeftGlove = Meta->GetBoolField("hasLeftGlove");
+	hasRightGlove = Meta->GetBoolField("hasRightGlove");
 	hasBody = Meta->GetBoolField("hasBody");
 	hasFace = Meta->GetBoolField("hasFace");
 

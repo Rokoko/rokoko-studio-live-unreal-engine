@@ -933,6 +933,8 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 
 	void CreateRetargetAsset(const UAnimInstance* InAnimInstance);
 
+	void UpdateComponentPose_AnyThread(const FAnimationUpdateContext& Context) override;
+
 private:
 	//bool firstTime = true;
 	// FAnimNode_SkeletalControlBase interface

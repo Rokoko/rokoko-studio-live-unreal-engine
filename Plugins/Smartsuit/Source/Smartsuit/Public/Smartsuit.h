@@ -20,6 +20,7 @@
 #include "Modules/ModuleInterface.h"
 #include "Modules/ModuleManager.h"
 
+
 class ISmartsuitModule : public IModuleInterface
 {
 public:
