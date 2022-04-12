@@ -401,6 +401,12 @@ struct FSuitData
 	bool hasGloves;
 
 	UPROPERTY(BlueprintReadOnly, Category = Default)
+	bool hasLeftGlove;
+
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	bool hasRightGlove;
+
+	UPROPERTY(BlueprintReadOnly, Category = Default)
 	bool hasBody;
 
 	UPROPERTY(BlueprintReadOnly, Category = Default)

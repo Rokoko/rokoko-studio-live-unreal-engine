@@ -35,22 +35,23 @@ public class Smartsuit : ModuleRules
         //         );
 
 
-   //     PrivateIncludePaths.AddRange(
-   //         new string[] {
-   //             "Smartsuit/Private",
-   //             "LiveLink/Private",
+        //     PrivateIncludePaths.AddRange(
+        //         new string[] {
+        //             "Smartsuit/Private",
+        //             "LiveLink/Private",
 
-			//	// ... add other private include paths required here ...
-			//}
-   //         );
+        //	// ... add other private include paths required here ...
+        //}
+        //         );
 
+        PublicDefinitions.Add("USE_SMARTSUIT_ANIMATION_ROLE");
 
         PublicDependencyModuleNames.AddRange(
             new string[]
             {
                 //"Core",
                 //"Core", "AnimGraph", "BlueprintGraph", "AnimGraphRuntime", "CoreUObject", "Engine", "Sockets", "Networking",
-                "Core", "CoreUObject", "Engine", "Sockets", "Http", "Networking", "AnimGraphRuntime", "Json", "JsonUtilities", "LiveLink", "RenderCore", "InputCore"/*, "LiveLinkInterface"*/
+                "Core", "CoreUObject", "Engine", "Sockets", "Http", "Networking", "AnimGraphRuntime", "Json", "JsonUtilities", "LiveLink", "RenderCore", "InputCore", "LiveLinkInterface", "LiveLinkAnimationCore"
 				// ... add other public dependencies that you statically link with here ...
 			}
             );

@@ -8,6 +8,8 @@
 #include "Roles/LiveLinkLightRole.h"
 #include "Roles/LiveLinkLightTypes.h"
 #include "Features/IModularFeatures.h"
+#include "Roles/LiveLinkSmartsuitRole.h"
+#include "Roles/LiveLinkSmartsuitTypes.h"
 
 #include "VirtualProductionFrame.h"
 #include "Smartsuit.h"
@@ -424,13 +426,26 @@ void FVirtualProductionSource::HandleSuitData(FSuitData suit)
 	boneParents.Add(16); //60 - LeftToe
 	boneParents.Add(19); //61 - RightToe
 
+	#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+	FLiveLinkStaticDataStruct StaticData(FLiveLinkSmartsuitStaticData::StaticStruct());
+	FLiveLinkSmartsuitStaticData* SkeletonData = StaticData.Cast<FLiveLinkSmartsuitStaticData>();
+	#else
 	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
 	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
+	#endif
+
+
 	SkeletonData->SetBoneNames(boneNames);
 	SkeletonData->SetBoneParents(boneParents);
 
 	if(Client)
-		Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
+	{
+		#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+			Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkSmartsuitRole::StaticClass(), MoveTemp(StaticData));
+		#else
+			Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
+		#endif
+	}
 }
 
 
@@ -634,8 +649,17 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 		}
 
 		//FTimer timer;
+
+		#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+		FLiveLinkFrameDataStruct FrameData1(FLiveLinkSmartsuitFrameData::StaticStruct());
+		FLiveLinkSmartsuitFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkSmartsuitFrameData>();
+		#else
 		FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
 		FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
+		#endif
+		//FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
+		
+
 		AnimFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 
 		TArray<FTransform> transforms;
@@ -725,6 +749,11 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 		CreateJoint(transforms, 0, subject.GetBoneByName(SmartsuitBones::rightFoot), subject.GetBoneByName(SmartsuitBones::rightToe));
 
 		AnimFrameData.Transforms.Append(transforms);
+
+		#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+		AnimFrameData.HasLeftGlove = subject.hasLeftGlove;
+		AnimFrameData.HasRightGlove = subject.hasRightGlove;
+		#endif
 
 		if(Client)
 			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData1));
@@ -1236,7 +1265,7 @@ uint32 FVirtualProductionSource::Run()
 				if (FJsonSerializer::Deserialize(Reader, JsonObject))
 				{
 
-					VPFrame.version = JsonObject->GetIntegerField("version");
+					VPFrame.version = JsonObject->GetStringField("version");
 					//VPFrame.timestamp = JsonObject->GetNumberField("timestamp");
 					//VPFrame.playbackTimestamp = JsonObject->GetNumberField("");
 

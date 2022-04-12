@@ -42,7 +42,8 @@ public class SmartsuitEditor : ModuleRules
                 "AnimGraphRuntime",
                 "Smartsuit",
                 "LiveLinkInterface",
-                "LiveLink"
+                "LiveLink",
+                "LiveLinkAnimationCore"
 				// ... add other public dependencies that you statically link with here ...
 			}
             );

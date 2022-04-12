@@ -41,70 +41,83 @@ void USmartsuitPose::CheckForWarnings(FString name, FBoneReference bone, USkelet
 
 void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, FCompilerResultsLog& MessageLog)
 {
-	if (Node.CurrentRetargetAsset->IsValidLowLevel())
-	{
-		//Node.BoneMap.hip =					Node.Bone_Map_Override_OLD->hip;
-		//Node.BoneMap.stomach =				Node.Bone_Map_Override_OLD->stomach;
-		//Node.BoneMap.chest =				Node.Bone_Map_Override_OLD->chest;
-		//Node.BoneMap.neck =					Node.Bone_Map_Override_OLD->neck;
-		//Node.BoneMap.head =					Node.Bone_Map_Override_OLD->head;
-		//Node.BoneMap.leftShoulder =			Node.Bone_Map_Override_OLD->leftShoulder;
-		//Node.BoneMap.leftArm =				Node.Bone_Map_Override_OLD->leftArm;
-		//Node.BoneMap.leftForearm =			Node.Bone_Map_Override_OLD->leftForearm;
-		//Node.BoneMap.leftHand =				Node.Bone_Map_Override_OLD->leftHand;
-		//Node.BoneMap.rightShoulder =		Node.Bone_Map_Override_OLD->rightShoulder;
-		//Node.BoneMap.rightArm =				Node.Bone_Map_Override_OLD->rightArm;
-		//Node.BoneMap.rightForearm =			Node.Bone_Map_Override_OLD->rightForearm;
-		//Node.BoneMap.rightHand =			Node.Bone_Map_Override_OLD->rightHand;
-		//Node.BoneMap.leftUpleg =			Node.Bone_Map_Override_OLD->leftUpleg;
-		//Node.BoneMap.leftLeg =				Node.Bone_Map_Override_OLD->leftLeg;
-		//Node.BoneMap.leftFoot =				Node.Bone_Map_Override_OLD->leftFoot;
-		//Node.BoneMap.leftToe =				Node.Bone_Map_Override_OLD->leftToe;
-		//Node.BoneMap.rightUpleg =			Node.Bone_Map_Override_OLD->rightUpleg;
-		//Node.BoneMap.rightLeg =				Node.Bone_Map_Override_OLD->rightLeg;
-		//Node.BoneMap.rightFoot =			Node.Bone_Map_Override_OLD->rightFoot;
-		//Node.BoneMap.rightToe =				Node.Bone_Map_Override_OLD->rightToe;
-		//Node.BoneMap.leftThumbProximal =	Node.Bone_Map_Override_OLD->leftThumbProximal;
-		//Node.BoneMap.leftThumbMedial =		Node.Bone_Map_Override_OLD->leftThumbMedial;
-		//Node.BoneMap.leftThumbDistal =		Node.Bone_Map_Override_OLD->leftThumbDistal;
-		//Node.BoneMap.leftThumbTip =			Node.Bone_Map_Override_OLD->leftThumbTip;
-		//Node.BoneMap.leftIndexProximal =	Node.Bone_Map_Override_OLD->leftIndexProximal;
-		//Node.BoneMap.leftIndexMedial =		Node.Bone_Map_Override_OLD->leftIndexMedial;
-		//Node.BoneMap.leftIndexDistal =		Node.Bone_Map_Override_OLD->leftIndexDistal;
-		//Node.BoneMap.leftIndexTip =			Node.Bone_Map_Override_OLD->leftIndexTip;
-		//Node.BoneMap.leftMiddleProximal =	Node.Bone_Map_Override_OLD->leftMiddleProximal;
-		//Node.BoneMap.leftMiddleMedial =		Node.Bone_Map_Override_OLD->leftMiddleMedial;
-		//Node.BoneMap.leftMiddleDistal =		Node.Bone_Map_Override_OLD->leftMiddleDistal;
-		//Node.BoneMap.leftMiddleTip =		Node.Bone_Map_Override_OLD->leftMiddleTip;
-		//Node.BoneMap.leftRingProximal =		Node.Bone_Map_Override_OLD->leftRingProximal;
-		//Node.BoneMap.leftRingMedial =		Node.Bone_Map_Override_OLD->leftRingMedial;
-		//Node.BoneMap.leftRingDistal =		Node.Bone_Map_Override_OLD->leftRingDistal;
-		//Node.BoneMap.leftRingTip =			Node.Bone_Map_Override_OLD->leftRingTip;
-		//Node.BoneMap.leftLittleProximal =	Node.Bone_Map_Override_OLD->leftLittleProximal;
-		//Node.BoneMap.leftLittleMedial =		Node.Bone_Map_Override_OLD->leftLittleMedial;
-		//Node.BoneMap.leftLittleDistal =		Node.Bone_Map_Override_OLD->leftLittleDistal;
-		//Node.BoneMap.leftLittleTip =		Node.Bone_Map_Override_OLD->leftLittleTip;
-		//Node.BoneMap.rightThumbProximal =	Node.Bone_Map_Override_OLD->rightThumbProximal;
-		//Node.BoneMap.rightThumbMedial =		Node.Bone_Map_Override_OLD->rightThumbMedial;
-		//Node.BoneMap.rightThumbDistal =		Node.Bone_Map_Override_OLD->rightThumbDistal;
-		//Node.BoneMap.rightThumbTip =		Node.Bone_Map_Override_OLD->rightThumbTip;
-		//Node.BoneMap.rightIndexProximal =	Node.Bone_Map_Override_OLD->rightIndexProximal;
-		//Node.BoneMap.rightIndexMedial =		Node.Bone_Map_Override_OLD->rightIndexMedial;
-		//Node.BoneMap.rightIndexDistal =		Node.Bone_Map_Override_OLD->rightIndexDistal;
-		//Node.BoneMap.rightIndexTip =		Node.Bone_Map_Override_OLD->rightIndexTip;
-		//Node.BoneMap.rightMiddleProximal =	Node.Bone_Map_Override_OLD->rightMiddleProximal;
-		//Node.BoneMap.rightMiddleMedial =	Node.Bone_Map_Override_OLD->rightMiddleMedial;
-		//Node.BoneMap.rightMiddleDistal =	Node.Bone_Map_Override_OLD->rightMiddleDistal;
-		//Node.BoneMap.rightMiddleTip =		Node.Bone_Map_Override_OLD->rightMiddleTip;
-		//Node.BoneMap.rightRingProximal =	Node.Bone_Map_Override_OLD->rightRingProximal;
-		//Node.BoneMap.rightRingMedial =		Node.Bone_Map_Override_OLD->rightRingMedial;
-		//Node.BoneMap.rightRingDistal =		Node.Bone_Map_Override_OLD->rightRingDistal;
-		//Node.BoneMap.rightRingTip =			Node.Bone_Map_Override_OLD->rightRingTip;
-		//Node.BoneMap.rightLittleProximal =	Node.Bone_Map_Override_OLD->rightLittleProximal;
-		//Node.BoneMap.rightLittleMedial =	Node.Bone_Map_Override_OLD->rightLittleMedial;
-		//Node.BoneMap.rightLittleDistal =	Node.Bone_Map_Override_OLD->rightLittleDistal;
-		//Node.BoneMap.rightLittleTip =		Node.Bone_Map_Override_OLD->rightLittleTip;
+	
+	Super::ValidateAnimNodeDuringCompilation(ForSkeleton, MessageLog);
 
+	//UEdGraphPin* BoneMapAssetPin = FindPin(GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Bone_Map_Override_OLD), EGPD_Input);
+
+	//if (BoneMapAssetPin != nullptr)
+	//{
+	//	MessageLog.Warning(*debugmsg, this);
+	//}
+
+
+	//if (Node.Bone_Map_Override_OLD->IsValidLowLevel())
+	//{
+	//	Node.BoneMap.hip =					Node.Bone_Map_Override_OLD->hip;
+	//	Node.BoneMap.stomach =				Node.Bone_Map_Override_OLD->stomach;
+	//	Node.BoneMap.chest =				Node.Bone_Map_Override_OLD->chest;
+	//	Node.BoneMap.neck =					Node.Bone_Map_Override_OLD->neck;
+	//	Node.BoneMap.head =					Node.Bone_Map_Override_OLD->head;
+	//	Node.BoneMap.leftShoulder =			Node.Bone_Map_Override_OLD->leftShoulder;
+	//	Node.BoneMap.leftArm =				Node.Bone_Map_Override_OLD->leftArm;
+	//	Node.BoneMap.leftForearm =			Node.Bone_Map_Override_OLD->leftForearm;
+	//	Node.BoneMap.leftHand =				Node.Bone_Map_Override_OLD->leftHand;
+	//	Node.BoneMap.rightShoulder =		Node.Bone_Map_Override_OLD->rightShoulder;
+	//	Node.BoneMap.rightArm =				Node.Bone_Map_Override_OLD->rightArm;
+	//	Node.BoneMap.rightForearm =			Node.Bone_Map_Override_OLD->rightForearm;
+	//	Node.BoneMap.rightHand =			Node.Bone_Map_Override_OLD->rightHand;
+	//	Node.BoneMap.leftUpleg =			Node.Bone_Map_Override_OLD->leftUpleg;
+	//	Node.BoneMap.leftLeg =				Node.Bone_Map_Override_OLD->leftLeg;
+	//	Node.BoneMap.leftFoot =				Node.Bone_Map_Override_OLD->leftFoot;
+	//	Node.BoneMap.leftToe =				Node.Bone_Map_Override_OLD->leftToe;
+	//	Node.BoneMap.rightUpleg =			Node.Bone_Map_Override_OLD->rightUpleg;
+	//	Node.BoneMap.rightLeg =				Node.Bone_Map_Override_OLD->rightLeg;
+	//	Node.BoneMap.rightFoot =			Node.Bone_Map_Override_OLD->rightFoot;
+	//	Node.BoneMap.rightToe =				Node.Bone_Map_Override_OLD->rightToe;
+	//	Node.BoneMap.leftThumbProximal =	Node.Bone_Map_Override_OLD->leftThumbProximal;
+	//	Node.BoneMap.leftThumbMedial =		Node.Bone_Map_Override_OLD->leftThumbMedial;
+	//	Node.BoneMap.leftThumbDistal =		Node.Bone_Map_Override_OLD->leftThumbDistal;
+	//	Node.BoneMap.leftThumbTip =			Node.Bone_Map_Override_OLD->leftThumbTip;
+	//	Node.BoneMap.leftIndexProximal =	Node.Bone_Map_Override_OLD->leftIndexProximal;
+	//	Node.BoneMap.leftIndexMedial =		Node.Bone_Map_Override_OLD->leftIndexMedial;
+	//	Node.BoneMap.leftIndexDistal =		Node.Bone_Map_Override_OLD->leftIndexDistal;
+	//	Node.BoneMap.leftIndexTip =			Node.Bone_Map_Override_OLD->leftIndexTip;
+	//	Node.BoneMap.leftMiddleProximal =	Node.Bone_Map_Override_OLD->leftMiddleProximal;
+	//	Node.BoneMap.leftMiddleMedial =		Node.Bone_Map_Override_OLD->leftMiddleMedial;
+	//	Node.BoneMap.leftMiddleDistal =		Node.Bone_Map_Override_OLD->leftMiddleDistal;
+	//	Node.BoneMap.leftMiddleTip =		Node.Bone_Map_Override_OLD->leftMiddleTip;
+	//	Node.BoneMap.leftRingProximal =		Node.Bone_Map_Override_OLD->leftRingProximal;
+	//	Node.BoneMap.leftRingMedial =		Node.Bone_Map_Override_OLD->leftRingMedial;
+	//	Node.BoneMap.leftRingDistal =		Node.Bone_Map_Override_OLD->leftRingDistal;
+	//	Node.BoneMap.leftRingTip =			Node.Bone_Map_Override_OLD->leftRingTip;
+	//	Node.BoneMap.leftLittleProximal =	Node.Bone_Map_Override_OLD->leftLittleProximal;
+	//	Node.BoneMap.leftLittleMedial =		Node.Bone_Map_Override_OLD->leftLittleMedial;
+	//	Node.BoneMap.leftLittleDistal =		Node.Bone_Map_Override_OLD->leftLittleDistal;
+	//	Node.BoneMap.leftLittleTip =		Node.Bone_Map_Override_OLD->leftLittleTip;
+	//	Node.BoneMap.rightThumbProximal =	Node.Bone_Map_Override_OLD->rightThumbProximal;
+	//	Node.BoneMap.rightThumbMedial =		Node.Bone_Map_Override_OLD->rightThumbMedial;
+	//	Node.BoneMap.rightThumbDistal =		Node.Bone_Map_Override_OLD->rightThumbDistal;
+	//	Node.BoneMap.rightThumbTip =		Node.Bone_Map_Override_OLD->rightThumbTip;
+	//	Node.BoneMap.rightIndexProximal =	Node.Bone_Map_Override_OLD->rightIndexProximal;
+	//	Node.BoneMap.rightIndexMedial =		Node.Bone_Map_Override_OLD->rightIndexMedial;
+	//	Node.BoneMap.rightIndexDistal =		Node.Bone_Map_Override_OLD->rightIndexDistal;
+	//	Node.BoneMap.rightIndexTip =		Node.Bone_Map_Override_OLD->rightIndexTip;
+	//	Node.BoneMap.rightMiddleProximal =	Node.Bone_Map_Override_OLD->rightMiddleProximal;
+	//	Node.BoneMap.rightMiddleMedial =	Node.Bone_Map_Override_OLD->rightMiddleMedial;
+	//	Node.BoneMap.rightMiddleDistal =	Node.Bone_Map_Override_OLD->rightMiddleDistal;
+	//	Node.BoneMap.rightMiddleTip =		Node.Bone_Map_Override_OLD->rightMiddleTip;
+	//	Node.BoneMap.rightRingProximal =	Node.Bone_Map_Override_OLD->rightRingProximal;
+	//	Node.BoneMap.rightRingMedial =		Node.Bone_Map_Override_OLD->rightRingMedial;
+	//	Node.BoneMap.rightRingDistal =		Node.Bone_Map_Override_OLD->rightRingDistal;
+	//	Node.BoneMap.rightRingTip =			Node.Bone_Map_Override_OLD->rightRingTip;
+	//	Node.BoneMap.rightLittleProximal =	Node.Bone_Map_Override_OLD->rightLittleProximal;
+	//	Node.BoneMap.rightLittleMedial =	Node.Bone_Map_Override_OLD->rightLittleMedial;
+	//	Node.BoneMap.rightLittleDistal =	Node.Bone_Map_Override_OLD->rightLittleDistal;
+	//	Node.BoneMap.rightLittleTip =		Node.Bone_Map_Override_OLD->rightLittleTip;
+
+	if (Node.CurrentRetargetAsset->IsValidLowLevel())
+	{ 
 		Node.BoneMap.hip = Node.CurrentRetargetAsset->GetRemappedBoneName("hip");
 		Node.BoneMap.stomach = Node.CurrentRetargetAsset->GetRemappedBoneName("stomach");
 		Node.BoneMap.chest = Node.CurrentRetargetAsset->GetRemappedBoneName("chest");
@@ -244,7 +257,7 @@ void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, F
 	//if (Node.Controller == NULL) {
 	//	MessageLog.Warning(*LOCTEXT("NoSmartsuit", "@@ - Smartsuit Controller is not set.").ToString(), this);
 	//}
-	Super::ValidateAnimNodeDuringCompilation(ForSkeleton, MessageLog);
+	
 }
 
 FText USmartsuitPose::GetControllerDescription() const
@@ -302,6 +315,9 @@ void USmartsuitPose::CopyNodeDataToPreviewNode(FAnimNode_Base* InPreviewNode)
 	//ModifyBone->TranslationSpace = Node.TranslationSpace;
 	//ModifyBone->RotationSpace = Node.RotationSpace;
 	//ModifyBone->ScaleSpace = Node.ScaleSpace;
+
+	//ModifyBone->Bone_Map_Override_OLD = Node.Bone_Map_Override_OLD;
+	ModifyBone->CurrentRetargetAsset = Node.CurrentRetargetAsset;
 }
 
 //FEditorModeID USmartsuitPose::GetEditorMode() const
@@ -324,6 +340,11 @@ void USmartsuitPose::CopyPinDefaultsToNodeData(UEdGraphPin* InPin)
 	//{
 	//	GetDefaultValue(GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Scale), Node.Scale);
 	//}
-}
 
+	//if (InPin->GetName() == GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Bone_Map_Override_OLD))
+	//{
+	//	//GetDefaultValue(GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Bone_Map_Override_OLD), Node.Bone_Map_Override_OLD);
+	//}
+}
+PRAGMA_ENABLE_OPTIMIZATION
 #undef LOCTEXT_NAMESPACE

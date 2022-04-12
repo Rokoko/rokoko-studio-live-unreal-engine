@@ -383,7 +383,7 @@ struct FVirtualProductionFrame {
 
 	/**Indicates the VP frame version.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Virtual Production version."))
-	int version;
+	FString version;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "List of props."))
 	/** Array of props. */

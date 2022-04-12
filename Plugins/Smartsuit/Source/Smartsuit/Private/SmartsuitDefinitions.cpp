@@ -97,6 +97,8 @@ FSuitData::FSuitData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 
 	TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField("meta");
 	hasGloves = Meta->GetBoolField("hasGloves");
+	hasLeftGlove = Meta->GetBoolField("hasLeftGlove");
+	hasRightGlove = Meta->GetBoolField("hasRightGlove");
 	hasBody = Meta->GetBoolField("hasBody");
 	hasFace = Meta->GetBoolField("hasFace");
 
@@ -174,6 +176,13 @@ void FSuitData::ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& Bon
 		TSharedPtr<FJsonObject> BoneObject = jsonObject->GetObjectField(BoneName);
 		FVector SensorPosition = USmartsuitBlueprintLibrary::GetVectorField(BoneObject->GetObjectField("position"));
 		FQuat SensorRotation = USmartsuitBlueprintLibrary::GetQuaternionField(BoneObject->GetObjectField("rotation"));
+
+		if (BoneName == SmartsuitBones::leftUpperArm.ToString())
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("left upper arm rotation: %s"),*SensorRotation.ToString());
+		}
+
+
 		SmartsuitBones.Add(FName(*BoneName), FSmartsuitBone(FName(*BoneName), SensorPosition, SensorRotation));
 	}
 }

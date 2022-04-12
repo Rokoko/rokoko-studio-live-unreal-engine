@@ -97,7 +97,7 @@ bool ARokokoRemote::Sender_SendData()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Sent %d bytes"), BytesSent);
+		//UE_LOG(LogTemp, Warning, TEXT("Sent %d bytes"), BytesSent);
 	}
 
 	return true;
@@ -198,7 +198,7 @@ FString testfunc(const uint8* SrcBuffer, const uint32 SrcSize)
 
 void ARokokoRemote::Recv(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Received bytes: %d"), ArrayReaderPtr->Num());
+	//UE_LOG(LogTemp, Warning, TEXT("Received bytes: %d"), ArrayReaderPtr->Num());
 
 	FRokokoRemoteInstance Data2;
 
@@ -245,7 +245,7 @@ void ARokokoRemote::Recv(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpo
 		
 	}
 
-	Data2.DisplayValues();
+	//Data2.DisplayValues();
 }
 
 FString FRokokoRemoteInstance::Serialize()
