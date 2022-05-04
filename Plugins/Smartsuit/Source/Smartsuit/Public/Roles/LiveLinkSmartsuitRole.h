@@ -2,14 +2,14 @@
 
 #pragma once
 
-#include "Roles/LiveLinkTransformRole.h"
+#include "Roles/LiveLinkAnimationRole.h"
 #include "LiveLinkSmartsuitRole.generated.h"
 
 /**
  * Role associated for Smartsuit data.
  */
 UCLASS(BlueprintType, meta = (DisplayName = "Smartsuit Role"))
-class SMARTSUIT_API ULiveLinkSmartsuitRole : public ULiveLinkTransformRole
+class SMARTSUIT_API ULiveLinkSmartsuitRole : public ULiveLinkAnimationRole
 {
 	GENERATED_BODY()
 
