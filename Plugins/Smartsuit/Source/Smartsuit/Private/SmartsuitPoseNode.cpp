@@ -3,6 +3,7 @@
 #include "SmartsuitPoseNode.h"
 #include "Smartsuit.h"
 #include "AnimationRuntime.h"
+#include "LiveLinkCustomVersion.h"
 #include "SmartsuitDefinitions.h"
 #include "Animation/AnimInstanceProxy.h"
 #include "Roles/LiveLinkAnimationRole.h"
@@ -895,8 +896,17 @@ bool FSmartsuitPoseNode::IsValidToEvaluate(const USkeleton* Skeleton, const FBon
 void FSmartsuitPoseNode::PreUpdate(const UAnimInstance* InAnimInstance)
 {
 	Super::PreUpdate(InAnimInstance);
+	//
+	// LiveLinkClient_AnyThread = LiveLinkClient_GameThread.GetClient();
 
-	LiveLinkClient_AnyThread = LiveLinkClient_GameThread.GetClient();
+
+	ILiveLinkClient* ThisFrameClient = nullptr;
+	IModularFeatures& ModularFeatures = IModularFeatures::Get();
+	if (ModularFeatures.IsModularFeatureAvailable(ILiveLinkClient::ModularFeatureName))
+	{
+		ThisFrameClient = &IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
+	}
+	LiveLinkClient_AnyThread = ThisFrameClient;
 
 	CreateRetargetAsset(InAnimInstance);
 }
@@ -1200,7 +1210,17 @@ FLiveLinkSubjectName FSmartsuitPoseNode::GetLiveLinkSubjectName()
 //{
 //	InitializeTMap();
 //}
-
+PRAGMA_DISABLE_OPTIMIZATION
+FName URokokoBodyMapData::GetRemappedBoneName_Implementation(FName CurveName) const
+{
+	if (auto RemappedName = NameMapping.Find(CurveName))
+	{
+		return *RemappedName;
+	}
+	
+	return "";
+}
+PRAGMA_ENABLE_OPTIMIZATION
 void FSmartsuitPoseNode::OnInitializeAnimInstance(const FAnimInstanceProxy* InProxy, const UAnimInstance* InAnimInstance)
 {
 	//CurrentRetargetAsset = nullptr;
@@ -1215,3 +1235,44 @@ void FSmartsuitPoseNode::UpdateComponentPose_AnyThread(const FAnimationUpdateCon
 
 	Super::UpdateComponentPose_AnyThread(Context);
 }
+
+void FSmartsuitPoseNode::UpdateInternal(const FAnimationUpdateContext & Context)
+{
+	GetEvaluateGraphExposedInputs().Execute(Context);
+
+	Super::UpdateInternal(Context);
+}
+
+void FSmartsuitPoseNode::Initialize_AnyThread(const FAnimationInitializeContext& Context)
+{
+	GetEvaluateGraphExposedInputs().Execute(Context);
+	
+	Super::Initialize_AnyThread(Context);
+}
+
+// bool FSmartsuitPoseNode::Serialize(FArchive& Ar)
+// {
+// 	Ar.UsingCustomVersion(FLiveLinkCustomVersion::GUID);
+// 	
+// 	UScriptStruct* Struct = FSmartsuitPoseNode::StaticStruct();
+// 	
+// 	if (Ar.IsLoading() || Ar.IsSaving())
+// 	{
+// 		Struct->SerializeTaggedProperties(Ar, (uint8*)this, Struct, nullptr);
+// 	}
+//
+// #if WITH_EDITORONLY_DATA
+// 	//Take old data and put it in new data structure
+// 	if (Ar.IsLoading())
+// 	{
+// 		if (Ar.CustomVer(FLiveLinkCustomVersion::GUID) < FLiveLinkCustomVersion::NewLiveLinkRoleSystem)
+// 		{
+// 			PRAGMA_DISABLE_DEPRECATION_WARNINGS
+// 			//LiveLinkSubjectName.Name = SubjectName_DEPRECATED;
+// 			PRAGMA_ENABLE_DEPRECATION_WARNINGS
+// 		}
+// 	}
+// #endif
+//
+// 	return true;
+// }

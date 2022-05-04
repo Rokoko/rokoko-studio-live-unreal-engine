@@ -147,14 +147,14 @@ class SMARTSUIT_API URokokoBodyMapData : public ULiveLinkRemapAsset
 	}
 public:
 
-	FName GetRemappedBoneName_Implementation(FName CurveName) const override
-	{
-		if (auto RemappedName = NameMapping.Find(CurveName))
-		{
-			return *RemappedName;
-		}
-		return "";
-	}
+	FName GetRemappedBoneName_Implementation(FName CurveName) const override;
+	// {
+	// 	if (auto RemappedName = NameMapping.Find(CurveName))
+	// 	{
+	// 		return *RemappedName;
+	// 	}
+	// 	return "";
+	// }
 
 	virtual void Initialize() override
 	{
@@ -164,6 +164,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = BoneRemapping)
 	void InitializeTMap()
 	{
+		NameMapping.Empty();
+		
 		NameMapping.Add("hip", hip);
 
 		NameMapping.Add("stomach", stomach);
@@ -934,6 +936,12 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 	void CreateRetargetAsset(const UAnimInstance* InAnimInstance);
 
 	void UpdateComponentPose_AnyThread(const FAnimationUpdateContext& Context) override;
+	
+	virtual void UpdateInternal(const FAnimationUpdateContext& Context) override;
+	
+	virtual void Initialize_AnyThread(const FAnimationInitializeContext& Context) override;
+	
+	//virtual bool Serialize(FArchive& Ar);
 
 private:
 	//bool firstTime = true;
