@@ -44,7 +44,7 @@ public class Smartsuit : ModuleRules
         //}
         //         );
 
-        Definitions.Add("USE_SMARTSUIT_ANIMATION_ROLE");
+        PublicDefinitions.Add("USE_SMARTSUIT_ANIMATION_ROLE");
 
         PublicDependencyModuleNames.AddRange(
             new string[]

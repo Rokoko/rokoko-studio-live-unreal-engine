@@ -30,6 +30,8 @@ protected:
 	//virtual FEditorModeID GetEditorMode() const override;
 	virtual void CopyNodeDataToPreviewNode(FAnimNode_Base* InPreviewNode) override;
 	virtual void CopyPinDefaultsToNodeData(UEdGraphPin* InPin) override;
+	
+	virtual void PreloadRequiredAssets() override;
 	// End of UAnimGraphNode_Base interface
 
 	// UAnimGraphNode_SkeletalControlBase interface

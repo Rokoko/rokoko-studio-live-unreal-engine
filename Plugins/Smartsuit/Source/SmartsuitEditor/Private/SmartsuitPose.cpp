@@ -2,6 +2,7 @@
 
 #include "SmartsuitPose.h"
 #include "SmartsuitEditor.h"
+#include "LiveLinkRemapAsset.h"
 #include "SmartsuitEditorPrivatePCH.h"
 //#include "CompilerResultsLog.h"
 
@@ -38,20 +39,12 @@ void USmartsuitPose::CheckForWarnings(FString name, FBoneReference bone, USkelet
 		}
 	}
 }
-
+PRAGMA_DISABLE_OPTIMIZATION
 void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, FCompilerResultsLog& MessageLog)
 {
 	
 	Super::ValidateAnimNodeDuringCompilation(ForSkeleton, MessageLog);
-
-	//UEdGraphPin* BoneMapAssetPin = FindPin(GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Bone_Map_Override_OLD), EGPD_Input);
-
-	//if (BoneMapAssetPin != nullptr)
-	//{
-	//	MessageLog.Warning(*debugmsg, this);
-	//}
-
-
+	
 	//if (Node.Bone_Map_Override_OLD->IsValidLowLevel())
 	//{
 	//	Node.BoneMap.hip =					Node.Bone_Map_Override_OLD->hip;
@@ -116,6 +109,26 @@ void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, F
 	//	Node.BoneMap.rightLittleDistal =	Node.Bone_Map_Override_OLD->rightLittleDistal;
 	//	Node.BoneMap.rightLittleTip =		Node.Bone_Map_Override_OLD->rightLittleTip;
 
+	UClass* RetargetAssetPtr = Node.RetargetAsset.Get();
+	
+	if(IsValid(RetargetAssetPtr))
+	{
+		FString Msg = "retarget asset: " + Node.RetargetAsset->GetName();
+		MessageLog.Note(*Msg, this);
+
+
+		//ForSkeleton
+		Node.CurrentRetargetAsset = NewObject<ULiveLinkRemapAsset>(GetTransientPackage(), RetargetAssetPtr);
+		Node.CurrentRetargetAsset->Initialize();
+	}
+	else
+	{
+		// FString Msg = "could not get retarget asset!";
+		// MessageLog.Warning(*Msg, this);
+	}
+
+	bool CheckBoneOverrides = true;
+	
 	if (Node.CurrentRetargetAsset->IsValidLowLevel())
 	{ 
 		Node.BoneMap.hip = Node.CurrentRetargetAsset->GetRemappedBoneName("hip");
@@ -183,11 +196,13 @@ void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, F
 	else
 	{
 		FFormatNamedArguments Args;
-		FString Msg = "Bone map override not set!";
+		FString Msg = "Bone map override appears to not be set.  If is set, try recompiling";
 		MessageLog.Warning(*Msg, this);
+
+		CheckBoneOverrides = false;
 	}
 
-	if(ForSkeleton && !ForSkeleton->HasAnyFlags(RF_NeedPostLoad))
+	if(CheckBoneOverrides && ForSkeleton && !ForSkeleton->HasAnyFlags(RF_NeedPostLoad))
 	{
 		CheckForWarnings("Hip", Node.BoneMap.hip, ForSkeleton, MessageLog);
 		CheckForWarnings("Stomach", Node.BoneMap.stomach, ForSkeleton, MessageLog);
@@ -317,7 +332,11 @@ void USmartsuitPose::CopyNodeDataToPreviewNode(FAnimNode_Base* InPreviewNode)
 	//ModifyBone->ScaleSpace = Node.ScaleSpace;
 
 	//ModifyBone->Bone_Map_Override_OLD = Node.Bone_Map_Override_OLD;
-	ModifyBone->CurrentRetargetAsset = Node.CurrentRetargetAsset;
+	//ModifyBone->CurrentRetargetAsset = Node.CurrentRetargetAsset;
+
+	Node.RetargetAsset = ModifyBone->RetargetAsset;
+
+	//Node.CurrentRetargetAsset = ModifyBone->CurrentRetargetAsset;
 }
 
 //FEditorModeID USmartsuitPose::GetEditorMode() const
@@ -345,6 +364,19 @@ void USmartsuitPose::CopyPinDefaultsToNodeData(UEdGraphPin* InPin)
 	//{
 	//	//GetDefaultValue(GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Bone_Map_Override_OLD), Node.Bone_Map_Override_OLD);
 	//}
+
+
 }
+
+void USmartsuitPose::PreloadRequiredAssets()
+{
+	Super::PreloadRequiredAssets();
+
+	
+	PreloadObject(Node.RetargetAsset);
+
+
+}
+
 PRAGMA_ENABLE_OPTIMIZATION
 #undef LOCTEXT_NAMESPACE
