@@ -3,6 +3,7 @@
 #pragma once
 
 #include "../Lib/V8/Includes/SmartsuitDef.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "SmartsuitDefinitions.generated.h"
 /*! \file SmartsuitDefinitions.h
 \brief This file includes all definitions used by Smartsuit plugin.

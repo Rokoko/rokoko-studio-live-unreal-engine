@@ -137,7 +137,7 @@ FTransform USmartsuitBlueprintLibrary::GetRefPoseBoneTransform(USkeletalMeshComp
 	{
 		SkelMesh->ClearRefPoseOverride();
 		FReferenceSkeleton RefSkel;
-		RefSkel = SkelMesh->SkeletalMesh->RefSkeleton;
+		RefSkel = SkelMesh->GetSkeletalMeshAsset()->GetRefSkeleton();
 
 		BoneTransform = GetWorldSpaceTransform(RefSkel, RefSkel.FindBoneIndex(BoneName));
 	}
@@ -156,7 +156,7 @@ FTransform USmartsuitBlueprintLibrary::GetBoneTransform(USkeletalMeshComponent* 
 	if (SkelMesh && !BoneName.IsNone())
 	{
 		FReferenceSkeleton RefSkel;
-		RefSkel = SkelMesh->SkeletalMesh->RefSkeleton;
+		RefSkel = SkelMesh->GetSkeletalMeshAsset()->GetRefSkeleton();
 		BoneTransform = SkelMesh->GetBoneTransform(RefSkel.FindBoneIndex(BoneName));
 	}
 

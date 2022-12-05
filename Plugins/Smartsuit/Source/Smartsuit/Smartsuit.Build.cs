@@ -51,7 +51,7 @@ public class Smartsuit : ModuleRules
             {
                 //"Core",
                 //"Core", "AnimGraph", "BlueprintGraph", "AnimGraphRuntime", "CoreUObject", "Engine", "Sockets", "Networking",
-                "Core", "CoreUObject", "Engine", "Sockets", "Http", "Networking", "AnimGraphRuntime", "Json", "JsonUtilities", "LiveLink", "RenderCore", "InputCore", "LiveLinkInterface", "LiveLinkAnimationCore"
+                "Core", "CoreUObject", "Engine", "Sockets", "HTTP", "Networking", "AnimGraphRuntime", "Json", "JsonUtilities", "LiveLink", "RenderCore", "InputCore", "LiveLinkInterface", "LiveLinkAnimationCore"
 				// ... add other public dependencies that you statically link with here ...
 			}
             );

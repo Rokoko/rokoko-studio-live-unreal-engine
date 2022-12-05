@@ -97,8 +97,9 @@ void SVirtualProductionSourceEditor::Tick(const FGeometry& AllottedGeometry, con
 	const double CurrentTickTime = FPlatformTime::Seconds();
 	if (CurrentTickTime - LastTickTime > 1.f)
 	{
+		bool bIsValidProvider = true;
 		#if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 24)
-		FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString("Studio"), FString(""), 0.0);
+		FProviderPollResult *result = new FProviderPollResult(FMessageAddress::NewAddress(), FString("Studio"), FString(""), 0.0, bIsValidProvider);
 		#else
 		FProviderPollResult* result = new FProviderPollResult(FMessageAddress::NewAddress(), FString("Studio"), FString(""));
 		#endif

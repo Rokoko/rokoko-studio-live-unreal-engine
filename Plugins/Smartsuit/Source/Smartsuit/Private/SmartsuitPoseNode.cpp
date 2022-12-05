@@ -399,7 +399,7 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 
 	FLiveLinkSubjectName LiveLinkSubjectName = GetLiveLinkSubjectName();
 
-	TSubclassOf<ULiveLinkRole> SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole(LiveLinkSubjectName);
+	TSubclassOf<ULiveLinkRole> SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole_AnyThread(LiveLinkSubjectName);
 	if (SubjectRole)
 	{
 #ifdef USE_SMARTSUIT_ANIMATION_ROLE

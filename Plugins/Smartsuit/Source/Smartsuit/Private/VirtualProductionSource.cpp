@@ -28,7 +28,7 @@ FVirtualProductionSource::FVirtualProductionSource(const FText& InSourceType, co
 {
 	Client = nullptr;
 
-	int32 RokokoPort;
+	int32 RokokoPort = 0;
 	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
 	{
 		RokokoPort = It->RokokoPortNumber;

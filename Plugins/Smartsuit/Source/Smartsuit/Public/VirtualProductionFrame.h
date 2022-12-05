@@ -6,6 +6,7 @@
 #include "Dom/JsonValue.h"
 #include "Dom/JsonObject.h"
 //#include "SmartsuitBlueprintLibrary.h"
+#include "Runtime/Launch/Resources/Version.h"
 #include "SmartsuitDefinitions.h"
 #include "VirtualProductionFrame.generated.h"
 

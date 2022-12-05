@@ -7,7 +7,7 @@ This plugin let's you stream animation data from Rokoko Studio into Unreal Engin
 ---
 
 ## Requirements
-- Unreal Engine 5.0EA2
+- Unreal Engine 5.1
 - Rokoko Studio 1.19.0b
 
 ## Features
