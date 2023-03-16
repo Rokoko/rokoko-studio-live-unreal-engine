@@ -48,6 +48,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Command API")
 	void StopRecording(const FRokokoCommandAPI_IPInfo& IPInfo);
 
+	UFUNCTION(BlueprintCallable, Category = "Command API")
+	void Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, const FTransform& transform);
+
 	UPROPERTY(BlueprintAssignable, Category="Command API")
 	FOnCompletedRequest OnCompletedRequest;
 

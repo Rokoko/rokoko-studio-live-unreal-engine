@@ -113,6 +113,52 @@ void URokokoStudioCommandAPI::StopRecording(const FRokokoCommandAPI_IPInfo& IPIn
 	HttpRequest->ProcessRequest();
 }
 
+void URokokoStudioCommandAPI::Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, const FTransform& transform)
+{
+	const double worldScale{ 0.01 };
+
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+	
+	TSharedPtr<FJsonObject> positionJsonObject = MakeShareable(new FJsonObject);
+	// convert UE coord system into target Studio coord system
+	positionJsonObject->SetNumberField("X", worldScale * transform.GetLocation().X);
+	positionJsonObject->SetNumberField("Y", worldScale * transform.GetLocation().Z);
+	positionJsonObject->SetNumberField("Z", -worldScale * transform.GetLocation().Y);
+
+	TSharedPtr<FJsonObject> rotationJsonObject = MakeShareable(new FJsonObject);
+	rotationJsonObject->SetNumberField("X", transform.GetRotation().X);
+	rotationJsonObject->SetNumberField("Y", transform.GetRotation().Y);
+	rotationJsonObject->SetNumberField("Z", transform.GetRotation().Z);
+	rotationJsonObject->SetNumberField("W", transform.GetRotation().W);
+	
+	JsonObject->SetStringField("deviceID", "");
+	JsonObject->SetStringField("boneAttached", "HIPS");
+	JsonObject->SetObjectField("position", positionJsonObject);
+	JsonObject->SetObjectField("rotation", rotationJsonObject);
+	JsonObject->SetBoolField("isQueryOnly", false);
+	JsonObject->SetNumberField("timeout", 2.0);
+	FString JsonString;
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
+	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+
+	FString URLPath = "http://" + IPInfo.IPAddress + ":" + IPInfo.Port + "/v2/" + IPInfo.APIKey + "/tracker";
+
+	FString TrimmedUrl = URLPath;
+	TrimmedUrl.TrimStartAndEndInline();
+
+#if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 26)
+	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
+#else
+	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+#endif
+	HttpRequest->SetURL(TrimmedUrl);
+	HttpRequest->SetVerb(TEXT("POST"));
+	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
+	HttpRequest->SetContentAsString(JsonString);
+	HttpRequest->OnProcessRequestComplete().BindUObject(this, &URokokoStudioCommandAPI::OnProcessRequestComplete);
+	HttpRequest->ProcessRequest();
+}
+
 PRAGMA_DISABLE_OPTIMIZATION
 void URokokoStudioCommandAPI::SaveConfigFile(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitname)
 {
