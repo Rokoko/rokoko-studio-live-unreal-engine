@@ -113,7 +113,7 @@ void URokokoStudioCommandAPI::StopRecording(const FRokokoCommandAPI_IPInfo& IPIn
 	HttpRequest->ProcessRequest();
 }
 
-void URokokoStudioCommandAPI::Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, const FTransform& transform)
+void URokokoStudioCommandAPI::Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& DeviceId, const FString& BoneName, float timeoutTime, const FTransform& transform)
 {
 	const double worldScale{ 0.01 };
 
@@ -131,12 +131,12 @@ void URokokoStudioCommandAPI::Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, co
 	rotationJsonObject->SetNumberField("Z", transform.GetRotation().Z);
 	rotationJsonObject->SetNumberField("W", transform.GetRotation().W);
 	
-	JsonObject->SetStringField("deviceID", "");
-	JsonObject->SetStringField("boneAttached", "HIPS");
+	JsonObject->SetStringField("deviceID", DeviceId);
+	JsonObject->SetStringField("boneAttached", BoneName);
 	JsonObject->SetObjectField("position", positionJsonObject);
 	JsonObject->SetObjectField("rotation", rotationJsonObject);
 	JsonObject->SetBoolField("isQueryOnly", false);
-	JsonObject->SetNumberField("timeout", 2.0);
+	JsonObject->SetNumberField("timeout", timeoutTime);
 	FString JsonString;
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
