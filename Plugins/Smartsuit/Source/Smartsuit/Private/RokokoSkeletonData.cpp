@@ -1,6 +1,6 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
-#include "SmartsuitDefinitions.h"
+#include "RokokoSkeletonData.h"
 #include "Smartsuit.h"
 #include "SmartsuitBlueprintLibrary.h"
 
@@ -79,7 +79,7 @@ SmartsuitDefinitions::~SmartsuitDefinitions()
 {
 }
 
-FSuitData::FSuitData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
+FRkkActorData::FRkkActorData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 {
 	suitname = jsonObject->GetStringField("name");
 
@@ -169,7 +169,7 @@ FSuitData::FSuitData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 	ParseBone(BodyObj, SmartsuitBones::rightLittleTip.ToString());
 }
 
-void FSuitData::ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& BoneName)
+void FRkkActorData::ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& BoneName)
 {
 	if (jsonObject->HasField(BoneName))
 	{
@@ -177,12 +177,6 @@ void FSuitData::ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& Bon
 		FVector SensorPosition = USmartsuitBlueprintLibrary::GetVectorField(BoneObject->GetObjectField("position"));
 		FQuat SensorRotation = USmartsuitBlueprintLibrary::GetQuaternionField(BoneObject->GetObjectField("rotation"));
 
-		if (BoneName == SmartsuitBones::leftUpperArm.ToString())
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("left upper arm rotation: %s"),*SensorRotation.ToString());
-		}
-
-
-		SmartsuitBones.Add(FName(*BoneName), FSmartsuitBone(FName(*BoneName), SensorPosition, SensorRotation));
+		bones.Add(FName(*BoneName), FSmartsuitBone(FName(*BoneName), SensorPosition, SensorRotation));
 	}
 }

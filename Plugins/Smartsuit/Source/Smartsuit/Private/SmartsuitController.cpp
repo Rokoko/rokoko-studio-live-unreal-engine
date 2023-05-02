@@ -65,7 +65,7 @@ void ASmartsuitController::Tick(float DeltaTime)
 		return;
 	}
 
-	FSuitData *data = listener->GetSmartsuit(suitname);
+	FRkkActorData *data = listener->GetSmartsuit(suitname);
 	if (!data) 
 	{
 		return;

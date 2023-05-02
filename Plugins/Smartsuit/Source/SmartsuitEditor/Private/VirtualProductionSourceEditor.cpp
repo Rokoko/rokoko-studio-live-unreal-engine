@@ -1,6 +1,7 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "VirtualProductionSourceEditor.h"
+#include "VirtualProductionSource.h"
 #include "LiveLinkMessageBusFinder.h"
 #include "Widgets/Layout/SBox.h"
 

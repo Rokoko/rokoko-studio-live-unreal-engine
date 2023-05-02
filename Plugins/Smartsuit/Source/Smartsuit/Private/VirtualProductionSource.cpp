@@ -45,8 +45,6 @@ FVirtualProductionSource::~FVirtualProductionSource()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Destroying Virtual production source!!!"));
 
-
-
 	// Stop the runnable
 	Stop();
 	ClearAllSubjects();
@@ -101,14 +99,14 @@ void FVirtualProductionSource::ClearAllSubjects()
 	{
 		HandleClearSubject(faceNames[i]);
 	}
-	for (int i = 0; i < suitNames.Num(); i++) 
+	for (int i = 0; i < actorNames.Num(); i++) 
 	{
-		HandleClearSubject(suitNames[i]);
+		HandleClearSubject(actorNames[i]);
 	}
 
 	subjectNames.Empty();
 	faceNames.Empty();
-	suitNames.Empty();
+	actorNames.Empty();
 }
 
 bool FVirtualProductionSource::RequestSourceShutdown()
@@ -262,9 +260,9 @@ void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtu
 	//UE_LOG(LogTemp, Warning, TEXT("SKELETON!! "), skeleton);
 }
 	
-void FVirtualProductionSource::HandleSuitData(FSuitData suit) 
+void FVirtualProductionSource::HandleSuitData(FRkkActorData suit) 
 {
-	suitNames.Add(suit.GetSubjectName());
+	actorNames.Add(suit.GetSubjectName());
 
 	FLiveLinkSubjectKey Key = FLiveLinkSubjectKey(SourceGuid, suit.GetSubjectName());
 
@@ -455,187 +453,62 @@ void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32
 	int32 transformIndex = transforms.AddUninitialized(1);
 	if (!sensor)
 	{
-		transforms[transformIndex].SetLocation(FVector(0, 0, 0));
+		transforms[transformIndex].SetLocation(FVector::ZeroVector);
 		transforms[transformIndex].SetRotation(FQuat::Identity);
-		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
+		transforms[transformIndex].SetScale3D(FVector::OneVector);
 	}
-	//else if (parent)
-	//{
-	//	FQuat parentRealRotation;
-	//	if (index == -1)
-	//	{
-	//		parentRealRotation = parent->Uquaternion() * FQuat::MakeFromEuler(FVector(0, 0, 180));
-	//	}
-	//	else
-	//	{
-	//		parentRealRotation = parent->Uquaternion();
-	//	}
-
-	//	//FVector realSensorPosition;
-	//	//float chestOffset = 20;
-	//	//if (sensor->addr == SENSOR_NECK) {
-	//	//	realSensorPosition
-	//	//
-	//	//} else if (sensor->addr == SENSOR_LEFT_SHOULDER || sensor->addr == SENSOR_RIGHT_SHOULDER) {
-	//	//	FVector direction = sensor->UPosition();
-	//	//	direction.Normalize();
-	//	//	realSensorPosition = sensor->UPosition() + (direction * (-chestOffset));
-	//	//}
-	//	//else {
-	//	//	realSensorPosition = sensor->UPosition();
-	//	//}
-
-
-	//	//FVector realParentPosition;
-	//	//if (parent->addr == SENSOR_CHEST) {
-
-	//	//}
-	//	//else {
-	//	//	realParentPosition = parent->UPosition();
-	//	//}
-	//	if (sensor->name == SmartsuitBones::neck)
-	//	{
-	//		transforms[transformIndex].SetLocation(FVector(0, 20.150345, 0));
-	//	}
-	//	else if (sensor->name == SmartsuitBones::rightShoulder)
-	//	{
-	//		transforms[transformIndex].SetLocation(FVector(7, 12.368073, 1.90378));
-	//	}
-	//	else if (sensor->name == SmartsuitBones::leftShoulder)
-	//	{
-	//		transforms[transformIndex].SetLocation(FVector(-7, 12.368073, 1.90378));
-	//	}
-	//	else
-	//	{
-	//		transforms[transformIndex].SetLocation(parentRealRotation.Inverse() * (sensor->UPosition() - parent->UPosition()));
-	//	}
-	//	transforms[transformIndex].SetRotation(parentRealRotation.Inverse() * sensor->Uquaternion());
-	//	transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
-	//}
 	else
 	{
 		FQuat modifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
 		transforms[transformIndex].SetLocation(sensor->UPosition());
 		transforms[transformIndex].SetRotation(sensor->Uquaternion() /** modifier*/);
-		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
+		transforms[transformIndex].SetScale3D(FVector::OneVector);
 	}
 }
 
 
-/*
-void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32 index, Sensor* parent, Sensor* sensor) {
-	
-	int32 transformIndex = transforms.AddUninitialized(1);
-	if (!sensor) 
-	{
-		transforms[transformIndex].SetLocation(FVector(0, 0, 0));
-		transforms[transformIndex].SetRotation(FQuat::Identity);
-		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
-	} 
-	else if (parent) 
-	{
-		FQuat parentRealRotation;
-		if (index == -1) 
-		{
-			parentRealRotation = parent->Uquaternion() * FQuat::MakeFromEuler(FVector(0, 0, 180));
-		}
-		else 
-		{
-			parentRealRotation = parent->Uquaternion();
-		}
-
-		//FVector realSensorPosition;
-		//float chestOffset = 20;
-		//if (sensor->addr == SENSOR_NECK) {
-		//	realSensorPosition 
-		//	
-		//} else if (sensor->addr == SENSOR_LEFT_SHOULDER || sensor->addr == SENSOR_RIGHT_SHOULDER) {
-		//	FVector direction = sensor->UPosition();
-		//	direction.Normalize();
-		//	realSensorPosition = sensor->UPosition() + (direction * (-chestOffset));
-		//}
-		//else {
-		//	realSensorPosition = sensor->UPosition();
-		//}
-
-		
-		//FVector realParentPosition;
-		//if (parent->addr == SENSOR_CHEST) {
-
-		//}
-		//else {
-		//	realParentPosition = parent->UPosition();
-		//}
-		if (sensor->addr == SENSOR_NECK) 
-		{
-			transforms[transformIndex].SetLocation(FVector(0, 20.150345, 0));
-		}
-		else if (sensor->addr == SENSOR_RIGHT_SHOULDER) 
-		{
-			transforms[transformIndex].SetLocation(FVector(7, 12.368073, 1.90378));
-		}
-		else if (sensor->addr == SENSOR_LEFT_SHOULDER) 
-		{
-			transforms[transformIndex].SetLocation(FVector(-7, 12.368073, 1.90378));
-		}
-		else 
-		{
-			transforms[transformIndex].SetLocation(parentRealRotation.Inverse() * (sensor->UPosition() - parent->UPosition()));
-		}
-		transforms[transformIndex].SetRotation(parentRealRotation.Inverse() * sensor->Uquaternion());
-		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
-	}
-	else 
-	{
-		FQuat modifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
-		transforms[transformIndex].SetLocation(sensor->UPosition());
-		transforms[transformIndex].SetRotation(sensor->Uquaternion() * modifier);
-		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
-	}
-}
-*/
-void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits) 
+void FVirtualProductionSource::HandleSuits(TArray<FRkkActorData> suits) 
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Handling faces %d"), faces.Num());
-	existingSuits.Empty();
+	existingActors.Empty();
 	notExistingSubjects.Empty();
 	for (int subjectIndex = 0; subjectIndex < suits.Num(); subjectIndex++) 
 	{
-		FSuitData subject = suits[subjectIndex];
+		FRkkActorData subject = suits[subjectIndex];
 
 		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
 		bool nameExists = false;
-		for (int suitNameIndex = 0; suitNameIndex < suitNames.Num(); suitNameIndex++) 
+		for (int suitNameIndex = 0; suitNameIndex < actorNames.Num(); suitNameIndex++) 
 		{
-			if (subject.GetSubjectName() == suitNames[suitNameIndex]) 
+			if (subject.GetSubjectName() == actorNames[suitNameIndex]) 
 			{
 				nameExists = true;
-				existingSuits.Add(subject);
+				existingActors.Add(subject);
 				break;
 			}
 		}
 
 		if (!nameExists) 
 		{
-			existingSuits.Add(subject);
+			existingActors.Add(subject);
 			HandleSuitData(subject);
 		}
 		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
 		if (subjectIndex == suits.Num() - 1) 
 		{
-			for (int i = 0; i < suitNames.Num(); i++) 
+			for (int i = 0; i < actorNames.Num(); i++) 
 			{
 				bool subjectExists = false;
-				for (int j = 0; j < existingSuits.Num(); j++) 
+				for (int j = 0; j < existingActors.Num(); j++) 
 				{
-					if (suitNames[i] == existingSuits[j].GetSubjectName()) 
+					if (actorNames[i] == existingActors[j].GetSubjectName()) 
 					{
 						subjectExists = true;
 					}
 				}
 				if (!subjectExists) 
 				{
-					notExistingSubjects.Add(suitNames[i]);
+					notExistingSubjects.Add(actorNames[i]);
 				}
 			}
 
@@ -643,7 +516,7 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("Removing face"));
 				Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, notExistingSubjects[i]));
-				suitNames.RemoveSingle(notExistingSubjects[i]);
+				actorNames.RemoveSingle(notExistingSubjects[i]);
 				notExistingSubjects.RemoveAt(i);
 			}
 		}
@@ -666,9 +539,9 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 		transforms.Reset(62);
 		int32 transformIndex = transforms.AddUninitialized(1);
 		
-		transforms[transformIndex].SetLocation(FVector(0, 0, 0));
+		transforms[transformIndex].SetLocation(FVector::ZeroVector);
 		transforms[transformIndex].SetRotation(FQuat::Identity);
-		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
+		transforms[transformIndex].SetScale3D(FVector::OneVector);
 
 		
 		CreateJoint(transforms, 0, nullptr, subject.Hip());
@@ -949,7 +822,7 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 		FTransform hardCodedTransform;
 		hardCodedTransform.SetTranslation(subject.position);
 		hardCodedTransform.SetRotation(subject.rotation);
-		hardCodedTransform.SetScale3D(FVector(1, 1, 1));
+		hardCodedTransform.SetScale3D(FVector::OneVector);
 
 		if (subject.name.ToString().StartsWith("prop"))
 		{
@@ -1070,35 +943,6 @@ void URokokoFaceMapData::Initialize()
 	InitializeTMap();
 }
 
-//VPStreamingNetwork::VPStreamingNetwork()
-//{
-//}
-//
-//
-//VPStreamingNetwork::~VPStreamingNetwork()
-//{
-//	// Stop the runnable
-//	Stop();
-//	auto livelink = FVirtualProductionSource::Get();
-//	if (livelink.IsValid())
-//	{
-//		livelink->ClearAllSubjects();
-//	}
-//	//livelink->HandleClearSubject(FLiveLinkClearSubject(FString("subjectNames")));
-//
-//	if (Socket)
-//	{
-//		Socket->Close();
-//	}
-//
-//	// And last but not least stop the main thread
-//	if (Thread != NULL)
-//	{
-//		Thread->Kill(true);
-//		delete Thread;
-//	}
-//}
-
 
 void FVirtualProductionSource::StartRunnable(int port)
 {
@@ -1141,34 +985,16 @@ FString BytesToStringFixed(const uint8* In, int32 Count)
 
 void FVirtualProductionSource::SendToLiveLink(TArray<FVirtualProductionSubject> Subjects)
 {
-	//auto livelink = FVirtualProductionSource::Get();
-	//if (livelink.IsValid())
-	//{
-	//	livelink->HandleSubjectFrame(Subjects);
-	//}
-
 	HandleSubjectFrame(Subjects);
 }
 
 void FVirtualProductionSource::SendFacesToLivelink(TArray<FFace> Subjects)
 {
-	//auto livelink = FVirtualProductionSource::Get();
-	//if (livelink.IsValid())
-	//{
-	//	livelink->HandleFace(Subjects);
-	//}
-
 	HandleFace(Subjects);
 }
 
-void FVirtualProductionSource::SendSuitsToLiveLink(TArray<FSuitData> Smartsuits)
+void FVirtualProductionSource::SendSuitsToLiveLink(TArray<FRkkActorData> Smartsuits)
 {
-	//auto livelink = FVirtualProductionSource::Get();
-	//if (livelink.IsValid())
-	//{
-	//	livelink->HandleSuits(Smartsuits);
-	//}
-
 	HandleSuits(Smartsuits);
 
 }
@@ -1201,10 +1027,10 @@ uint32 FVirtualProductionSource::Run()
 				//FGraphEventRef Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]()
 				//{
 				if (Stopping) break;
-				mtx.lock();
+				
 				FVirtualProductionFrame VPFrame;
 
-				int32 UncompressedSize = 2097152;
+				constexpr int32 UncompressedSize{ 2097152 };
 
 				TArray<uint8> UncompressedData;
 				UncompressedData.Empty(UncompressedSize);
@@ -1217,17 +1043,7 @@ uint32 FVirtualProductionSource::Run()
 				//}
 
 
-				//IFileManager* FileManager = &IFileManager::Get();
 				uint32 WriteFlags = 0;
-
-				//FString path = "C:/GitHub/rokoko-studio-live-unreal-engine_JSONV3/test12345678.lz4";
-				//TUniquePtr<FArchive> Ar = TUniquePtr<FArchive>(FileManager->CreateFileWriter(*path, WriteFlags));
-				//if (!Ar)
-				//{
-				//	UE_LOG(LogTemp, Error, TEXT("Could not write file %s!"), bytes_read, UncompressedSize, data, *FormatName.ToString());
-				//}
-				//Ar->Serialize(const_cast<uint8*>(data), bytes_read);
-				//Ar->Close();
 
 
 				size_t srcSize = (size_t)bytes_read;
@@ -1240,26 +1056,9 @@ uint32 FVirtualProductionSource::Run()
 				if (srcSize != (size_t)bytes_read) { UE_LOG(LogTemp, Error, TEXT("Error decompressing frame : read size incorrect \n")); }
 
 
-				//FString path2 = "C:/GitHub/rokoko-studio-live-unreal-engine_JSONV3/3actorstest.txt";
-				//TUniquePtr<FArchive> Ar2 = TUniquePtr<FArchive>(FileManager->CreateFileWriter(*path2, WriteFlags));
-				//if (!Ar2)
-				//{
-				//	UE_LOG(LogTemp, Error, TEXT("Could not write file %s!"), *path2);
-				//}
-				//Ar2->Serialize(UncompressedData.GetData(), dstSize);
-				//Ar2->Close();
-
-
-
-
 				FString result = BytesToStringFixed(UncompressedData.GetData(), static_cast<int32_t>(dstSize));
 				FString test = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
-				//FString result = BytesToString(UncompressedData.GetData(), static_cast<int32_t>(UncompressedData.Num()));
-				//FString result = BytesToStringFixed(UncompressedData.GetData(), UncompressedData.Num());
-				//FString result = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
-				//UE_LOG(LogTemp, Warning, TEXT("received: %s"), *result);
-				//FJsonObjectConverter::JsonObjectStringToUStruct(result, &VPFrame, 0, 0);
-
+				
 				TSharedPtr<FJsonObject> JsonObject;
 				TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(result);
 				if (FJsonSerializer::Deserialize(Reader, JsonObject))
@@ -1284,7 +1083,7 @@ uint32 FVirtualProductionSource::Run()
 							TArray<TSharedPtr<FJsonValue>> Livesuitsarray = SceneObj->GetArrayField("actors");
 							for (auto& currentsuit : Livesuitsarray)
 							{
-								auto SuitData = FSuitData(true, currentsuit->AsObject());
+								auto SuitData = FRkkActorData(true, currentsuit->AsObject());
 								if (SuitData.hasFace)
 								{
 									auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
@@ -1296,81 +1095,15 @@ uint32 FVirtualProductionSource::Run()
 							}
 						}
 					}
-
-					////LIVE
-					//{
-					//	TSharedPtr<FJsonObject> LiveObj = JsonObject->GetObjectField("live");
-					//	TArray<TSharedPtr<FJsonValue>> Livepropsarray = LiveObj->GetArrayField("props");
-
-					//	for (auto& currentprop : Livepropsarray)
-					//	{
-					//		VPFrame.props.Add(FProp(true, currentprop->AsObject()));
-					//	}
-
-					//	if (LiveObj->HasField("actors"))
-					//	{
-					//		TArray<TSharedPtr<FJsonValue>> Livesuitsarray = LiveObj->GetArrayField("actors");
-					//		for (auto& currentsuit : Livesuitsarray)
-					//		{
-					//			auto SuitData = FSuitData(true, currentsuit->AsObject());
-					//			if (SuitData.hasFace)
-					//			{
-					//				auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
-					//				auto FaceData = FFace(JSONObjectface, SuitData.suitname);
-					//				SuitData.faceId = FaceData.faceId;
-					//				VPFrame.faces.Add(FaceData);
-					//			}
-					//			VPFrame.suits.Add(SuitData);
-					//		}
-					//	}
-					//}
-
-					////PLAYBACK
-					//{
-					//	TSharedPtr<FJsonObject> PlaybackObj = JsonObject->GetObjectField("playback");
-					//	TArray<TSharedPtr<FJsonValue>> Playbackpropsarray = PlaybackObj->GetArrayField("props");
-
-					//	for (auto& currentprop : Playbackpropsarray)
-					//	{
-					//		VPFrame.props.Add(FProp(false, currentprop->AsObject()));
-					//	}
-
-					//	if (PlaybackObj->HasField("actors"))
-					//	{
-					//		TArray<TSharedPtr<FJsonValue>> Playbacksuitsarray = PlaybackObj->GetArrayField("actors");
-					//		for (auto& currentsuit : Playbacksuitsarray)
-					//		{
-					//			auto SuitData = FSuitData(false, currentsuit->AsObject());
-					//			if (SuitData.hasFace)
-					//			{
-					//				auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
-					//				auto FaceData = FFace(JSONObjectface, SuitData.suitname);
-					//				SuitData.faceId = FaceData.faceId;
-					//				VPFrame.faces.Add(FaceData);
-					//			}
-					//			VPFrame.suits.Add(SuitData);
-					//		}
-					//	}
-					//}
-
-
-
-
-
 				}
 
+				mtx.lock();
 
-				//if (!GlobalVPFrame)
-				//{
-				//	GlobalVPFrame = new FVirtualProductionFrame();
-				//}
 				GlobalVPFrame.version = VPFrame.version;
 				GlobalVPFrame.props.Empty();
 				GlobalVPFrame.trackers.Empty();
 				GlobalVPFrame.faces.Empty();
 				GlobalVPFrame.suits.Empty();
-
-				//auto livelink = FVirtualProductionSource::Get();
 
 				//if (livelink.IsValid())
 				{
@@ -1399,26 +1132,7 @@ uint32 FVirtualProductionSource::Run()
 					SendFacesToLivelink(GlobalVPFrame.faces);
 					SendSuitsToLiveLink(GlobalVPFrame.suits);
 				}
-				//else
-				//{
-				//	for (int i = 0; i < VPFrame.props.Num(); i++)
-				//	{
-				//		GlobalVPFrame.props.Add(VPFrame.props[i]);
-				//	}
-				//	for (int i = 0; i < VPFrame.trackers.Num(); i++)
-				//	{
-				//		GlobalVPFrame.trackers.Add(VPFrame.trackers[i]);
-				//	}
-				//	for (int i = 0; i < VPFrame.faces.Num(); i++)
-				//	{
-				//		//UE_LOG(LogTemp, Warning, TEXT("face: %d - %s - %f"), VPFrame.faces[i].version, *VPFrame.faces[i].provider, VPFrame.faces[i].jawOpen);
-				//		GlobalVPFrame.faces.Add(VPFrame.faces[i]);
-				//	}
-				//	for (int i = 0; i < VPFrame.suits.Num(); i++)
-				//	{
-				//		GlobalVPFrame.suits.Add(VPFrame.suits[i]);
-				//	}
-				//}
+				
 				//UE_LOG(LogTemp, Warning, TEXT("Faces... %i"), GlobalVPFrame.faces.Num());
 				mtx.unlock();
 				//}, TStatId(), NULL, ENamedThreads::GameThread);
@@ -1436,7 +1150,6 @@ FProp* FVirtualProductionSource::GetPropByName(FString name, bool isLive)
 {
 	FProp* result = nullptr;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
 		for (int i = 0; i < GlobalVPFrame.props.Num(); i++)
 		{
@@ -1452,29 +1165,23 @@ FProp* FVirtualProductionSource::GetPropByName(FString name, bool isLive)
 
 TArray<FProp> FVirtualProductionSource::GetAllProps()
 {
-	//return nullptr;
 	TArray<FProp> result;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
 		for (int i = 0; i < GlobalVPFrame.props.Num(); i++)
 		{
 			result.Add(GlobalVPFrame.props[i]);
-			//result->Add
 		}
 	}
 	mtx.unlock();
 	//UE_LOG(LogTemp, Display, TEXT("Yeeee3"));
 	return result;
-
-	//return GlobalVPFrame.props;
 }
 
 FTracker* FVirtualProductionSource::GetTrackerByName(FString name, bool isLive)
 {
 	FTracker* result = nullptr;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
 		for (int i = 0; i < GlobalVPFrame.trackers.Num(); i++)
 		{
@@ -1492,7 +1199,6 @@ FTracker* FVirtualProductionSource::GetTrackerByConnectionID(const FString& name
 {
 	FTracker* result = nullptr;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
 		for (int i = 0; i < GlobalVPFrame.trackers.Num(); i++)
 		{
@@ -1510,7 +1216,6 @@ TArray<FTracker> FVirtualProductionSource::GetTrackersWithMatchingId(FString Con
 {
 	TArray<FTracker> result;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
 		for (int i = 0; i < GlobalVPFrame.trackers.Num(); i++)
 		{
@@ -1524,22 +1229,22 @@ TArray<FTracker> FVirtualProductionSource::GetTrackersWithMatchingId(FString Con
 	return result;
 }
 
-FSuitData* FVirtualProductionSource::GetSmartsuitByName(FString suitName)
+FRkkActorData* FVirtualProductionSource::GetSmartsuitByName(FString suitName)
 {
-	if (suitName.Len() == 0 || suitName.Compare(FString("")) == 0)
+	
+	if (suitName.IsEmpty() || suitName.Compare(FString("")) == 0)
 	{
 		return nullptr;
 	}
 
-	FSuitData* result = nullptr;
+	FRkkActorData* result = nullptr;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
 		//should probably set the limit to the size of the suit array here?
 		for (int i = 0; i < GlobalVPFrame.suits.Num(); i++)
 		{
 			FString mySuitName(GlobalVPFrame.suits[i].suitname);
-			if (suitName.Compare(mySuitName) == 0 && mySuitName.Len() > 0)
+			if (suitName.Compare(mySuitName) == 0 && !mySuitName.IsEmpty())
 			{
 				result = &(GlobalVPFrame.suits[i]);
 			}
@@ -1554,7 +1259,6 @@ TArray<FString> FVirtualProductionSource::GetAvailableSmartsuitNames()
 	TArray<FString> result;
 	//maybe we should set the limit to the size of the suits array
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
 		for (int i = 0; i < GlobalVPFrame.suits.Num(); i++)
 		{
@@ -1568,12 +1272,11 @@ TArray<FString> FVirtualProductionSource::GetAvailableSmartsuitNames()
 	return result;
 }
 
-TArray<FSuitData> FVirtualProductionSource::GetAllSmartsuits()
+TArray<FRkkActorData> FVirtualProductionSource::GetAllSmartsuits()
 {
-	TArray<FSuitData> suits;
+	TArray<FRkkActorData> suits;
 	//maybe we should set the limit to the size of the suits array
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
 		for (int i = 0; i < GlobalVPFrame.suits.Num(); i++)
 		{
@@ -1591,7 +1294,6 @@ FFace FVirtualProductionSource::GetFaceByFaceID(FString faceID)
 {
 	FFace result;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
 		for (int i = 0; i < GlobalVPFrame.faces.Num(); i++)
 		{
@@ -1611,7 +1313,6 @@ FFace* FVirtualProductionSource::GetFaceByProfileName(const FString& profileName
 {
 	FFace* result = nullptr;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
 		for (int i = 0; i < GlobalVPFrame.faces.Num(); i++)
 		{
@@ -1631,17 +1332,13 @@ TArray<FFace> FVirtualProductionSource::GetAllFaces()
 {
 	TArray<FFace> result;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
 		for (int i = 0; i < GlobalVPFrame.faces.Num(); i++)
 		{
 			result.Add(GlobalVPFrame.faces[i]);
-			//result->Add
 		}
 	}
 	mtx.unlock();
 
 	return result;
-
-	//return GlobalVPFrame.faces;
 }

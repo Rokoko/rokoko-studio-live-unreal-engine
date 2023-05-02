@@ -5,13 +5,10 @@
 #include "CoreMinimal.h"
 #include "Dom/JsonValue.h"
 #include "Dom/JsonObject.h"
-//#include "SmartsuitBlueprintLibrary.h"
 #include "Runtime/Launch/Resources/Version.h"
-#include "SmartsuitDefinitions.h"
+#include "RokokoSkeletonData.h"
 #include "VirtualProductionFrame.generated.h"
 
-
-//#include "JsonUtilities.h"
 
 class VirtualProductionFrame
 {
@@ -398,7 +395,7 @@ struct FVirtualProductionFrame {
 	TArray<FFace> faces;
 
 	UPROPERTY()
-	TArray<FSuitData> suits;
+	TArray<FRkkActorData> suits;
 
 	//FVirtualProductionFrame (){}
 };

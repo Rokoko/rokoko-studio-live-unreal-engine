@@ -3,9 +3,8 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "SmartsuitStreamingNetwork.h"
 #include "SmartsuitReceiver.h"
-#include "SmartsuitDefinitions.h"
+#include "RokokoSkeletonData.h"
 
 #include "SmartsuitController.generated.h"
 

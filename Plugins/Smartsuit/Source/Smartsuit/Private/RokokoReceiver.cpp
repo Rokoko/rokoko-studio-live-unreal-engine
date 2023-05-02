@@ -2,7 +2,7 @@
 
 #include "SmartsuitReceiver.h"
 #include "Smartsuit.h"
-
+#include "VirtualProductionSource.h"
 
 
 // Sets default values
@@ -118,10 +118,10 @@ TArray<FFace> ARokokoReceiver::GetFacesNotAssociatedWithActor()
 	return FacesNotPairedWithSuit;
 }
 
-FSuitData* ARokokoReceiver::GetSmartsuit(FString suitName)
+FRkkActorData* ARokokoReceiver::GetSmartsuit(FString suitName)
 {
 	//return VPlistener.GetSmartsuitByName(suitName);
-	FSuitData* ReturnValue = nullptr;
+	FRkkActorData* ReturnValue = nullptr;
 	auto livelink = FVirtualProductionSource::Get();
 	if (livelink.IsValid())
 	{
@@ -135,24 +135,24 @@ FSuitData* ARokokoReceiver::GetSmartsuit(FString suitName)
 	return ReturnValue;
 }
 
-bool ARokokoReceiver::GetSmartsuitByName(const FString& suitName, FSuitData& SuitData)
+bool ARokokoReceiver::GetSmartsuitByName(const FString& suitName, FRkkActorData& SuitData)
 {
 	//return *VPlistener.GetSmartsuitByName(suitName);
 
-	if (FSuitData* smartsuit = GetSmartsuit(suitName))
+	if (FRkkActorData* smartsuit = GetSmartsuit(suitName))
 	{
 		SuitData = *smartsuit;
 		return true;
 	}
-	SuitData = FSuitData();
+	SuitData = FRkkActorData();
 	return false;
 }
 
-TArray<FSuitData> ARokokoReceiver::GetAllSmartsuits()
+TArray<FRkkActorData> ARokokoReceiver::GetAllSmartsuits()
 {
 	//return VPlistener.GetAllSmartsuits();
 
-	TArray<FSuitData> Smartsuits;
+	TArray<FRkkActorData> Smartsuits;
 	auto livelink = FVirtualProductionSource::Get();
 	if (livelink.IsValid())
 	{
@@ -297,9 +297,4 @@ FTracker ARokokoReceiver::GetTrackerByConnectionIDFromVP(const FString& name, bo
 		found = true;
 	}
 	return returnval;
-}
-
-void ARokokoReceiver::SetSupportsWiFiAPI(FString suitname)
-{
-	//listener.wifiSupportedSuits.Add(suitname);
 }
