@@ -1,6 +1,6 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
-#include "SmartsuitReceiver.h"
+#include "RokokoReceiver.h"
 #include "Smartsuit.h"
 #include "VirtualProductionSource.h"
 
