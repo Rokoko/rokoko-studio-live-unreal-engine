@@ -1,7 +1,6 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "SmartsuitPoseNode.h"
-#include "Smartsuit.h"
 #include "AnimationRuntime.h"
 #include "LiveLinkCustomVersion.h"
 #include "LiveLinkClient.h"
@@ -312,7 +311,7 @@ float FSmartsuitPoseNode::ScaleBonesToDistance(FBoneReference scaleBone, FBoneRe
 //	return FVector::ZeroVector;
 //}
 
-FQuat GetRotation2(const FName& BoneName, FRkkActorData* suitdata)
+FQuat GetRotation2(const FName& BoneName, FSuitData* suitdata)
 {
 	if (auto SmartsuitBone = suitdata->bones.Find(BoneName))
 	{
@@ -322,7 +321,7 @@ FQuat GetRotation2(const FName& BoneName, FRkkActorData* suitdata)
 	return FQuat::Identity;
 }
 
-FVector GetPosition2(const FName& BoneName, FRkkActorData* suitdata)
+FVector GetPosition2(const FName& BoneName, FSuitData* suitdata)
 {
 	if (auto SmartsuitBone = suitdata->bones.Find(BoneName))
 	{
@@ -378,7 +377,7 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 		//UE_LOG(LogTemp, Warning, TEXT("No receiver"));
 		//return;
 	}
-	FRkkActorData* data = nullptr;//receiver->GetSmartsuit(Controller->suitname);
+	FSuitData* data = nullptr;//receiver->GetSmartsuit(Controller->suitname);
 	if (!data) 
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("No data for %s"), *Controller->suitname);

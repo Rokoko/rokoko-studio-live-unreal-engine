@@ -7,7 +7,7 @@
 #include "LiveLinkCustomVersion.h"
 #include "LiveLinkRemapAsset.h"
 #include "LiveLinkTypes.h"
-#include "SmartsuitReceiver.h"
+#include "RokokoReceiver.h"
 #include "SmartsuitController.h"
 #include "SmartsuitTPose.h"
 #include "SmartsuitPoseNode.generated.h"

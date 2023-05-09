@@ -321,7 +321,7 @@ public:
 class SMARTSUIT_API FVirtualProductionSource : public ILiveLinkSource, public FRunnable
 {
 public:
-	FVirtualProductionSource(const FText& InSourceType, const FText& InSourceMachineName, const FMessageAddress& InConnectionAddress);
+	FVirtualProductionSource(FIPv4Endpoint address, const FText& InSourceType, const FText& InSourceMachineName, const FMessageAddress& InConnectionAddress);
 	
 	FVirtualProductionSource()
 	{
@@ -339,9 +339,9 @@ public:
 	virtual FText GetSourceStatus() const { return SourceStatus; }
 	static TSharedPtr<FVirtualProductionSource> Get() { return instance; }
 
-	void HandleSubjectFrame(TArray<FVirtualProductionSubject> virtualProductionObject);
-	void HandleFace(TArray<FFace> faces);
-	void HandleSuits(TArray<FRkkActorData> suits);
+	void HandleSubjectFrame(const TArray<FVirtualProductionSubject>& virtualProductionObject);
+	void HandleFace(const TArray<FFace>& faces);
+	void HandleSuits(const TArray<FSuitData>& suits);
 	void ClearAllSubjects();
 
 	static void SetInstance(TSharedPtr<FVirtualProductionSource> NewInstance) { instance = NewInstance; }
@@ -350,10 +350,10 @@ public:
 	static void RemoveLiveLinkSource(TSharedPtr<FVirtualProductionSource> InSource);
 private:
 	void HandleClearSubject(const FName subjectName);
-	void HandleSubjectData(FVirtualProductionSubject virtualProductionObject);
-	void HandleFaceData(FFace face);
-	void HandleSuitData(FRkkActorData suit);
-	void CreateJoint(TArray<FTransform>& transforms, int32 index, FSmartsuitBone* parent, FSmartsuitBone* sensor);
+	void HandleSubjectData(const FVirtualProductionSubject& virtualProductionObject);
+	void HandleFaceData(const FFace& face);
+	void HandleSuitData(const FSuitData& suit);
+	void CreateJoint(TArray<FTransform>& transforms, int32 index, const FSmartsuitBone* parent, const FSmartsuitBone* sensor);
 
 	TArray<FName> subjectNames;
 	TArray<FName> faceNames;
@@ -361,7 +361,7 @@ private:
 
 	TArray<FVirtualProductionSubject> existingSubjects;
 	TArray<FFace> existingFaces;
-	TArray<FRkkActorData> existingActors;
+	TArray<FSuitData> existingActors;
 
 	TArray<FName> notExistingSubjects;
 
@@ -379,7 +379,7 @@ private:
 
 public:
 	/// @private
-	virtual bool InitSocket(int port);
+	virtual bool InitSocket();
 
 	/// @private
 	virtual uint32 Run() override;
@@ -407,7 +407,7 @@ public:
 	*
 	* @param port The port number to bind.
 	*/
-	void StartRunnable(int port);
+	void StartRunnable();
 
 	/// @private
 	virtual void Exit() override { }
@@ -419,9 +419,9 @@ public:
 	FTracker* GetTrackerByConnectionID(const FString& name, bool isLive);
 	TArray<FTracker> GetTrackersWithMatchingId(FString name, bool isLive);
 
-	FRkkActorData* GetSmartsuitByName(FString suitName);
+	FSuitData* GetSmartsuitByName(FString suitName);
 	TArray<FString> GetAvailableSmartsuitNames();
-	TArray<FRkkActorData> GetAllSmartsuits();
+	TArray<FSuitData> GetAllSmartsuits();
 
 	FFace GetFaceByFaceID(FString faceID);
 	FFace* GetFaceByProfileName(const FString& profileName);
@@ -431,7 +431,11 @@ public:
 private:
 	std::mutex mtx;
 	
-	int streaming_port;
+	// network receiver data
+	FIPv4Endpoint			m_NetworkAddress;
+	bool					m_NetworkBindAnyAddress;
+	bool					m_NetworkBroadcast;
+
 	FSocket* Socket{ nullptr };
 	/** Used to tell that the thread is stopping */
 	bool Stopping;
@@ -440,8 +444,8 @@ private:
 	FRunnableThread* Thread{ nullptr };
 	FVirtualProductionFrame GlobalVPFrame;
 	TArray<FVirtualProductionSubject> subjects;
-	void SendToLiveLink(TArray<FVirtualProductionSubject> Subjects);
-	void SendFacesToLivelink(TArray<FFace> Subjects);
-	void SendSuitsToLiveLink(TArray<FRkkActorData> Smartsuits);
+	void SendToLiveLink(const TArray<FVirtualProductionSubject>& Subjects);
+	void SendFacesToLivelink(const TArray<FFace>& Subjects);
+	void SendSuitsToLiveLink(const TArray<FSuitData>& Smartsuits);
 
 };

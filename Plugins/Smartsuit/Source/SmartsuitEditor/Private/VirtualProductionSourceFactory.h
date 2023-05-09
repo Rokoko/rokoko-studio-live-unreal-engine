@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "LiveLinkSourceFactory.h"
 #include "LiveLinkMessageBusFinder.h"
+#include "VirtualProductionSourceEditor.h"
 #include "VirtualProductionSourceFactory.generated.h"
 
 class SVirtualProductionSourceEditor;
@@ -22,5 +23,5 @@ class UVirtualProductionSourceFactory : public ULiveLinkSourceFactory
 	virtual TSharedPtr<ILiveLinkSource> CreateSource(const FString& ConnectionString) const override;
 
 private:
-	void OnSourceSelected(FProviderPollResultPtr SelectedSource, FOnLiveLinkSourceCreated OnLiveLinkSourceCreated) const;
+	void OnSourceSelected(SCreationInfo info, FProviderPollResultPtr SelectedSource, FOnLiveLinkSourceCreated OnLiveLinkSourceCreated) const;
 };

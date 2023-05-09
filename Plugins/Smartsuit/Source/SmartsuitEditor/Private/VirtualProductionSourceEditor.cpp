@@ -4,7 +4,7 @@
 #include "VirtualProductionSource.h"
 #include "LiveLinkMessageBusFinder.h"
 #include "Widgets/Layout/SBox.h"
-
+#include "Interfaces/IPv4/IPv4Endpoint.h"
 #include "MessageEndpointBuilder.h"
 
 #define LOCTEXT_NAMESPACE "VirtualProductionSourceEditor"
@@ -68,28 +68,61 @@ void SVirtualProductionSourceEditor::Construct(const FArguments& Args)
 	OnSourceSelected = Args._OnSourceSelected;
 	LastTickTime = 0.0;
 
+	// default values
+	FIPv4Address address(FIPv4Address::Any);
+
+	FIPv4Endpoint Endpoint;
+	Endpoint.Address = address;
+	Endpoint.Port = 14043;
+
 	ChildSlot
 		[
 			SNew(SBox)
 			.HeightOverride(200)
-		.WidthOverride(200)
-		[
-			SAssignNew(ListView, SListView<FProviderPollResultPtr>)
-			.ListItemsSource(&PollData)
-		.SelectionMode(ESelectionMode::SingleToggle)
-		.OnGenerateRow(this, &SVirtualProductionSourceEditor::MakeSourceListViewWidget)
-		.OnSelectionChanged(this, &SVirtualProductionSourceEditor::OnSourceListSelectionChanged)
-		.HeaderRow
-		(
-			SNew(SHeaderRow)
-			+ SHeaderRow::Column(ProviderPollUI::TypeColumnName)
-			.FillWidth(43.0f)
-			.DefaultLabel(LOCTEXT("TypeColumnHeaderName", "Source Type"))
-			+ SHeaderRow::Column(ProviderPollUI::MachineColumnName)
-			.FillWidth(43.0f)
-			.DefaultLabel(LOCTEXT("MachineColumnHeaderName", "Source Machine"))
-		)
-		]
+			.WidthOverride(200)
+			[
+				SNew(SVerticalBox)
+				+ SVerticalBox::Slot()
+				.AutoHeight()
+				[
+					SNew(SHorizontalBox)
+					+ SHorizontalBox::Slot()
+					.HAlign(HAlign_Left)
+					.FillWidth(0.5f)
+					[
+						SNew(STextBlock)
+						.Text(LOCTEXT("UDPAddress", "Network Address:Port"))
+					]
+					+ SHorizontalBox::Slot()
+					.HAlign(HAlign_Fill)
+					.FillWidth(0.5f)
+					[
+						SAssignNew(m_NetworkAddress, SEditableTextBox)
+						.Text(FText::FromString(Endpoint.ToString()))
+						.OnTextCommitted(this, &SVirtualProductionSourceEditor::OnEndpointChanged)
+					]
+				]
+				+ SVerticalBox::Slot()
+				.HAlign(HAlign_Right)
+				.AutoHeight()
+				[
+					SAssignNew(ListView, SListView<FProviderPollResultPtr>)
+					.ListItemsSource(&PollData)
+					.SelectionMode(ESelectionMode::SingleToggle)
+					.OnGenerateRow(this, &SVirtualProductionSourceEditor::MakeSourceListViewWidget)
+					.OnSelectionChanged(this, &SVirtualProductionSourceEditor::OnSourceListSelectionChanged)
+					.HeaderRow
+					(
+						SNew(SHeaderRow)
+						+ SHeaderRow::Column(ProviderPollUI::TypeColumnName)
+						.FillWidth(43.0f)
+						.DefaultLabel(LOCTEXT("TypeColumnHeaderName", "Source Type"))
+						+ SHeaderRow::Column(ProviderPollUI::MachineColumnName)
+						.FillWidth(43.0f)
+						.DefaultLabel(LOCTEXT("MachineColumnHeaderName", "Source Machine"))
+					)
+				]
+			]
 		];
 }
 
@@ -125,7 +158,35 @@ TSharedRef<ITableRow> SVirtualProductionSourceEditor::MakeSourceListViewWidget(F
 void SVirtualProductionSourceEditor::OnSourceListSelectionChanged(FProviderPollResultPtr PollResult, ESelectInfo::Type SelectionType)
 {
 	SelectedResult = PollResult;
-	OnSourceSelected.ExecuteIfBound(SelectedResult);
+
+	TSharedPtr<SEditableTextBox> address = m_NetworkAddress.Pin();
+	if (address.IsValid())
+	{
+		FIPv4Endpoint Endpoint;
+		if (FIPv4Endpoint::Parse(address->GetText().ToString(), Endpoint))
+		{
+			SCreationInfo info{
+				Endpoint
+			};
+
+			OnSourceSelected.ExecuteIfBound(info, SelectedResult);
+		}
+	}
+}
+
+void SVirtualProductionSourceEditor::OnEndpointChanged(const FText& NewValue, ETextCommit::Type)
+{
+	TSharedPtr<SEditableTextBox> address = m_NetworkAddress.Pin();
+	if (address.IsValid())
+	{
+		FIPv4Endpoint Endpoint;
+		if (!FIPv4Endpoint::Parse(NewValue.ToString(), Endpoint))
+		{
+			Endpoint.Address = FIPv4Address::Any;
+			Endpoint.Port = 14043;
+			address->SetText(FText::FromString(Endpoint.ToString()));
+		}
+	}
 }
 
 #undef LOCTEXT_NAMESPACE

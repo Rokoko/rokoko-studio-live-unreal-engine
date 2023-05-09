@@ -1,7 +1,6 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "RokokoReceiver.h"
-#include "Smartsuit.h"
 #include "VirtualProductionSource.h"
 
 
@@ -118,10 +117,10 @@ TArray<FFace> ARokokoReceiver::GetFacesNotAssociatedWithActor()
 	return FacesNotPairedWithSuit;
 }
 
-FRkkActorData* ARokokoReceiver::GetSmartsuit(FString suitName)
+FSuitData* ARokokoReceiver::GetSmartsuit(FString suitName)
 {
 	//return VPlistener.GetSmartsuitByName(suitName);
-	FRkkActorData* ReturnValue = nullptr;
+	FSuitData* ReturnValue = nullptr;
 	auto livelink = FVirtualProductionSource::Get();
 	if (livelink.IsValid())
 	{
@@ -135,24 +134,24 @@ FRkkActorData* ARokokoReceiver::GetSmartsuit(FString suitName)
 	return ReturnValue;
 }
 
-bool ARokokoReceiver::GetSmartsuitByName(const FString& suitName, FRkkActorData& SuitData)
+bool ARokokoReceiver::GetSmartsuitByName(const FString& suitName, FSuitData& SuitData)
 {
 	//return *VPlistener.GetSmartsuitByName(suitName);
 
-	if (FRkkActorData* smartsuit = GetSmartsuit(suitName))
+	if (FSuitData* smartsuit = GetSmartsuit(suitName))
 	{
 		SuitData = *smartsuit;
 		return true;
 	}
-	SuitData = FRkkActorData();
+	SuitData = FSuitData();
 	return false;
 }
 
-TArray<FRkkActorData> ARokokoReceiver::GetAllSmartsuits()
+TArray<FSuitData> ARokokoReceiver::GetAllSmartsuits()
 {
 	//return VPlistener.GetAllSmartsuits();
 
-	TArray<FRkkActorData> Smartsuits;
+	TArray<FSuitData> Smartsuits;
 	auto livelink = FVirtualProductionSource::Get();
 	if (livelink.IsValid())
 	{

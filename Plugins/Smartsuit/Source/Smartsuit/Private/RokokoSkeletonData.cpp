@@ -1,7 +1,6 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "RokokoSkeletonData.h"
-#include "Smartsuit.h"
 #include "SmartsuitBlueprintLibrary.h"
 
 namespace SmartsuitBones
@@ -79,7 +78,7 @@ SmartsuitDefinitions::~SmartsuitDefinitions()
 {
 }
 
-FRkkActorData::FRkkActorData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
+FSuitData::FSuitData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 {
 	suitname = jsonObject->GetStringField("name");
 
@@ -169,7 +168,7 @@ FRkkActorData::FRkkActorData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 	ParseBone(BodyObj, SmartsuitBones::rightLittleTip.ToString());
 }
 
-void FRkkActorData::ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& BoneName)
+void FSuitData::ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& BoneName)
 {
 	if (jsonObject->HasField(BoneName))
 	{

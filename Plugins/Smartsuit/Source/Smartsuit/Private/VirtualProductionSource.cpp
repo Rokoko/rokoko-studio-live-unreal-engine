@@ -12,33 +12,27 @@
 #include "Roles/LiveLinkSmartsuitTypes.h"
 
 #include "VirtualProductionFrame.h"
-#include "Smartsuit.h"
 #include "Runtime/Core/Public/Containers/UnrealString.h"
 //#include "Engine.h"
 #include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
 #include "Serialization/BufferArchive.h"
 #include "lz4frame.h"
-#include "SmartsuitReceiver.h"
+#include "RokokoReceiver.h"
 
 TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::instance = nullptr;
 
-FVirtualProductionSource::FVirtualProductionSource(const FText& InSourceType, const FText& InSourceMachineName, const FMessageAddress& InConnectionAddress)
+FVirtualProductionSource::FVirtualProductionSource(FIPv4Endpoint address, const FText& InSourceType, const FText& InSourceMachineName, const FMessageAddress& InConnectionAddress)
 	: SourceType(InSourceType)
 	, SourceMachineName(InSourceMachineName)
 {
 	Client = nullptr;
-
-	int32 RokokoPort = 0;
-	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
-	{
-		RokokoPort = It->RokokoPortNumber;
-		UE_LOG(LogTemp, Warning, TEXT("setting port to... %i"), RokokoPort);
-	}
-
+	
+	m_NetworkAddress = address;
+	
 	UE_LOG(LogTemp, Warning, TEXT("Creating Virtual production source!!!"));
 
-	InitSocket(RokokoPort);
-	StartRunnable(RokokoPort);
+	InitSocket();
+	StartRunnable();
 }
 
 FVirtualProductionSource::~FVirtualProductionSource()
@@ -116,7 +110,7 @@ bool FVirtualProductionSource::RequestSourceShutdown()
 	return true;
 }
 
-void FVirtualProductionSource::HandleFaceData(FFace face) 
+void FVirtualProductionSource::HandleFaceData(const FFace& face) 
 {
 	//verify(Client != nullptr);
 
@@ -134,64 +128,66 @@ void FVirtualProductionSource::HandleFaceData(FFace face)
 	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
 	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
 
-	
-	SkeletonData->PropertyNames.Add("browDownLeft");
-	SkeletonData->PropertyNames.Add("browDownRight");
-	SkeletonData->PropertyNames.Add("browInnerUp");
-	SkeletonData->PropertyNames.Add("browOuterUpLeft");
-	SkeletonData->PropertyNames.Add("browOuterUpRight");
-	SkeletonData->PropertyNames.Add("cheekPuff");
-	SkeletonData->PropertyNames.Add("cheekSquintLeft");
-	SkeletonData->PropertyNames.Add("cheekSquintRight");
-	SkeletonData->PropertyNames.Add("eyeBlinkLeft");
-	SkeletonData->PropertyNames.Add("eyeBlinkRight");
-	SkeletonData->PropertyNames.Add("eyeLookDownLeft");
-	SkeletonData->PropertyNames.Add("eyeLookDownRight");
-	SkeletonData->PropertyNames.Add("eyeLookInLeft");
-	SkeletonData->PropertyNames.Add("eyeLookInRight");
-	SkeletonData->PropertyNames.Add("eyeLookOutLeft");
-	SkeletonData->PropertyNames.Add("eyeLookOutRight");
-	SkeletonData->PropertyNames.Add("eyeLookUpLeft");
-	SkeletonData->PropertyNames.Add("eyeLookUpRight");
-	SkeletonData->PropertyNames.Add("eyeSquintLeft");
-	SkeletonData->PropertyNames.Add("eyeSquintRight");
-	SkeletonData->PropertyNames.Add("eyeWideLeft");
-	SkeletonData->PropertyNames.Add("eyeWideRight");
-	SkeletonData->PropertyNames.Add("jawOpen");
-	SkeletonData->PropertyNames.Add("jawForward");
-	SkeletonData->PropertyNames.Add("jawLeft");
-	SkeletonData->PropertyNames.Add("jawRight");
-	SkeletonData->PropertyNames.Add("mouthClose");
-	SkeletonData->PropertyNames.Add("mouthDimpleLeft");
-	SkeletonData->PropertyNames.Add("mouthDimpleRight");
-	SkeletonData->PropertyNames.Add("mouthFrownLeft");
-	SkeletonData->PropertyNames.Add("mouthFrownRight");
-	SkeletonData->PropertyNames.Add("mouthFunnel");
-	SkeletonData->PropertyNames.Add("mouthLeft");
-	SkeletonData->PropertyNames.Add("mouthLowerDownLeft");
-	SkeletonData->PropertyNames.Add("mouthLowerDownRight");
-	SkeletonData->PropertyNames.Add("mouthPressLeft");
-	SkeletonData->PropertyNames.Add("mouthPressRight");
-	SkeletonData->PropertyNames.Add("mouthPucker");
-	SkeletonData->PropertyNames.Add("mouthRight");
-	SkeletonData->PropertyNames.Add("mouthRollLower");
-	SkeletonData->PropertyNames.Add("mouthRollUpper");
-	SkeletonData->PropertyNames.Add("mouthShrugLower");
-	SkeletonData->PropertyNames.Add("mouthShrugUpper");
-	SkeletonData->PropertyNames.Add("mouthSmileLeft");
-	SkeletonData->PropertyNames.Add("mouthSmileRight");
-	SkeletonData->PropertyNames.Add("mouthStretchLeft");
-	SkeletonData->PropertyNames.Add("mouthStretchRight");
-	SkeletonData->PropertyNames.Add("mouthUpperUpLeft");
-	SkeletonData->PropertyNames.Add("mouthUpperUpRight");
-	SkeletonData->PropertyNames.Add("noseSneerLeft");
-	SkeletonData->PropertyNames.Add("noseSneerRight");
-	SkeletonData->PropertyNames.Add("tongueOut");
+	SkeletonData->PropertyNames.Append(
+		{ 
+			"browDownLeft",
+			"browDownRight",
+			"browInnerUp",
+			"browOuterUpLeft",
+			"browOuterUpRight",
+			"cheekPuff",
+			"cheekSquintLeft",
+			"cheekSquintRight",
+			"eyeBlinkLeft",
+			"eyeBlinkRight",
+			"eyeLookDownLeft",
+			"eyeLookDownRight",
+			"eyeLookInLeft",
+			"eyeLookInRight",
+			"eyeLookOutLeft",
+			"eyeLookOutRight",
+			"eyeLookUpLeft",
+			"eyeLookUpRight",
+			"eyeSquintLeft",
+			"eyeSquintRight",
+			"eyeWideLeft",
+			"eyeWideRight",
+			"jawOpen",
+			"jawForward",
+			"jawLeft",
+			"jawRight",
+			"mouthClose",
+			"mouthDimpleLeft",
+			"mouthDimpleRight",
+			"mouthFrownLeft",
+			"mouthFrownRight",
+			"mouthFunnel",
+			"mouthLeft",
+			"mouthLowerDownLeft",
+			"mouthLowerDownRight",
+			"mouthPressLeft",
+			"mouthPressRight",
+			"mouthPucker",
+			"mouthRight",
+			"mouthRollLower",
+			"mouthRollUpper",
+			"mouthShrugLower",
+			"mouthShrugUpper",
+			"mouthSmileLeft",
+			"mouthSmileRight",
+			"mouthStretchLeft",
+			"mouthStretchRight",
+			"mouthUpperUpLeft",
+			"mouthUpperUpRight",
+			"noseSneerLeft",
+			"noseSneerRight",
+			"tongueOut"
+		});
 
 	Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
 }
 
-void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtualProductionObject)
+void FVirtualProductionSource::HandleSubjectData(const FVirtualProductionSubject& virtualProductionObject)
 {
 	//verify(Client != nullptr);
 
@@ -260,169 +256,175 @@ void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtu
 	//UE_LOG(LogTemp, Warning, TEXT("SKELETON!! "), skeleton);
 }
 	
-void FVirtualProductionSource::HandleSuitData(FRkkActorData suit) 
+void FVirtualProductionSource::HandleSuitData(const FSuitData& suit) 
 {
 	actorNames.Add(suit.GetSubjectName());
 
 	FLiveLinkSubjectKey Key = FLiveLinkSubjectKey(SourceGuid, suit.GetSubjectName());
 
-	TArray<FName> boneNames;
-	boneNames.Add("Base");
-	boneNames.Add("hip");
-	boneNames.Add("spine");
-	boneNames.Add("chest");
-	boneNames.Add("neck");
-	boneNames.Add("head");
+	static TArray<FName> boneNames = 
+	{ 
+		"Base",
+		"hip",
+		"spine",
+		"chest",
+		"neck",
+		"head",
 
-	boneNames.Add("leftShoulder");
-	boneNames.Add("leftUpperArm");
-	boneNames.Add("leftLowerArm");
-	boneNames.Add("leftHand");
+		"leftShoulder",
+		"leftUpperArm",
+		"leftLowerArm",
+		"leftHand",
+
+		"rightShoulder",
+		"rightUpperArm",
+		"rightLowerArm",
+		"rightHand",
+
+		"leftUpLeg",
+		"leftLeg",
+		"leftFoot",
+
+		"rightUpLeg",
+		"rightLeg",
+		"rightFoot",
+
+		"leftThumbProximal",
+		"leftThumbMedial",
+		"leftThumbDistal",
+		"leftThumbTip",
+
+		"leftIndexProximal",
+		"leftIndexMedial",
+		"leftIndexDistal",
+		"leftIndexTip",
+
+		"leftMiddleProximal",
+		"leftMiddleMedial",
+		"leftMiddleDistal",
+		"leftMiddleTip",
+
+		"leftRingProximal",
+		"leftRingMedial",
+		"leftRingDistal",
+		"leftRingTip",
+
+		"leftLittleProximal",
+		"leftLittleMedial",
+		"leftLittleDistal",
+		"leftLittleTip",
+
+		"rightThumbProximal",
+		"rightThumbMedial",
+		"rightThumbDistal",
+		"rightThumbTip",
+
+		"rightIndexProximal",
+		"rightIndexMedial",
+		"rightIndexDistal",
+		"rightIndexTip",
+
+		"rightMiddleProximal",
+		"rightMiddleMedial",
+		"rightMiddleDistal",
+		"rightMiddleTip",
+
+		"rightRingProximal",
+		"rightRingMedial",
+		"rightRingDistal",
+		"rightRingTip",
+
+		"rightLittleProximal",
+		"rightLittleMedial",
+		"rightLittleDistal",
+		"rightLittleTip",
+
+		"leftToe",
+		"rightToe",
+	};
 	
-	boneNames.Add("rightShoulder");
-	boneNames.Add("rightUpperArm");
-	boneNames.Add("rightLowerArm");
-	boneNames.Add("rightHand");
 
-	boneNames.Add("leftUpLeg");
-	boneNames.Add("leftLeg");
-	boneNames.Add("leftFoot");
+	static TArray<int32> boneParents =
+	{
+		0, //0 - root
+		0, //1 - hip
+		1, //2 - spine
+		2, //3 - spine2
+		3, //4 - neck
+		4, //5 - head
 
-	boneNames.Add("rightUpLeg");
-	boneNames.Add("rightLeg");
-	boneNames.Add("rightFoot");
+		3, //6 - LeftShoulder
+		6, //7 - LeftArm
+		7, //8 - LeftForearm
+		8, //9 - LeftHand
 
-	boneNames.Add("leftThumbProximal");
-	boneNames.Add("leftThumbMedial");
-	boneNames.Add("leftThumbDistal");
-	boneNames.Add("leftThumbTip");
+		3, //10 - RightShoulder
+		10, //11 - RightArm
+		11, //12 - RightForearm
+		12, //13 - RightHand
 
-	boneNames.Add("leftIndexProximal");
-	boneNames.Add("leftIndexMedial");
-	boneNames.Add("leftIndexDistal");
-	boneNames.Add("leftIndexTip");
+		1, //14 - LeftUpLeg
+		14, //15 - LeftLeg
+		15, //16 - LeftFoot
 
-	boneNames.Add("leftMiddleProximal");
-	boneNames.Add("leftMiddleMedial");
-	boneNames.Add("leftMiddleDistal");
-	boneNames.Add("leftMiddleTip");
+		1, //17 - RightUpLeg
+		17, //18 - RightLeg
+		18, //19 - RightFoot
 
-	boneNames.Add("leftRingProximal");
-	boneNames.Add("leftRingMedial");
-	boneNames.Add("leftRingDistal");
-	boneNames.Add("leftRingTip");
+		9, //20 - leftThumbProximal
+		20, //21 - leftThumbMedial
+		21, //22 - leftThumbDistal
+		22, //23 - leftThumbTip
 
-	boneNames.Add("leftLittleProximal");
-	boneNames.Add("leftLittleMedial");
-	boneNames.Add("leftLittleDistal");
-	boneNames.Add("leftLittleTip");
+		9, //24 - leftIndexProximal
+		24, //25 - leftIndexMedial
+		25, //26 - leftIndexDistal
+		26, //27 - leftIndexTip
 
-	boneNames.Add("rightThumbProximal");
-	boneNames.Add("rightThumbMedial");
-	boneNames.Add("rightThumbDistal");
-	boneNames.Add("rightThumbTip");
+		9, //28 - leftMiddleProximal
+		28, //29 - leftMiddleMedial
+		29, //30 - leftMiddleDistal
+		30, //31 - leftMiddleTip
 
-	boneNames.Add("rightIndexProximal");
-	boneNames.Add("rightIndexMedial");
-	boneNames.Add("rightIndexDistal");
-	boneNames.Add("rightIndexTip");
+		9, //32 - leftRingProximal
+		32, //33 - leftRingMedial
+		33, //34 - leftRingDistal
+		34, //35 - leftRingTip
 
-	boneNames.Add("rightMiddleProximal");
-	boneNames.Add("rightMiddleMedial");
-	boneNames.Add("rightMiddleDistal");
-	boneNames.Add("rightMiddleTip");
+		9, //36 - leftLittleProximal
+		36, //37 - leftLittleMedial
+		37, //38 - leftLittleDistal
+		38, //39 - leftLittleTip
 
-	boneNames.Add("rightRingProximal");
-	boneNames.Add("rightRingMedial");
-	boneNames.Add("rightRingDistal");
-	boneNames.Add("rightRingTip");
+		13, //40 - rightThumbProximal
+		40, //41 - rightThumbMedial
+		41, //42 - rightThumbDistal
+		42, //43 - rightThumbTip
 
-	boneNames.Add("rightLittleProximal");
-	boneNames.Add("rightLittleMedial");
-	boneNames.Add("rightLittleDistal");
-	boneNames.Add("rightLittleTip");
+		13, //44 - rightIndexProximal
+		44, //45 - rightIndexMedial
+		45, //46 - rightIndexDistal
+		46, //47 - rightIndexTip
 
-	boneNames.Add("leftToe");
-	boneNames.Add("rightToe");
+		13, //48 - rightMiddleProximal
+		48, //49 - rightMiddleMedial
+		49, //50 - rightMiddleDistal
+		50, //51 - rightMiddleTip
 
-	TArray<int32> boneParents;
-	boneParents.Add(0); //0 - root
-	boneParents.Add(0); //1 - hip
-	boneParents.Add(1); //2 - spine
-	boneParents.Add(2); //3 - spine2
-	boneParents.Add(3); //4 - neck
-	boneParents.Add(4); //5 - head
+		13, //52 - rightRingProximal
+		52, //53 - rightRingMedial
+		53, //54 - rightRingDistal
+		54, //55 - rightRingTip
 
-	boneParents.Add(3); //6 - LeftShoulder
-	boneParents.Add(6); //7 - LeftArm
-	boneParents.Add(7); //8 - LeftForearm
-	boneParents.Add(8); //9 - LeftHand
+		13, //56 - rightLittleProximal
+		56, //57 - rightLittleMedial
+		57, //58 - rightLittleDistal
+		58, //59 - rightLittleTip
 
-	boneParents.Add(3); //10 - RightShoulder
-	boneParents.Add(10); //11 - RightArm
-	boneParents.Add(11); //12 - RightForearm
-	boneParents.Add(12); //13 - RightHand
-
-	boneParents.Add(1); //14 - LeftUpLeg
-	boneParents.Add(14); //15 - LeftLeg
-	boneParents.Add(15); //16 - LeftFoot
-
-	boneParents.Add(1); //17 - RightUpLeg
-	boneParents.Add(17); //18 - RightLeg
-	boneParents.Add(18); //19 - RightFoot
-
-	boneParents.Add(9); //20 - leftThumbProximal
-	boneParents.Add(20); //21 - leftThumbMedial
-	boneParents.Add(21); //22 - leftThumbDistal
-	boneParents.Add(22); //23 - leftThumbTip
-
-	boneParents.Add(9); //24 - leftIndexProximal
-	boneParents.Add(24); //25 - leftIndexMedial
-	boneParents.Add(25); //26 - leftIndexDistal
-	boneParents.Add(26); //27 - leftIndexTip
-
-	boneParents.Add(9); //28 - leftMiddleProximal
-	boneParents.Add(28); //29 - leftMiddleMedial
-	boneParents.Add(29); //30 - leftMiddleDistal
-	boneParents.Add(30); //31 - leftMiddleTip
-
-	boneParents.Add(9); //32 - leftRingProximal
-	boneParents.Add(32); //33 - leftRingMedial
-	boneParents.Add(33); //34 - leftRingDistal
-	boneParents.Add(34); //35 - leftRingTip
-
-	boneParents.Add(9); //36 - leftLittleProximal
-	boneParents.Add(36); //37 - leftLittleMedial
-	boneParents.Add(37); //38 - leftLittleDistal
-	boneParents.Add(38); //39 - leftLittleTip
-
-	boneParents.Add(13); //40 - rightThumbProximal
-	boneParents.Add(40); //41 - rightThumbMedial
-	boneParents.Add(41); //42 - rightThumbDistal
-	boneParents.Add(42); //43 - rightThumbTip
-
-	boneParents.Add(13); //44 - rightIndexProximal
-	boneParents.Add(44); //45 - rightIndexMedial
-	boneParents.Add(45); //46 - rightIndexDistal
-	boneParents.Add(46); //47 - rightIndexTip
-
-	boneParents.Add(13); //48 - rightMiddleProximal
-	boneParents.Add(48); //49 - rightMiddleMedial
-	boneParents.Add(49); //50 - rightMiddleDistal
-	boneParents.Add(50); //51 - rightMiddleTip
-
-	boneParents.Add(13); //52 - rightRingProximal
-	boneParents.Add(52); //53 - rightRingMedial
-	boneParents.Add(53); //54 - rightRingDistal
-	boneParents.Add(54); //55 - rightRingTip
-
-	boneParents.Add(13); //56 - rightLittleProximal
-	boneParents.Add(56); //57 - rightLittleMedial
-	boneParents.Add(57); //58 - rightLittleDistal
-	boneParents.Add(58); //59 - rightLittleTip
-
-	boneParents.Add(16); //60 - LeftToe
-	boneParents.Add(19); //61 - RightToe
+		16, //60 - LeftToe
+		19 //61 - RightToe
+	};
+	
 
 	#ifdef USE_SMARTSUIT_ANIMATION_ROLE
 	FLiveLinkStaticDataStruct StaticData(FLiveLinkSmartsuitStaticData::StaticStruct());
@@ -447,7 +449,7 @@ void FVirtualProductionSource::HandleSuitData(FRkkActorData suit)
 }
 
 
-void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32 index, FSmartsuitBone* parent, FSmartsuitBone* sensor)
+void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32 index, const FSmartsuitBone* parent, const FSmartsuitBone* sensor)
 {
 
 	int32 transformIndex = transforms.AddUninitialized(1);
@@ -467,14 +469,14 @@ void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32
 }
 
 
-void FVirtualProductionSource::HandleSuits(TArray<FRkkActorData> suits) 
+void FVirtualProductionSource::HandleSuits(const TArray<FSuitData>& suits) 
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Handling faces %d"), faces.Num());
 	existingActors.Empty();
 	notExistingSubjects.Empty();
 	for (int subjectIndex = 0; subjectIndex < suits.Num(); subjectIndex++) 
 	{
-		FRkkActorData subject = suits[subjectIndex];
+		const FSuitData& subject = suits[subjectIndex];
 
 		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
 		bool nameExists = false;
@@ -633,7 +635,7 @@ void FVirtualProductionSource::HandleSuits(TArray<FRkkActorData> suits)
 	}
 }
 
-void FVirtualProductionSource::HandleFace(TArray<FFace> faces) 
+void FVirtualProductionSource::HandleFace(const TArray<FFace>& faces) 
 {
 	//verify(Client != nullptr);
 
@@ -648,7 +650,7 @@ void FVirtualProductionSource::HandleFace(TArray<FFace> faces)
 	notExistingSubjects.Empty();
 	for (int subjectIndex = 0; subjectIndex < faces.Num(); subjectIndex++) 
 	{
-		FFace subject = faces[subjectIndex];
+		const FFace& subject = faces[subjectIndex];
 
 		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
 		bool nameExists = false;
@@ -700,67 +702,68 @@ void FVirtualProductionSource::HandleFace(TArray<FFace> faces)
 		FLiveLinkAnimationFrameData& AnimFrameData = *FrameData.Cast<FLiveLinkAnimationFrameData>();
 		AnimFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 
-
-
-		AnimFrameData.PropertyValues.Add(subject.browDownLeft);
-		AnimFrameData.PropertyValues.Add(subject.browDownRight);
-		AnimFrameData.PropertyValues.Add(subject.browInnerUp);
-		AnimFrameData.PropertyValues.Add(subject.browOuterUpLeft);
-		AnimFrameData.PropertyValues.Add(subject.browOuterUpRight);
-		AnimFrameData.PropertyValues.Add(subject.cheekPuff);
-		AnimFrameData.PropertyValues.Add(subject.cheekSquintLeft);
-		AnimFrameData.PropertyValues.Add(subject.cheekSquintRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeBlinkLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeBlinkRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookDownLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookDownRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookInLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookInRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookOutLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookOutRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookUpLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookUpRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeSquintLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeSquintRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeWideLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeWideRight);
-		AnimFrameData.PropertyValues.Add(subject.jawOpen);
-		AnimFrameData.PropertyValues.Add(subject.jawForward);
-		AnimFrameData.PropertyValues.Add(subject.jawLeft);
-		AnimFrameData.PropertyValues.Add(subject.jawRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthClose);
-		AnimFrameData.PropertyValues.Add(subject.mouthDimpleLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthDimpleRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthFrownLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthFrownRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthFunnel);
-		AnimFrameData.PropertyValues.Add(subject.mouthLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthLowerDownLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthLowerDownRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthPressLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthPressRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthPucker);
-		AnimFrameData.PropertyValues.Add(subject.mouthRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthRollLower);
-		AnimFrameData.PropertyValues.Add(subject.mouthRollUpper);
-		AnimFrameData.PropertyValues.Add(subject.mouthShrugLower);
-		AnimFrameData.PropertyValues.Add(subject.mouthShrugUpper);
-		AnimFrameData.PropertyValues.Add(subject.mouthSmileLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthSmileRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthStretchLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthStretchRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthUpperUpLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthUpperUpRight);
-		AnimFrameData.PropertyValues.Add(subject.noseSneerLeft);
-		AnimFrameData.PropertyValues.Add(subject.noseSneerRight);
-		AnimFrameData.PropertyValues.Add(subject.tongueOut);
+		AnimFrameData.PropertyValues.Append(
+			{
+				subject.browDownLeft,
+				subject.browDownRight,
+				subject.browInnerUp,
+				subject.browOuterUpLeft,
+				subject.browOuterUpRight,
+				subject.cheekPuff,
+				subject.cheekSquintLeft,
+				subject.cheekSquintRight,
+				subject.eyeBlinkLeft,
+				subject.eyeBlinkRight,
+				subject.eyeLookDownLeft,
+				subject.eyeLookDownRight,
+				subject.eyeLookInLeft,
+				subject.eyeLookInRight,
+				subject.eyeLookOutLeft,
+				subject.eyeLookOutRight,
+				subject.eyeLookUpLeft,
+				subject.eyeLookUpRight,
+				subject.eyeSquintLeft,
+				subject.eyeSquintRight,
+				subject.eyeWideLeft,
+				subject.eyeWideRight,
+				subject.jawOpen,
+				subject.jawForward,
+				subject.jawLeft,
+				subject.jawRight,
+				subject.mouthClose,
+				subject.mouthDimpleLeft,
+				subject.mouthDimpleRight,
+				subject.mouthFrownLeft,
+				subject.mouthFrownRight,
+				subject.mouthFunnel,
+				subject.mouthLeft,
+				subject.mouthLowerDownLeft,
+				subject.mouthLowerDownRight,
+				subject.mouthPressLeft,
+				subject.mouthPressRight,
+				subject.mouthPucker,
+				subject.mouthRight,
+				subject.mouthRollLower,
+				subject.mouthRollUpper,
+				subject.mouthShrugLower,
+				subject.mouthShrugUpper,
+				subject.mouthSmileLeft,
+				subject.mouthSmileRight,
+				subject.mouthStretchLeft,
+				subject.mouthStretchRight,
+				subject.mouthUpperUpLeft,
+				subject.mouthUpperUpRight,
+				subject.noseSneerLeft,
+				subject.noseSneerRight,
+				subject.tongueOut
+			});
 
 		Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData));
 	}
 }
 
 
-void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubject> FrameSubjects)
+void FVirtualProductionSource::HandleSubjectFrame(const TArray<FVirtualProductionSubject>& FrameSubjects)
 {
 	//verify(Client != nullptr);
 
@@ -907,8 +910,15 @@ TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::CreateLiveLinkSou
 
 		if (!bDoesAlreadyExist)
 		{
+			// TODO: start source with a default streaming address and port
+			FIPv4Address address(FIPv4Address::Any);
+
+			FIPv4Endpoint Endpoint;
+			Endpoint.Address = address;
+			Endpoint.Port = 14043;
+
 			ILiveLinkClient* LiveLinkClient = &IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
-			TSharedPtr<FVirtualProductionSource> Source = MakeShared<FVirtualProductionSource>(FText::FromString("Studio"), FText::FromString(""), FMessageAddress::NewAddress());
+			TSharedPtr<FVirtualProductionSource> Source = MakeShared<FVirtualProductionSource>(Endpoint, FText::FromString("Studio"), FText::FromString(""), FMessageAddress::NewAddress());
 			FVirtualProductionSource::SetInstance(Source);
 			LiveLinkClient->AddSource(Source);
 			return Source;
@@ -944,24 +954,22 @@ void URokokoFaceMapData::Initialize()
 }
 
 
-void FVirtualProductionSource::StartRunnable(int port)
+void FVirtualProductionSource::StartRunnable()
 {
-	streaming_port = port;
 	FString ThreadName(FString::Printf(TEXT("VPStreamingNetwork%ld"), (long)(FDateTime::UtcNow().ToUnixTimestamp())));
-	if (streaming_port)
+	if (m_NetworkAddress.Port)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("VP port... %i"), streaming_port);
+		UE_LOG(LogTemp, Warning, TEXT("VP port... %i"), m_NetworkAddress.Port);
 	}
 	Thread = FRunnableThread::Create(this, *ThreadName, 512 * 1024, TPri_Normal);
 }
 
 
-bool FVirtualProductionSource::InitSocket(int port)
+bool FVirtualProductionSource::InitSocket()
 {
-	streaming_port = port;
-	if (Socket == NULL)
+	if (Socket == nullptr)
 	{
-		Socket = FUdpSocketBuilder(TEXT("VPStreamingNetwork")).BoundToAddress(FIPv4Address(0, 0, 0, 0)).BoundToPort(streaming_port).AsReusable().Build();
+		Socket = FUdpSocketBuilder(TEXT("VPStreamingNetwork")).BoundToAddress(m_NetworkAddress.Address).BoundToPort(m_NetworkAddress.Port).AsReusable().Build();
 		//allow the socket to listen to an already bounded address.
 		Socket->SetReuseAddr(true);
 		Stopping = false;
@@ -983,17 +991,17 @@ FString BytesToStringFixed(const uint8* In, int32 Count)
 	return Fixed;
 }
 
-void FVirtualProductionSource::SendToLiveLink(TArray<FVirtualProductionSubject> Subjects)
+void FVirtualProductionSource::SendToLiveLink(const TArray<FVirtualProductionSubject>& Subjects)
 {
 	HandleSubjectFrame(Subjects);
 }
 
-void FVirtualProductionSource::SendFacesToLivelink(TArray<FFace> Subjects)
+void FVirtualProductionSource::SendFacesToLivelink(const TArray<FFace>& Subjects)
 {
 	HandleFace(Subjects);
 }
 
-void FVirtualProductionSource::SendSuitsToLiveLink(TArray<FRkkActorData> Smartsuits)
+void FVirtualProductionSource::SendSuitsToLiveLink(const TArray<FSuitData>& Smartsuits)
 {
 	HandleSuits(Smartsuits);
 
@@ -1083,7 +1091,7 @@ uint32 FVirtualProductionSource::Run()
 							TArray<TSharedPtr<FJsonValue>> Livesuitsarray = SceneObj->GetArrayField("actors");
 							for (auto& currentsuit : Livesuitsarray)
 							{
-								auto SuitData = FRkkActorData(true, currentsuit->AsObject());
+								auto SuitData = FSuitData(true, currentsuit->AsObject());
 								if (SuitData.hasFace)
 								{
 									auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
@@ -1229,7 +1237,7 @@ TArray<FTracker> FVirtualProductionSource::GetTrackersWithMatchingId(FString Con
 	return result;
 }
 
-FRkkActorData* FVirtualProductionSource::GetSmartsuitByName(FString suitName)
+FSuitData* FVirtualProductionSource::GetSmartsuitByName(FString suitName)
 {
 	
 	if (suitName.IsEmpty() || suitName.Compare(FString("")) == 0)
@@ -1237,7 +1245,7 @@ FRkkActorData* FVirtualProductionSource::GetSmartsuitByName(FString suitName)
 		return nullptr;
 	}
 
-	FRkkActorData* result = nullptr;
+	FSuitData* result = nullptr;
 	mtx.lock();
 	{
 		//should probably set the limit to the size of the suit array here?
@@ -1272,9 +1280,9 @@ TArray<FString> FVirtualProductionSource::GetAvailableSmartsuitNames()
 	return result;
 }
 
-TArray<FRkkActorData> FVirtualProductionSource::GetAllSmartsuits()
+TArray<FSuitData> FVirtualProductionSource::GetAllSmartsuits()
 {
-	TArray<FRkkActorData> suits;
+	TArray<FSuitData> suits;
 	//maybe we should set the limit to the size of the suits array
 	mtx.lock();
 	{

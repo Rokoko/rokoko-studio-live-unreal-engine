@@ -362,7 +362,7 @@ struct FFace
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
 	float tongueOut;
 
-	FName GetSubjectName() 
+	FName GetSubjectName() const
 	{
 		FString TempSubjectName = "actor:" + actorName + ":face";
 #if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
@@ -395,7 +395,7 @@ struct FVirtualProductionFrame {
 	TArray<FFace> faces;
 
 	UPROPERTY()
-	TArray<FRkkActorData> suits;
+	TArray<FSuitData> suits;
 
 	//FVirtualProductionFrame (){}
 };

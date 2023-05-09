@@ -43,7 +43,8 @@ public class SmartsuitEditor : ModuleRules
                 "Smartsuit",
                 "LiveLinkInterface",
                 "LiveLink",
-                "LiveLinkAnimationCore"
+                "LiveLinkAnimationCore",
+                "Networking"
 				// ... add other public dependencies that you statically link with here ...
 			}
             );
@@ -58,7 +59,8 @@ public class SmartsuitEditor : ModuleRules
                 "SlateCore",
                 "Slate",
 
-                "LiveLinkInterface"
+                "LiveLinkInterface",
+                "Networking"
                 //"ToolMenus"
             }
             );

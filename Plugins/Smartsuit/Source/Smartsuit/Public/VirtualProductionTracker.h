@@ -4,7 +4,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameFramework/Actor.h"
-#include "SmartsuitReceiver.h"
+#include "RokokoReceiver.h"
 #include "VirtualProductionTracker.generated.h"
 
 

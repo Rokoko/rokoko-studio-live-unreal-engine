@@ -1,7 +1,6 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "SmartsuitController.h"
-#include "Smartsuit.h"
 
 
 // Sets default values
@@ -65,7 +64,7 @@ void ASmartsuitController::Tick(float DeltaTime)
 		return;
 	}
 
-	FRkkActorData *data = listener->GetSmartsuit(suitname);
+	FSuitData *data = listener->GetSmartsuit(suitname);
 	if (!data) 
 	{
 		return;

@@ -235,12 +235,12 @@ struct FSmartsuitBone
 * It also includes meta variables used to manage the state of the Actor in Unreal.
 */
 USTRUCT(BlueprintType)
-struct FRkkActorData
+struct FSuitData
 {
 	GENERATED_BODY()
 
-	FRkkActorData() {}
-	FRkkActorData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject);
+	FSuitData() {}
+	FSuitData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject);
 
 	void ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& BoneName);
 
@@ -283,17 +283,17 @@ struct FRkkActorData
 
 	TMap<FName, FSmartsuitBone> bones;
 
-	FSmartsuitBone* Hip()
+	const FSmartsuitBone* Hip() const
 	{
 		return GetBoneByName("hip");
 	}
 
-	FSmartsuitBone* GetBoneByName(const FName& BoneName)
+	const FSmartsuitBone* GetBoneByName(const FName& BoneName) const
 	{
 		return bones.Find(BoneName);
 	}
 
-	FName GetSubjectName()
+	FName GetSubjectName() const
 	{
 		FString TempSubjectName = "actor:" + suitname + ":body";
 #if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)

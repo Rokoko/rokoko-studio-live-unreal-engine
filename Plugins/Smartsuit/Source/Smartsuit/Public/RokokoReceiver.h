@@ -62,10 +62,10 @@ public:
 	* @param suitName The smartsuit name to get the last data for.
 	* @return Returns the last frame received for the smartsuit with name suitName. If no frame is found, it will return nullptr.
 	*/
-	FRkkActorData* GetSmartsuit(FString suitName);
+	FSuitData* GetSmartsuit(FString suitName);
 
 	UFUNCTION(BlueprintCallable, Category = Default)
-	bool GetSmartsuitByName(const FString& suitName, FRkkActorData& SuitData);
+	bool GetSmartsuitByName(const FString& suitName, FSuitData& SuitData);
 
 	/**
 	* Lists the names of all known Smartsuits connected to this computer.
@@ -77,7 +77,7 @@ public:
 	TArray<FString> GetAvailableSmartsuitNames();
 
 	UFUNCTION(BlueprintCallable, Category = Default)
-	TArray<FRkkActorData> GetAllSmartsuits();
+	TArray<FSuitData> GetAllSmartsuits();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
 	int RokokoPortNumber;

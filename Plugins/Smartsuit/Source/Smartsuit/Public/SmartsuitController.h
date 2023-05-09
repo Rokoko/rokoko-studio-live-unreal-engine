@@ -3,7 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "SmartsuitReceiver.h"
+#include "RokokoReceiver.h"
 #include "RokokoSkeletonData.h"
 
 #include "SmartsuitController.generated.h"
