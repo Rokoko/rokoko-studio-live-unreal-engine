@@ -5,13 +5,10 @@
 #include "CoreMinimal.h"
 #include "Dom/JsonValue.h"
 #include "Dom/JsonObject.h"
-//#include "SmartsuitBlueprintLibrary.h"
 #include "Runtime/Launch/Resources/Version.h"
-#include "SmartsuitDefinitions.h"
+#include "RokokoSkeletonData.h"
 #include "VirtualProductionFrame.generated.h"
 
-
-//#include "JsonUtilities.h"
 
 class VirtualProductionFrame
 {
@@ -365,7 +362,7 @@ struct FFace
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
 	float tongueOut;
 
-	FName GetSubjectName() 
+	FName GetSubjectName() const
 	{
 		FString TempSubjectName = "actor:" + actorName + ":face";
 #if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)

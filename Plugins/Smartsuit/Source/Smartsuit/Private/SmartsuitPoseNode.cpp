@@ -1,10 +1,10 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "SmartsuitPoseNode.h"
-#include "Smartsuit.h"
 #include "AnimationRuntime.h"
 #include "LiveLinkCustomVersion.h"
-#include "SmartsuitDefinitions.h"
+#include "LiveLinkClient.h"
+#include "RokokoSkeletonData.h"
 #include "Animation/AnimInstanceProxy.h"
 #include "Roles/LiveLinkAnimationRole.h"
 #include "SmartsuitBlueprintLibrary.h"
@@ -313,7 +313,7 @@ float FSmartsuitPoseNode::ScaleBonesToDistance(FBoneReference scaleBone, FBoneRe
 
 FQuat GetRotation2(const FName& BoneName, FSuitData* suitdata)
 {
-	if (auto SmartsuitBone = suitdata->SmartsuitBones.Find(BoneName))
+	if (auto SmartsuitBone = suitdata->bones.Find(BoneName))
 	{
 		return SmartsuitBone->Uquaternion();
 	}
@@ -323,7 +323,7 @@ FQuat GetRotation2(const FName& BoneName, FSuitData* suitdata)
 
 FVector GetPosition2(const FName& BoneName, FSuitData* suitdata)
 {
-	if (auto SmartsuitBone = suitdata->SmartsuitBones.Find(BoneName))
+	if (auto SmartsuitBone = suitdata->bones.Find(BoneName))
 	{
 		return SmartsuitBone->UPosition();
 	}
@@ -1132,95 +1132,7 @@ FLiveLinkSubjectName FSmartsuitPoseNode::GetLiveLinkSubjectName()
 #endif
 }
 
-//USmartsuitBodyMapData::USmartsuitBodyMapData()
-//{
-//	hip = "hip";
-//	stomach = "stomach";
-//	chest = "chest";
-//	neck = "neck";
-//	head = "head";
-//	leftShoulder = "leftShoulder";
-//	leftArm = "leftArm";
-//	leftForearm = "leftForearm";
-//	leftHand = "leftHand";
-//	rightShoulder = "rightShoulder";
-//	rightArm = "rightArm";
-//	rightForearm = "rightForearm";
-//	rightHand = "rightHand";
-//	leftUpleg = "leftUpleg";
-//	leftLeg = "leftLeg";
-//	leftFoot = "leftFoot";
-//	leftToe = "leftToe";
-//	rightUpleg = "rightUpleg";
-//	rightLeg = "rightLeg";
-//	rightFoot = "rightFoot";
-//	rightToe = "rightToe";
-//	leftThumbProximal = "leftThumbProximal";
-//	leftThumbMedial = "leftThumbMedial";
-//	leftThumbDistal = "leftThumbDistal";
-//	leftThumbTip = "leftThumbTip";
-//	leftIndexProximal = "leftIndexProximal";
-//	leftIndexMedial = "leftIndexMedial";
-//	leftIndexDistal = "leftIndexDistal";
-//	leftIndexTip = "leftIndexTip";
-//	leftMiddleProximal = "leftMiddleProximal";
-//	leftMiddleMedial = "leftMiddleMedial";
-//	leftMiddleDistal = "leftMiddleDistal";
-//	leftMiddleTip = "leftMiddleTip";
-//	leftRingProximal = "leftRingProximal";
-//	leftRingMedial = "leftRingMedial";
-//	leftRingDistal = "leftRingDistal";
-//	leftRingTip = "leftRingTip";
-//	leftLittleProximal = "leftLittleProximal";
-//	leftLittleMedial = "leftLittleMedial";
-//	leftLittleDistal = "leftLittleDistal";
-//	leftLittleTip = "leftLittleTip";
-//	rightThumbProximal = "rightThumbProximal";
-//	rightThumbMedial = "rightThumbMedial";
-//	rightThumbDistal = "rightThumbDistal";
-//	rightThumbTip = "rightThumbTip";
-//	rightIndexProximal = "rightIndexProximal";
-//	rightIndexMedial = "rightIndexMedial";
-//	rightIndexDistal = "rightIndexDistal";
-//	rightIndexTip = "rightIndexTip";
-//	rightMiddleProximal = "rightMiddleProximal";
-//	rightMiddleMedial = "rightMiddleMedial";
-//	rightMiddleDistal = "rightMiddleDistal";
-//	rightMiddleTip = "rightMiddleTip";
-//	rightRingProximal = "rightRingProximal";
-//	rightRingMedial = "rightRingMedial";
-//	rightRingDistal = "rightRingDistal";
-//	rightRingTip = "rightRingTip";
-//	rightLittleProximal = "rightLittleProximal";
-//	rightLittleMedial = "rightLittleMedial";
-//	rightLittleDistal = "rightLittleDistal";
-//	rightLittleTip = "rightLittleTip";
-//}
 
-//FName URokokoBodyMapData::GetRemappedBoneName_Implementation(FName CurveName) const
-//{
-//	if (auto RemappedName = NameMapping.Find(CurveName))
-//	{
-//		return *RemappedName;
-//	}
-//	return "";
-//}
-//
-//void URokokoBodyMapData::Initialize()
-//{
-//	InitializeTMap();
-//}
-PRAGMA_DISABLE_OPTIMIZATION
-FName URokokoBodyMapData::GetRemappedBoneName_Implementation(FName CurveName) const
-{
-	if (auto RemappedName = NameMapping.Find(CurveName))
-	{
-		return *RemappedName;
-	}
-	
-	return "";
-}
-PRAGMA_ENABLE_OPTIMIZATION
 void FSmartsuitPoseNode::OnInitializeAnimInstance(const FAnimInstanceProxy* InProxy, const UAnimInstance* InAnimInstance)
 {
 	//CurrentRetargetAsset = nullptr;

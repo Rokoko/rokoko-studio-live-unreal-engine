@@ -21,7 +21,7 @@
 #include "Modules/ModuleManager.h"
 
 
-class ISmartsuitModule : public IModuleInterface
+class IRokokoModule : public IModuleInterface
 {
 public:
 	/**
@@ -30,9 +30,9 @@ public:
 	*
 	* @return Returns singleton instance, loading the module on demand if needed
 	*/
-	static inline ISmartsuitModule& Get()
+	static inline IRokokoModule& Get()
 	{
-		return FModuleManager::LoadModuleChecked< ISmartsuitModule >("Smartsuit");
+		return FModuleManager::LoadModuleChecked< IRokokoModule >("Rokoko");
 	}
 
 	/**
@@ -42,6 +42,6 @@ public:
 	*/
 	static inline bool IsAvailable()
 	{
-		return FModuleManager::Get().IsModuleLoaded("Smartsuit");
+		return FModuleManager::Get().IsModuleLoaded("Rokoko");
 	}
 };

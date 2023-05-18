@@ -1,8 +1,7 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
-#include "SmartsuitReceiver.h"
-#include "Smartsuit.h"
-
+#include "RokokoReceiver.h"
+#include "VirtualProductionSource.h"
 
 
 // Sets default values
@@ -297,9 +296,4 @@ FTracker ARokokoReceiver::GetTrackerByConnectionIDFromVP(const FString& name, bo
 		found = true;
 	}
 	return returnval;
-}
-
-void ARokokoReceiver::SetSupportsWiFiAPI(FString suitname)
-{
-	//listener.wifiSupportedSuits.Add(suitname);
 }

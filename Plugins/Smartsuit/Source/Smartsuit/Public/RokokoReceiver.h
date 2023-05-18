@@ -3,12 +3,9 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "SmartsuitStreamingNetwork.h"
-//#include "VPStreamingNetwork.h"
 #include "VirtualProductionFrame.h"
-//#include "Engine.h"
 #include "UObject/UObjectIterator.h"
-#include "SmartsuitReceiver.generated.h"
+#include "RokokoReceiver.generated.h"
 
 /*! \brief This AActor class implements the network layer between unreal and the SmartsuitPro.
  *
@@ -82,18 +79,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Default)
 	TArray<FSuitData> GetAllSmartsuits();
 
-	/**
-	* The port number used to listen for the streaming data of Smartsuits.
-	*/
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Smartsuit)
-	//int streamingDataPort = 14041;
-
-	/**
-	* The port number used to listen for trackers and props data.
-	*/
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
-	//int VPListenPort = 14045;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production")
 	int RokokoPortNumber;
 
@@ -103,63 +88,18 @@ public:
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction")
 	FTracker GetTrackerByConnectionIDFromVP(const FString& name, bool isLive, bool& found);
 
-	/// @cond nodoc
-	//Body* CheckForBodyCommand(FString suitname);
-	//HubInfo* CheckForHubInfo(FString suitname);
-	void SetSupportsWiFiAPI(FString suitname);
-	
+
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve all props."))
 	static TArray<FProp> GetAllProps(); 
-	//{
-	//	TArray<FProp> result;
-	//	//UE_LOG(LogTemp, Display, TEXT("Yeeee1"));
-	//	bool found = false;
-	//	int i = 0;
-	//	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
-	//	{
-	//		//UE_LOG(LogTemp, Display, TEXT("Looking up receiver %d"), i);
-	//		i++;
-	//		if (It->realLife) 
-	//		{
-	//			found = true;
-	//			//UE_LOG(LogTemp, Display, TEXT("Real life!"));
-	//			result = It->VPlistener.GetAllProps();
-	//		}
-	//	}
-	//	if (!found)
-	//	{
-	//		//UE_LOG(LogTemp, Display, TEXT("not Real life..."));
-	//	}
-	//	//UE_LOG(LogTemp, Display, TEXT("Yeeee2 %d"), result.Num());
-	//	return result;
-	//}
+	
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a prop by name."))
 	bool GetProp(FString name, /*bool isLive, */FProp& OutProp);
-	//{
-	//	FProp result;
-	//	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
-	//	{
-	//		if (It->realLife) 
-	//		{
-	//			result = *It->GetPropByNameFromVP(name, isLive);
-	//		}
-	//	}
-	//	return result;
-	//}
+	
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a tracker by name."))
 	static FTracker GetTracker(FString name, bool isLive);
-	//{
-	//	FTracker result;
-	//	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
-	//	{
-	//		if (It->realLife) {
-	//			result = *It->GetTrackerByNameFromVP(name, isLive);
-	//		}
-	//	}
-	//	return result;
-	//}
+	
 
 	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Converts Quaternions into rotators."))
 	static FRotator FQuatToRotator(FQuat rotation) 
@@ -175,10 +115,6 @@ public:
 		return FVector(100.0f*position.Z, 100.0f*position.X, 100.0f*position.Y);
 	}
 	/// @endcond
-
-private:
-	//SmartsuitStreamingNetwork listener;
-	//VPStreamingNetwork VPlistener;
 
 protected:
 	/*! \brief Indicates if this instance of the actor is in play mode and not an instance from the editor.*/

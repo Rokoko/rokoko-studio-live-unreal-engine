@@ -4,7 +4,9 @@
 
 #include "../Lib/V8/Includes/SmartsuitDef.h"
 #include "Runtime/Launch/Resources/Version.h"
-#include "SmartsuitDefinitions.generated.h"
+
+#include "RokokoSkeletonData.generated.h"
+
 /*! \file SmartsuitDefinitions.h
 \brief This file includes all definitions used by Smartsuit plugin.
 *
@@ -179,149 +181,6 @@ namespace SmartsuitBones
 }
 
 
-///*! \brief Information about specific sensor, including its status, rotation, position.*/
-//struct Sensor {
-//
-//	/**
-//	* The address of the Sensor in the Smartsuit. Represents its position.
-//	* A list of all supported addresses can be found in ASmartsuitCommands
-//	*/
-//	uint16_t addr;
-//
-//	/**Indicates weither there is another sensor connected after this, or this is the last sensor in a branch.*/
-//	char isAnotherSensorConnected;
-//
-//	char behavior;
-//	/**Indicates if the sensor detects metal or not.*/
-//	char command;
-//	/**Holds information about the acceleration detected in the sensor during the last frame.*/
-//	FVector acceleration;
-//
-//	/**
-//	* The rotation information for this sensor. This quaternion is represented in Smartsuits coordinate system.
-//	* To get a quaternion in Unreal coordinate system use UQuaternion() instead.
-//	*/
-//	FQuat quaternion;
-//
-//	/** Gyroscope information for this sensor.*/
-//	FVector gyro;
-//
-//	/**
-//	* Position information for this sensor. This position is represented in Smartsuits coordinate system.
-//	* To get the position in Unreal coordinate system use UPosition() instead.
-//	*/
-//	FVector position;
-//
-//	/** Timestamp information received from the sensor. This is the sensors internal clock.*/
-//	uint32_t microseconds;
-//
-//	/// @private
-//	FQuat NED2Unreal(FQuat rotation) {
-//		/*FVector forward = rotation.GetForwardVector();
-//		forward.Z = -forward.Z;
-//		FQuat result = */
-//		FQuat result(rotation.X, rotation.Y, rotation.Z, rotation.W);
-//		//result.X = -result.X;
-//		result.Z = -result.Z;
-//		result.Y = -result.Y;
-//		FQuat modifier = FQuat::MakeFromEuler(FVector(180, 0, 90));
-//		FQuat postModifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
-//		//result.Z = -result.Z;
-//		FQuat finalResult = modifier * result * postModifier;
-//		
-//		return FQuat(finalResult.X, finalResult.Y, finalResult.Z, finalResult.W);
-//	}
-//
-//
-//
-//	/**
-//	* Get sensor rotation in Unreal coordinate system.
-//	*
-//	* @return Sensor rotation.
-//	*/
-//	FQuat Uquaternion() {
-//		
-//		if (FGenericPlatformMath::IsNaN(quaternion.X) || FGenericPlatformMath::IsNaN(quaternion.Y) || FGenericPlatformMath::IsNaN(quaternion.Z) || FGenericPlatformMath::IsNaN(quaternion.W)) {
-//			return FQuat::Identity;
-//		}
-//		return NED2Unreal(quaternion);
-//
-//	}
-//
-//	/**
-//	* Get sensor position in Unreal coordinate system.
-//	*
-//	* @return Sensor position.
-//	*/
-//	FVector UPosition() {
-//		if (FGenericPlatformMath::IsNaN(position.X) || FGenericPlatformMath::IsNaN(position.Y) || FGenericPlatformMath::IsNaN(position.Z)) {
-//			return FVector::ZeroVector;
-//		}
-//		return FVector(100.0f*position.Y, -100.0f*position.X, -100.0f*position.Z);
-//	}
-//};
-
-
-///*! \brief Contains data that represent the last frame received from the Smartsuit.
-//*
-//* This struct represents a Smartsuit data frame as received from the Smartsuit.
-//* It also includes meta variables used to manage the state of the Smartsuit in Unreal.
-//*/
-//struct SuitData {
-//
-//	/** The name of the Smartsuit. */
-//	char suitname[5];
-//
-//	/** Information about the sensors connected to this Smartsuit, like position, rotation, etc.*/
-//	Sensor sensors[19];
-//
-//	/** The time to live indicator for this Smartsuit. This indica*/
-//	float ttl;
-//
-//	/** The ip address of the Smartsuit.*/
-//	uint32 url;
-//
-//	/** Indicator if the Smartsuit is broadcasting.*/
-//	bool isBroadcasting;
-//
-//	/** Indicator if the Smartsuit has profile.*/
-//	bool hasProfile;
-//
-//	/// @private.
-//	bool profileToggle;
-//
-//	/** The number of frames received from this Smartsuit during the last second.*/
-//	float fps;
-//
-//	/// @private
-//	int currFPSCount;
-//
-//	/// @private
-//	int lastFPSSecond;
-//
-//	/**
-//	* Shortcut function to get the Hip sensor information for this Smartsuit.
-//	*
-//	* @return The Sensor information that corresponds to hip, if no sensor is found, it returns nullptr.
-//	*/
-//	Sensor* Hip() {
-//		return GetSensor(SENSOR_HIP);
-//	}
-//
-//	Sensor* GetSensor(uint16_t address) {
-//		for (int i = 0; i < 19; i++) {
-//			if (sensors[i].addr == address) {
-//				return &(sensors[i]);
-//			}
-//		}
-//		return nullptr;
-//	}
-//
-//	FName GetSubjectName() {
-//		return FName(*FString(ANSI_TO_TCHAR(suitname)));
-//	}
-//};
-
 
 USTRUCT()
 struct FSmartsuitBone
@@ -329,7 +188,11 @@ struct FSmartsuitBone
 	GENERATED_BODY()
 
 	FSmartsuitBone() {}
-	FSmartsuitBone(FName Name, FVector Position, FQuat Rotation) { name = Name; position = Position; rotation = Rotation; }
+	FSmartsuitBone(FName Name, FVector Position, FQuat Rotation)
+		: name(Name)
+		, position(Position)
+		, rotation(Rotation)
+	{}
 
 	FQuat NED2Unreal(FQuat InRotation)
 	{
@@ -337,9 +200,9 @@ struct FSmartsuitBone
 		result.Z = -result.Z;
 		result.Y = -result.Y;
 
-		FQuat modifier = FQuat::MakeFromEuler(FVector(180, 0, 90));
-		FQuat postModifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
-		FQuat finalResult = modifier * result * postModifier;
+		static FQuat modifier = FQuat::MakeFromEuler(FVector(180, 0, 90));
+		static FQuat postModifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
+		const FQuat finalResult = modifier * result * postModifier;
 
 		return FQuat(finalResult.X, finalResult.Y, finalResult.Z, finalResult.W);
 	}
@@ -348,29 +211,28 @@ struct FSmartsuitBone
 	{
 		FQuat result(rotation.Z, rotation.X, rotation.Y, rotation.W);
 
-		FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, -90));
-
+		static FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, -90));
 		result *= modifier;
 
 		return result;
-
-		//return NED2Unreal(rotation);
 	}
 
 	FVector UPosition() const
 	{
-		return FVector(100.0f * position.Z, 100.0f * position.X, 100.0f * position.Y);
+		return FVector(WORLD_SCALE * position.Z, WORLD_SCALE * position.X, WORLD_SCALE * position.Y);
 	}
 
 	FName name;
 	FVector position;
 	FQuat rotation;
+
+	constexpr static float WORLD_SCALE{ 100.0f };
 };
 
-/*! \brief Contains data that represent the last frame received from the Smartsuit.
+/*! \brief Contains data that represent the last frame received from the Rokoko Actor.
 *
-* This struct represents a Smartsuit data frame as received from the Smartsuit.
-* It also includes meta variables used to manage the state of the Smartsuit in Unreal.
+* This struct represents a skeleton data frame as received from the Studio Actor.
+* It also includes meta variables used to manage the state of the Actor in Unreal.
 */
 USTRUCT(BlueprintType)
 struct FSuitData
@@ -419,19 +281,19 @@ struct FSuitData
 	UPROPERTY(BlueprintReadOnly, Category = Default)
 	FLinearColor color;
 
-	TMap<FName, FSmartsuitBone> SmartsuitBones;
+	TMap<FName, FSmartsuitBone> bones;
 
-	FSmartsuitBone* Hip()
+	const FSmartsuitBone* Hip() const
 	{
 		return GetBoneByName("hip");
 	}
 
-	FSmartsuitBone* GetBoneByName(const FName& BoneName)
+	const FSmartsuitBone* GetBoneByName(const FName& BoneName) const
 	{
-		return SmartsuitBones.Find(BoneName);
+		return bones.Find(BoneName);
 	}
 
-	FName GetSubjectName()
+	FName GetSubjectName() const
 	{
 		FString TempSubjectName = "actor:" + suitname + ":body";
 #if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
