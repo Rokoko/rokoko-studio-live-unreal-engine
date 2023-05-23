@@ -39,6 +39,10 @@
         {
             "Name": "LiveLink",
             "Enabled": true
+        },
+        {
+            "Name": "LiveLinkCamera",
+            "Enabled": true
         }
     ]
 }

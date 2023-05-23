@@ -2,17 +2,17 @@
 
 #include "RokokoModule.h"
 
-class FRokokoModule : public IRokokoModule
-{
-	virtual void StartupModule() override
-	{
-	
-	}
-
-	virtual void ShutdownModule() override
-	{
-	
-	}
-};
-
-IMPLEMENT_MODULE(FRokokoModule, Rokoko);
+// class FRokokoModule : public IRokokoModule
+// {
+// 	virtual void StartupModule() override
+// 	{
+// 	
+// 	}
+//
+// 	virtual void ShutdownModule() override
+// 	{
+// 	
+// 	}
+// };
+//
+// IMPLEMENT_MODULE(FRokokoModule, Rokoko);
