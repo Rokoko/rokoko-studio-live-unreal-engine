@@ -234,6 +234,10 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SourceData, meta = (PinShownByDefault))
 	FName RokokoActorName;
 
+	/** If enabled, root motion will be applied from this pose. This can help prevent characters from moving through walls etc. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = RootMotion, meta = (PinShownByDefault))
+	bool bApplyRootMotion;
+
 	/// @private
 	SmartsuitTPose TPose;
 	/// @private
@@ -299,5 +303,9 @@ private:
 
 	FLiveLinkClientReference LiveLinkClient_GameThread;
 	ILiveLinkClient* LiveLinkClient_AnyThread;
+
+	// Root motion support 
+	bool bInitializedRootPosition{};
+	FVector OldRootPosition{};
 
 };

@@ -752,8 +752,29 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	//	ApplySmartsuitTransform(BoneMap.hip, SuitRotation, SuitLocation, FVector(1, 1, 1), SuitTransformBoneControlSpace, SkelComp, MeshBases);
 	//}
 
+	// Apply root motion, if relevant
+	if (bApplyRootMotion)
+	{
+		FVector NewRootPosition = hipPosition;
+		NewRootPosition.Z = 0.0f;
 
+		// Make sure to initialize root motion position, otherwise we will get erronous results
+		if (!bInitializedRootPosition)
+		{
+			OldRootPosition = NewRootPosition;
+			bInitializedRootPosition = true;
+		}
 
+		FVector RootDelta = NewRootPosition - OldRootPosition;
+		OldRootPosition = NewRootPosition;
+
+		FTransform NewRootTransform;
+		NewRootTransform.SetRotation(FQuat::Identity);
+		NewRootTransform.SetScale3D(FVector::OneVector);
+		NewRootTransform.SetTranslation(RootDelta);
+
+		Output.AnimInstanceProxy->GetExtractedRootMotion().Accumulate(NewRootTransform);
+	}
 
 	ApplySmartsuitRotation(BoneMap.stomach, stomachQuat* stomachExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 	ApplySmartsuitRotation(BoneMap.chest, chestQuat* chestExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
