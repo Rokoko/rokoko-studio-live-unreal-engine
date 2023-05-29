@@ -18,29 +18,34 @@ public:
 #include "IMessageContext.h"
 #include "MessageEndpoint.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
-//#include "VPStreamingNetwork.h"
-#include "SmartsuitReceiver.h"
 #include "VirtualProductionFrame.h"
 #include "Misc/Guid.h"
 #include "LiveLink/Public/LiveLinkMessageBusFinder.h"
+#include "Interfaces/IPv4/IPv4Endpoint.h"
 
-//struct FLiveLinkPongMessage;
 struct FMessageAddress;
 struct FProviderPollResult;
 class ITableRow;
 class STableViewBase;
+class SEditableTextBox;
 
-//typedef TSharedPtr<FProviderPollResult> FProviderPollResultPtr;
+struct SCreationInfo
+{
+	FIPv4Endpoint	m_Address;
+	bool m_UseLZ4Compression; // TODO:
+};
 
-DECLARE_DELEGATE_OneParam(FOnVirtualProductionSourceSelected, FProviderPollResultPtr);
 
 class SVirtualProductionSourceEditor : public SCompoundWidget
 {
+public:
+	DECLARE_DELEGATE_TwoParams(FOnVirtualProductionSourceSelected, SCreationInfo, FProviderPollResultPtr);
+
 	SLATE_BEGIN_ARGS(SVirtualProductionSourceEditor){}
 		SLATE_EVENT(FOnVirtualProductionSourceSelected, OnSourceSelected)
 	SLATE_END_ARGS()
 
-		~SVirtualProductionSourceEditor();
+	virtual ~SVirtualProductionSourceEditor();
 
 	void Construct(const FArguments& Args);
 
@@ -53,8 +58,9 @@ class SVirtualProductionSourceEditor : public SCompoundWidget
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime);
 
 private:
+	void OnEndpointChanged(const FText& NewValue, ETextCommit::Type);
 
-	//void HandlePongMessage(const FLiveLinkPongMessage& Message, const TSharedRef<IMessageContext, ESPMode::ThreadSafe>& Context);
+	TWeakPtr<SEditableTextBox>		m_NetworkAddress;
 
 	TSharedRef<ITableRow> MakeSourceListViewWidget(FProviderPollResultPtr PollResult, const TSharedRef<STableViewBase>& OwnerTable) const;
 
@@ -68,14 +74,10 @@ private:
 
 	FOnVirtualProductionSourceSelected OnSourceSelected;
 
-	//TSharedPtr<FMessageEndpoint, ESPMode::ThreadSafe> MessageEndpoint;
-
 	FGuid CurrentPollRequest;
 
 	// Time since our UI was last ticked, allow us to refresh if we haven't been onscreen for a while
 	double LastTickTime;
 
-	ARokokoReceiver *receiver;
-	//VPStreamingNetwork *VPnet;
 	FVirtualProductionFrame *VPFrame;
 };

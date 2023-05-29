@@ -1,8 +1,8 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
-#include "Smartsuit.h"
+#include "RokokoModule.h"
 
-class FSmartsuitModule : public ISmartsuitModule
+class FRokokoModule : public IRokokoModule
 {
 	virtual void StartupModule() override
 	{
@@ -15,4 +15,4 @@ class FSmartsuitModule : public ISmartsuitModule
 	}
 };
 
-IMPLEMENT_MODULE(FSmartsuitModule, Smartsuit);
+IMPLEMENT_MODULE(FRokokoModule, Rokoko);

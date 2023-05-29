@@ -1,7 +1,6 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "SmartsuitController.h"
-#include "Smartsuit.h"
 
 
 // Sets default values
