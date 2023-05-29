@@ -45,9 +45,9 @@ _Note: You can skip this step by getting the plugin from the Unreal Engine marke
 
 https://unrealengine.com/marketplace/en-US/product/smartsuit-plugin
 
-For the plugin to work at its current state you need this development buid of Rokoko Studio: [https://developer.cloud.unity3d.com/share/share.html?shareId=-koPxa5S4I](https://developer.cloud.unity3d.com/share/share.html?shareId=-koPxa5S4I)
+For the plugin to work at its current state you need this development build of Rokoko Studio: [https://developer.cloud.unity3d.com/share/share.html?shareId=-koPxa5S4I](https://developer.cloud.unity3d.com/share/share.html?shareId=-koPxa5S4I)
 
-Then you need to download the Studio Live plugin and install it manualy by moving it into your Unreal project's **plugins folder:** [https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins](https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins)
+Then you need to download the Studio Live plugin and install it manually by moving it into your Unreal project's **plugins folder:** [https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins](https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins)
 
 _Note: If your unreal project doesn't have a plugins folder, then create a folder called "Plugins"._
 
@@ -59,11 +59,11 @@ Open up Visual Studio Installer and click on Individual Components. Then search 
 
 <img src="Images/visualInstaller.png">
 
-If it still doesn't work install theise optional packages under **desktop development with C++.**
+If it still doesn't work install these optional packages under **desktop development with C++.**
 
 <img src="Images/visualInstallerDownload.png">
 
-When the unreal project is open, go into settings → Plugins and search for **Rokoko Studio Live** and make sure the enable mark is on. If you clicked enable you have to restart the urneal project. 
+When the unreal project is open, go into settings → Plugins and search for **Rokoko Studio Live** and make sure the enable mark is on. If you clicked enable you have to restart the unreal project. 
 
 **Setting up the character inside Unreal Engine 4.25**
 
