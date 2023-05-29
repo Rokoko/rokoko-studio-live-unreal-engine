@@ -115,15 +115,15 @@ void URokokoStudioCommandAPI::StopRecording(const FRokokoCommandAPI_IPInfo& IPIn
 
 void URokokoStudioCommandAPI::Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& DeviceId, const FString& BoneName, const FTransform& transform, float timeoutTime, bool isQueryOnly)
 {
-	const double worldScale{ 0.01 };
+	const double WORLD_SCALE{ 0.01 };
 
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 	
 	TSharedPtr<FJsonObject> positionJsonObject = MakeShareable(new FJsonObject);
 	// convert UE coord system into target Studio coord system
-	positionJsonObject->SetNumberField("X", worldScale * transform.GetLocation().X);
-	positionJsonObject->SetNumberField("Y", worldScale * transform.GetLocation().Z);
-	positionJsonObject->SetNumberField("Z", -worldScale * transform.GetLocation().Y);
+	positionJsonObject->SetNumberField("X", WORLD_SCALE * transform.GetLocation().X);
+	positionJsonObject->SetNumberField("Y", WORLD_SCALE * transform.GetLocation().Z);
+	positionJsonObject->SetNumberField("Z", -WORLD_SCALE * transform.GetLocation().Y);
 
 	TSharedPtr<FJsonObject> rotationJsonObject = MakeShareable(new FJsonObject);
 	rotationJsonObject->SetNumberField("X", transform.GetRotation().X);
@@ -131,11 +131,11 @@ void URokokoStudioCommandAPI::Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, co
 	rotationJsonObject->SetNumberField("Z", transform.GetRotation().Z);
 	rotationJsonObject->SetNumberField("W", transform.GetRotation().W);
 	
-	JsonObject->SetStringField("deviceID", DeviceId);
-	JsonObject->SetStringField("boneAttached", BoneName);
+	JsonObject->SetStringField("device_id", DeviceId);
+	JsonObject->SetStringField("bone_attached", BoneName);
 	JsonObject->SetObjectField("position", positionJsonObject);
 	JsonObject->SetObjectField("rotation", rotationJsonObject);
-	JsonObject->SetBoolField("isQueryOnly", isQueryOnly);
+	JsonObject->SetBoolField("is_query_only", isQueryOnly);
 	JsonObject->SetNumberField("timeout", timeoutTime);
 	FString JsonString;
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
@@ -178,24 +178,28 @@ void URokokoStudioCommandAPI::OnProcessRequestComplete(FHttpRequestPtr HttpReque
 
 void URokokoStudioCommandAPI::OnTrackerRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
 {
+	const double WORLD_SCALE{ 100.0 };
+
 	TSharedPtr<FJsonObject> JsonObject;
 	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(HttpResponse->GetContentAsString());
-
-	FVector position;
-	FQuat rotation = FQuat::Identity;
 
 	// Deserialize the json data given Reader and the actual object to deserialize
 	if (FJsonSerializer::Deserialize(Reader, JsonObject)) 
 	{
 		auto arr = JsonObject->GetArrayField("parameters");
 		
-		auto objectPosition = arr[0]->AsObject();
-		auto objectRotation = arr[1]->AsObject();
+		if (!arr.IsEmpty())
+		{
+			auto objectPosition = arr[0]->AsObject();
+			auto objectRotation = arr[1]->AsObject();
 
-		position.Set(objectPosition->GetNumberField("X"), objectPosition->GetNumberField("Y"), objectPosition->GetNumberField("Z"));
-		rotation = FQuat(objectPosition->GetNumberField("X"), objectPosition->GetNumberField("Y"), objectPosition->GetNumberField("Z"),
-			objectPosition->GetNumberField("W"));
+			FVector position(WORLD_SCALE * objectPosition->GetNumberField("X"), 
+				-WORLD_SCALE * objectPosition->GetNumberField("Z"),
+				WORLD_SCALE * objectPosition->GetNumberField("Y"));
+			FQuat rotation(objectRotation->GetNumberField("X"), objectRotation->GetNumberField("Y"), objectRotation->GetNumberField("Z"),
+				objectRotation->GetNumberField("W"));
+
+			OnTrackerRequest.Broadcast(position, rotation);
+		}
 	}
-
-	OnTrackerRequest.Broadcast(position, rotation);
 }
