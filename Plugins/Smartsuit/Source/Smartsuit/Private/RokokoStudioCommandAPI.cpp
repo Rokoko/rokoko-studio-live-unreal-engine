@@ -113,7 +113,7 @@ void URokokoStudioCommandAPI::StopRecording(const FRokokoCommandAPI_IPInfo& IPIn
 	HttpRequest->ProcessRequest();
 }
 
-void URokokoStudioCommandAPI::Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& DeviceId, const FString& BoneName, float timeoutTime, const FTransform& transform)
+void URokokoStudioCommandAPI::Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& DeviceId, const FString& BoneName, const FTransform& transform, float timeoutTime, bool isQueryOnly)
 {
 	const double worldScale{ 0.01 };
 
@@ -135,14 +135,14 @@ void URokokoStudioCommandAPI::Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, co
 	JsonObject->SetStringField("boneAttached", BoneName);
 	JsonObject->SetObjectField("position", positionJsonObject);
 	JsonObject->SetObjectField("rotation", rotationJsonObject);
-	JsonObject->SetBoolField("isQueryOnly", false);
+	JsonObject->SetBoolField("isQueryOnly", isQueryOnly);
 	JsonObject->SetNumberField("timeout", timeoutTime);
 	FString JsonString;
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
 
-	FString URLPath = "http://" + IPInfo.IPAddress + ":" + IPInfo.Port + "/v2/" + IPInfo.APIKey + "/tracker";
-
+	FString URLPath = FString::Printf(TEXT("http://%s:%s/v2/%s/tracker"), *IPInfo.IPAddress, *IPInfo.Port, *IPInfo.APIKey);
+	
 	FString TrimmedUrl = URLPath;
 	TrimmedUrl.TrimStartAndEndInline();
 
@@ -155,7 +155,7 @@ void URokokoStudioCommandAPI::Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, co
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
 	HttpRequest->SetContentAsString(JsonString);
-	HttpRequest->OnProcessRequestComplete().BindUObject(this, &URokokoStudioCommandAPI::OnProcessRequestComplete);
+	HttpRequest->OnProcessRequestComplete().BindUObject(this, &URokokoStudioCommandAPI::OnTrackerRequestComplete);
 	HttpRequest->ProcessRequest();
 }
 
@@ -174,4 +174,28 @@ void URokokoStudioCommandAPI::OnProcessRequestComplete(FHttpRequestPtr HttpReque
 	FString ResponseString = HttpResponse->GetContentAsString();
 
 	OnCompletedRequest.Broadcast(ResponseCode, ResponseString, bSucceeded);
+}
+
+void URokokoStudioCommandAPI::OnTrackerRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
+{
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(HttpResponse->GetContentAsString());
+
+	FVector position;
+	FQuat rotation = FQuat::Identity;
+
+	// Deserialize the json data given Reader and the actual object to deserialize
+	if (FJsonSerializer::Deserialize(Reader, JsonObject)) 
+	{
+		auto arr = JsonObject->GetArrayField("parameters");
+		
+		auto objectPosition = arr[0]->AsObject();
+		auto objectRotation = arr[1]->AsObject();
+
+		position.Set(objectPosition->GetNumberField("X"), objectPosition->GetNumberField("Y"), objectPosition->GetNumberField("Z"));
+		rotation = FQuat(objectPosition->GetNumberField("X"), objectPosition->GetNumberField("Y"), objectPosition->GetNumberField("Z"),
+			objectPosition->GetNumberField("W"));
+	}
+
+	OnTrackerRequest.Broadcast(position, rotation);
 }

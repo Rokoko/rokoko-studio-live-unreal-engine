@@ -23,6 +23,7 @@ struct FRokokoCommandAPI_IPInfo
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCompletedRequest, int32, ResponseCode, const FString&, ResponseContentString, bool, bSucceeded);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTrackerRequest, FVector, Position, FQuat, Rotation);
 
 /**
  * 
@@ -49,10 +50,13 @@ public:
 	void StopRecording(const FRokokoCommandAPI_IPInfo& IPInfo);
 
 	UFUNCTION(BlueprintCallable, Category = "Command API")
-	void Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& DeviceId, const FString& BoneName, float timeoutTime, const FTransform& transform);
+	void Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& DeviceId, const FString& BoneName, const FTransform& transform, float timeoutTime=2.f, bool isQueryOnly=false);
 
 	UPROPERTY(BlueprintAssignable, Category="Command API")
 	FOnCompletedRequest OnCompletedRequest;
+
+	UPROPERTY(BlueprintAssignable, Category = "Command API")
+	FOnTrackerRequest OnTrackerRequest;
 
 	UPROPERTY(Config, BlueprintReadOnly, Category="Command API")
 	FRokokoCommandAPI_IPInfo Default_IPInfo;
@@ -64,4 +68,5 @@ public:
 	void SaveConfigFile(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitname);
 
 	void OnProcessRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
+	void OnTrackerRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 };
