@@ -739,7 +739,7 @@ void FVirtualProductionSource::HandleCharacterData(const FCharacterData& charact
 	for(int x = 0; x < character.joints.Num(); x++)
 	{
 		boneNames.Add(character.joints[x].name);
-		boneParents.Add(character.joints[x].parentIndex + 1);
+		boneParents.Add(character.joints[x].parentIndex );
 	}
 	
 	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
