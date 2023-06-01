@@ -179,3 +179,25 @@ void FSuitData::ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& Bon
 		bones.Add(FName(*BoneName), FSmartsuitBone(FName(*BoneName), SensorPosition, SensorRotation));
 	}
 }
+
+FCharacterData::FCharacterData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
+{
+	isLive = InIsLive;
+
+	charactername = jsonObject->GetStringField("name");
+	
+	TArray<TSharedPtr<FJsonValue>> JointsArray = jsonObject->GetArrayField("joints");
+
+	for(TArray< TSharedPtr< FJsonValue > >::TConstIterator JointsIter( JointsArray.CreateConstIterator() ); JointsIter; ++JointsIter)
+	{
+		const TSharedPtr< FJsonValue >  JointEntry = *JointsIter;
+		const TSharedPtr< FJsonObject > JoinJSONObject = JointEntry->AsObject();
+
+		FString JointName = JoinJSONObject->GetStringField("name");
+		int32 JointParentIndex = JoinJSONObject->GetIntegerField("parent");
+		FVector JointPosition = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField("position"));
+		FQuat JointRotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField("rotation"));
+
+		joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, JointPosition, JointRotation));
+	}
+}

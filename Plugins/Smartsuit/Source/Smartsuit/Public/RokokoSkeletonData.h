@@ -180,7 +180,26 @@ namespace SmartsuitBones
 	extern const FName rightLittleTip;
 }
 
+USTRUCT()
+struct FRokokoCharacterJoint
+{
+	GENERATED_BODY()
+	
+	FRokokoCharacterJoint() {}
+	FRokokoCharacterJoint(FName Name, int32 ParentIndex, FVector Position, FQuat Rotation)
+		: name(Name)
+		, parentIndex(ParentIndex)
+		, position(Position)
+		, rotation(Rotation)
+		
+	{}
 
+	FName name;
+	int32 parentIndex;
+	FVector position;
+	FQuat rotation;
+	
+};
 
 USTRUCT()
 struct FSmartsuitBone
@@ -301,6 +320,77 @@ struct FSuitData
 		#else
 		return FName(*TempSubjectName);
 		#endif
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FCharacterData
+{
+	GENERATED_BODY()
+
+	FCharacterData(){}
+
+	FCharacterData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject);
+
+	//void ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& BoneName);
+
+	/** The name of the Smartsuit. */
+	UPROPERTY(BlueprintReadOnly, Category=Default)
+	FString charactername;
+
+	uint32_t timestamp;
+	
+	UPROPERTY(BlueprintReadOnly, Category=Default)
+	FString id;
+
+	UPROPERTY(BlueprintReadOnly, Category=Default)
+	bool isLive;
+
+	/** The name of the profile. */
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	FString profileName;
+
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	bool hasGloves;
+
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	bool hasLeftGlove;
+
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	bool hasRightGlove;
+
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	bool hasBody;
+
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	bool hasFace;
+
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	FString faceId;
+
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	FLinearColor color;
+
+	TArray<FRokokoCharacterJoint> joints;
+
+	// const FRokokoCharacterJoint* Hip() const
+	// {
+	// 	return GetJointByName("hip");
+	// }
+
+	// const FRokokoCharacterJoint* GetJointByName(const FName& BoneName) const
+	// {
+	// 	return joints.Find(BoneName);
+	// }
+
+	FName GetSubjectName() const
+	{
+		FString TempSubjectName = "character:" + charactername + ":body";
+#if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
+		return FName(TempSubjectName);
+#else
+		return FName(*TempSubjectName);
+#endif
 	}
 };
 

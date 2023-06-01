@@ -395,7 +395,10 @@ struct FVirtualProductionFrame {
 	TArray<FFace> faces;
 
 	UPROPERTY()
-	TArray<FSuitData> suits;
+	TArray<FSuitData> Actors;
+
+	UPROPERTY()
+	TArray<FCharacterData> Characters;
 
 	//FVirtualProductionFrame (){}
 };

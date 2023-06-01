@@ -635,6 +635,125 @@ void FVirtualProductionSource::HandleSuits(const TArray<FSuitData>& suits)
 	}
 }
 
+void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& characters)
+{
+	if (Client == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client was null!!!!!!"));
+		return;
+	}
+
+	existingCharacters.Empty();
+	notExistingSubjects.Empty();
+
+	for (int subjectIndex = 0; subjectIndex < characters.Num(); subjectIndex++)
+	{
+		const FCharacterData& subject = characters[subjectIndex];
+
+		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
+		bool nameExists = false;
+		for (int characterNameIndex = 0; characterNameIndex < characterNames.Num(); characterNameIndex++) 
+		{
+			if (subject.GetSubjectName() == characterNames[characterNameIndex]) 
+			{
+				nameExists = true;
+				existingCharacters.Add(subject);
+				break;
+			}
+		}
+
+		if (!nameExists) 
+		{
+			existingCharacters.Add(subject);
+			HandleCharacterData(subject);
+		}
+		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
+		if (subjectIndex == characters.Num() - 1) 
+		{
+			for (int i = 0; i < actorNames.Num(); i++) 
+			{
+				bool subjectExists = false;
+				for (int j = 0; j < existingCharacters.Num(); j++) 
+				{
+					if (characterNames[i] == existingCharacters[j].GetSubjectName()) 
+					{
+						subjectExists = true;
+					}
+				}
+				if (!subjectExists) 
+				{
+					notExistingSubjects.Add(characterNames[i]);
+				}
+			}
+
+			for (int i = 0; i < notExistingSubjects.Num(); i++) 
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("Removing face"));
+				Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, notExistingSubjects[i]));
+				actorNames.RemoveSingle(notExistingSubjects[i]);
+				notExistingSubjects.RemoveAt(i);
+			}
+		}
+		
+		FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
+		FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
+		
+		AnimFrameData.WorldTime = FLiveLinkWorldTime();
+
+		TArray<FTransform> transforms;
+		transforms.Reset(subject.joints.Num());
+		
+		// int32 transformIndex = transforms.AddUninitialized(1);
+		// transforms[transformIndex].SetLocation(FVector::ZeroVector);
+		// transforms[transformIndex].SetRotation(FQuat::Identity);
+		// transforms[transformIndex].SetScale3D(FVector::OneVector);
+
+		for(int x = 0; x < subject.joints.Num(); x++)
+		{
+			int32 transformIndex = transforms.AddUninitialized(1);
+			FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, -90));
+			
+			transforms[transformIndex].SetLocation(FVector(subject.joints[x].position.Z * 10.f, subject.joints[x].position.X * 10.f, subject.joints[x].position.Y * 10.f));
+			transforms[transformIndex].SetRotation(FQuat(subject.joints[x].rotation.Z, subject.joints[x].rotation.X, subject.joints[x].rotation.Y, subject.joints[x].rotation.W)/* * modifier*/);
+			transforms[transformIndex].SetScale3D(FVector::OneVector);
+		}
+		
+		AnimFrameData.Transforms.Append(transforms);
+		
+		if(Client)
+		{
+			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData1));
+		}
+	}
+}
+
+void FVirtualProductionSource::HandleCharacterData(const FCharacterData& character) 
+{
+	characterNames.Add(character.GetSubjectName());
+
+	FLiveLinkSubjectKey Key = FLiveLinkSubjectKey(SourceGuid, character.GetSubjectName());
+
+	TArray<FName> boneNames;
+	TArray<int32> boneParents;
+
+	for(int x = 0; x < character.joints.Num(); x++)
+	{
+		boneNames.Add(character.joints[x].name);
+		boneParents.Add(character.joints[x].parentIndex + 1);
+	}
+	
+	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
+	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
+	
+	SkeletonData->SetBoneNames(boneNames);
+	SkeletonData->SetBoneParents(boneParents);
+
+	if(Client)
+	{
+		Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
+	}
+}
+
 void FVirtualProductionSource::HandleFace(const TArray<FFace>& faces) 
 {
 	//verify(Client != nullptr);
@@ -1007,6 +1126,11 @@ void FVirtualProductionSource::SendSuitsToLiveLink(const TArray<FSuitData>& Smar
 
 }
 
+void FVirtualProductionSource::SendCharactersToLiveLink(const TArray<FCharacterData>& Characters)
+{
+	HandleCharacters(Characters);
+}
+
 PRAGMA_DISABLE_OPTIMIZATION
 uint32 FVirtualProductionSource::Run()
 {
@@ -1099,7 +1223,17 @@ uint32 FVirtualProductionSource::Run()
 									SuitData.faceId = FaceData.faceId;
 									VPFrame.faces.Add(FaceData);
 								}
-								VPFrame.suits.Add(SuitData);
+								VPFrame.Actors.Add(SuitData);
+							}
+						}
+
+						if (SceneObj->HasField("characters"))
+						{
+							TArray<TSharedPtr<FJsonValue>> CharactersArray = SceneObj->GetArrayField("characters");
+							for (auto& currentcharacter : CharactersArray)
+							{
+								auto CharacterData = FCharacterData(true, currentcharacter->AsObject());
+								VPFrame.Characters.Add(CharacterData);
 							}
 						}
 					}
@@ -1111,7 +1245,8 @@ uint32 FVirtualProductionSource::Run()
 				GlobalVPFrame.props.Empty();
 				GlobalVPFrame.trackers.Empty();
 				GlobalVPFrame.faces.Empty();
-				GlobalVPFrame.suits.Empty();
+				GlobalVPFrame.Actors.Empty();
+				GlobalVPFrame.Characters.Empty();
 
 				//if (livelink.IsValid())
 				{
@@ -1132,13 +1267,18 @@ uint32 FVirtualProductionSource::Run()
 					{
 						GlobalVPFrame.faces.Add(VPFrame.faces[i]);
 					}
-					for (int i = 0; i < VPFrame.suits.Num(); i++)
+					for (int i = 0; i < VPFrame.Actors.Num(); i++)
 					{
-						GlobalVPFrame.suits.Add(VPFrame.suits[i]);
+						GlobalVPFrame.Actors.Add(VPFrame.Actors[i]);
+					}
+					for (int i = 0; i < VPFrame.Characters.Num(); i++)
+					{
+						GlobalVPFrame.Characters.Add(VPFrame.Characters[i]);
 					}
 					SendToLiveLink(subjects);
 					SendFacesToLivelink(GlobalVPFrame.faces);
-					SendSuitsToLiveLink(GlobalVPFrame.suits);
+					SendSuitsToLiveLink(GlobalVPFrame.Actors);
+					SendCharactersToLiveLink(GlobalVPFrame.Characters);
 				}
 				
 				//UE_LOG(LogTemp, Warning, TEXT("Faces... %i"), GlobalVPFrame.faces.Num());
@@ -1249,12 +1389,12 @@ FSuitData* FVirtualProductionSource::GetSmartsuitByName(FString suitName)
 	mtx.lock();
 	{
 		//should probably set the limit to the size of the suit array here?
-		for (int i = 0; i < GlobalVPFrame.suits.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Actors.Num(); i++)
 		{
-			FString mySuitName(GlobalVPFrame.suits[i].suitname);
+			FString mySuitName(GlobalVPFrame.Actors[i].suitname);
 			if (suitName.Compare(mySuitName) == 0 && !mySuitName.IsEmpty())
 			{
-				result = &(GlobalVPFrame.suits[i]);
+				result = &(GlobalVPFrame.Actors[i]);
 			}
 		}
 	}
@@ -1268,11 +1408,11 @@ TArray<FString> FVirtualProductionSource::GetAvailableSmartsuitNames()
 	//maybe we should set the limit to the size of the suits array
 	mtx.lock();
 	{
-		for (int i = 0; i < GlobalVPFrame.suits.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Actors.Num(); i++)
 		{
-			if ((GlobalVPFrame.suits[i].suitname != "\0\0\0\0") /*&& GlobalVPFrame.suits[i].fps > 0*/)
+			if ((GlobalVPFrame.Actors[i].suitname != "\0\0\0\0") /*&& GlobalVPFrame.suits[i].fps > 0*/)
 			{
-				result.Add(FString(GlobalVPFrame.suits[i].suitname));
+				result.Add(FString(GlobalVPFrame.Actors[i].suitname));
 			}
 		}
 	}
@@ -1286,11 +1426,11 @@ TArray<FSuitData> FVirtualProductionSource::GetAllSmartsuits()
 	//maybe we should set the limit to the size of the suits array
 	mtx.lock();
 	{
-		for (int i = 0; i < GlobalVPFrame.suits.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Actors.Num(); i++)
 		{
-			if ((GlobalVPFrame.suits[i].suitname != "\0\0\0\0") /*&& GlobalVPFrame.suits[i].fps > 0*/)
+			if ((GlobalVPFrame.Actors[i].suitname != "\0\0\0\0") /*&& GlobalVPFrame.suits[i].fps > 0*/)
 			{
-				suits.Add(GlobalVPFrame.suits[i]);
+				suits.Add(GlobalVPFrame.Actors[i]);
 			}
 		}
 	}

@@ -342,6 +342,7 @@ public:
 	void HandleSubjectFrame(const TArray<FVirtualProductionSubject>& virtualProductionObject);
 	void HandleFace(const TArray<FFace>& faces);
 	void HandleSuits(const TArray<FSuitData>& suits);
+	void HandleCharacters(const TArray<FCharacterData>& characters);
 	void ClearAllSubjects();
 
 	static void SetInstance(TSharedPtr<FVirtualProductionSource> NewInstance) { instance = NewInstance; }
@@ -353,15 +354,18 @@ private:
 	void HandleSubjectData(const FVirtualProductionSubject& virtualProductionObject);
 	void HandleFaceData(const FFace& face);
 	void HandleSuitData(const FSuitData& suit);
+	void HandleCharacterData(const FCharacterData& character);
 	void CreateJoint(TArray<FTransform>& transforms, int32 index, const FSmartsuitBone* parent, const FSmartsuitBone* sensor);
 
 	TArray<FName> subjectNames;
 	TArray<FName> faceNames;
 	TArray<FName> actorNames;
+	TArray<FName> characterNames;
 
 	TArray<FVirtualProductionSubject> existingSubjects;
 	TArray<FFace> existingFaces;
 	TArray<FSuitData> existingActors;
+	TArray<FCharacterData> existingCharacters;
 
 	TArray<FName> notExistingSubjects;
 
@@ -447,5 +451,5 @@ private:
 	void SendToLiveLink(const TArray<FVirtualProductionSubject>& Subjects);
 	void SendFacesToLivelink(const TArray<FFace>& Subjects);
 	void SendSuitsToLiveLink(const TArray<FSuitData>& Smartsuits);
-
+	void SendCharactersToLiveLink(const TArray<FCharacterData>& Characters);
 };
