@@ -703,19 +703,27 @@ void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& ch
 		TArray<FTransform> transforms;
 		transforms.Reset(subject.joints.Num());
 		
-		// int32 transformIndex = transforms.AddUninitialized(1);
-		// transforms[transformIndex].SetLocation(FVector::ZeroVector);
-		// transforms[transformIndex].SetRotation(FQuat::Identity);
-		// transforms[transformIndex].SetScale3D(FVector::OneVector);
+		int32 transformIndex = transforms.AddUninitialized(1);
+		transforms[transformIndex].SetLocation(FVector::ZeroVector);
+		transforms[transformIndex].SetRotation(FQuat::Identity);
+		transforms[transformIndex].SetScale3D(FVector::OneVector);
+
+		transformIndex = transforms.AddUninitialized(1);
+		transforms[transformIndex].SetLocation(FVector::ZeroVector);
+		transforms[transformIndex].SetRotation(FQuat::Identity);
+		transforms[transformIndex].SetScale3D(FVector::OneVector);
 
 		for(int x = 0; x < subject.joints.Num(); x++)
 		{
 			int32 transformIndex = transforms.AddUninitialized(1);
-			FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, -90));
+			//FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, -90));
 			
-			transforms[transformIndex].SetLocation(FVector(subject.joints[x].position.Z * 10.f, subject.joints[x].position.X * 10.f, subject.joints[x].position.Y * 10.f));
-			transforms[transformIndex].SetRotation(FQuat(subject.joints[x].rotation.Z, subject.joints[x].rotation.X, subject.joints[x].rotation.Y, subject.joints[x].rotation.W)/* * modifier*/);
+			transforms[transformIndex].SetLocation(subject.joints[x].position);
+			transforms[transformIndex].SetRotation(subject.joints[x].rotation);
 			transforms[transformIndex].SetScale3D(FVector::OneVector);
+
+			//UWorld *world = GWorld;//GEngine->GetWorld();
+			//DrawDebugSphere(world, subject.joints[x].position, 120, 12, FColor::Red, false, 0.0f, 0, 1);
 		}
 		
 		AnimFrameData.Transforms.Append(transforms);
@@ -736,6 +744,12 @@ void FVirtualProductionSource::HandleCharacterData(const FCharacterData& charact
 	TArray<FName> boneNames;
 	TArray<int32> boneParents;
 
+	boneNames.Add("SKM_Manny");
+	boneParents.Add(-1);
+	
+	boneNames.Add("root");
+	boneParents.Add(-1);
+	
 	for(int x = 0; x < character.joints.Num(); x++)
 	{
 		boneNames.Add(character.joints[x].name);
@@ -1189,7 +1203,7 @@ uint32 FVirtualProductionSource::Run()
 
 
 				FString result = BytesToStringFixed(UncompressedData.GetData(), static_cast<int32_t>(dstSize));
-				FString test = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
+				//FString test = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
 				
 				TSharedPtr<FJsonObject> JsonObject;
 				TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(result);

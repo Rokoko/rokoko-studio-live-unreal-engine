@@ -180,6 +180,19 @@ void FSuitData::ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& Bon
 	}
 }
 
+FQuat NED2Unreal_test(FQuat InRotation)
+{
+	FQuat result(InRotation.X, InRotation.Y, InRotation.Z, InRotation.W);
+	result.Z = -result.Z;
+	result.Y = -result.Y;
+
+	//static FQuat modifier = FQuat::MakeFromEuler(FVector(180, 0, 90));
+	//static FQuat postModifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
+	const FQuat finalResult = result;//modifier * result * postModifier;
+
+	return FQuat(finalResult.X, finalResult.Y, finalResult.Z, finalResult.W);
+}
+
 FCharacterData::FCharacterData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 {
 	isLive = InIsLive;
@@ -198,6 +211,29 @@ FCharacterData::FCharacterData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject
 		FVector JointPosition = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField("position"));
 		FQuat JointRotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField("rotation"));
 
-		joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, JointPosition, JointRotation));
+
+		FVector AdjustedJointPosition;
+		FQuat AdjustedJointRotation;
+
+		//convert meters to centimeters since values coming from unity are in meters
+		double WORLD_SCALE = 100;
+		//FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, -90));
+		AdjustedJointPosition = FVector(JointPosition.X * WORLD_SCALE, -JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
+		AdjustedJointRotation = FQuat(JointRotation.X, JointRotation.Y, JointRotation.Z, JointRotation.W);// * modifier;
+
+		
+		
+		if(JointName == "pelvis")
+		{
+			UE_LOG(LogTemp, Warning, TEXT("unadjusted hip location: %s         unadjusted hip rotation: %s"), *JointPosition.ToString(), *JointRotation.Rotator().ToString());
+			UE_LOG(LogTemp, Warning, TEXT("  adjusted hip location: %s      adjusted hip rotation:   %s"), *AdjustedJointPosition.ToString(), *AdjustedJointRotation.Rotator().ToString());
+		}
+
+		//if(JointParentIndex != -1)
+		{
+			JointParentIndex += 2;
+		}
+
+		joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, AdjustedJointPosition, AdjustedJointRotation));
 	}
 }
