@@ -218,9 +218,9 @@ FCharacterData::FCharacterData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject
 		FTransform jointTransform(qu, AdjustedJointPosition, FVector::OneVector);
 
 		//if(JointParentIndex != -1)
-		{
-			JointParentIndex += 2;
-		}
+		// {
+		// 	JointParentIndex += 2;
+		// }
 
 		joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, jointTransform));
 	}

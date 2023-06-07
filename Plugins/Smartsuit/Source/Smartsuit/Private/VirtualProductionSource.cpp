@@ -703,20 +703,20 @@ void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& ch
 		TArray<FTransform> transforms;
 		transforms.Reset(subject.joints.Num());
 		
-		int32 transformIndex = transforms.AddUninitialized(1);
-		transforms[transformIndex].SetLocation(FVector::ZeroVector);
-		transforms[transformIndex].SetRotation(FQuat::Identity);
-		transforms[transformIndex].SetScale3D(FVector::OneVector);
+		// int32 transformIndex = transforms.AddUninitialized(1);
+		// transforms[transformIndex].SetLocation(FVector::ZeroVector);
+		// transforms[transformIndex].SetRotation(FQuat::Identity);
+		// transforms[transformIndex].SetScale3D(FVector::OneVector);
 
-		transformIndex = transforms.AddUninitialized(1);
-		transforms[transformIndex].SetLocation(FVector::ZeroVector);
-		transforms[transformIndex].SetRotation(FQuat::Identity);
-		transforms[transformIndex].SetScale3D(FVector::OneVector);
+		// transformIndex = transforms.AddUninitialized(1);
+		// transforms[transformIndex].SetLocation(FVector::ZeroVector);
+		// transforms[transformIndex].SetRotation(FQuat::Identity);
+		// transforms[transformIndex].SetScale3D(FVector::OneVector);
 
 		for(int x = 0; x < subject.joints.Num(); x++)
 		{
 			const int32 transformIndex = transforms.AddUninitialized(1);
-			const int parentIndex = subject.joints[x].parentIndex - 2;
+			const int parentIndex = subject.joints[x].parentIndex/* - 2*/;
 
 			if (parentIndex >= 0)
 			{
@@ -747,11 +747,11 @@ void FVirtualProductionSource::HandleCharacterData(const FCharacterData& charact
 	TArray<FName> boneNames;
 	TArray<int32> boneParents;
 
-	boneNames.Add("SKM_Manny");
-	boneParents.Add(-1);
-	
-	boneNames.Add("root");
-	boneParents.Add(-1);
+	// boneNames.Add("SKM_Manny");
+	// boneParents.Add(-1);
+	//
+	// boneNames.Add("root");
+	// boneParents.Add(-1);
 	
 	for(int x = 0; x < character.joints.Num(); x++)
 	{
