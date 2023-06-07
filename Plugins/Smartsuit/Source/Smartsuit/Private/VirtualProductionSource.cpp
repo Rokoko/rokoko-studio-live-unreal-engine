@@ -715,15 +715,18 @@ void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& ch
 
 		for(int x = 0; x < subject.joints.Num(); x++)
 		{
-			int32 transformIndex = transforms.AddUninitialized(1);
-			//FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, -90));
-			
-			transforms[transformIndex].SetLocation(subject.joints[x].position);
-			transforms[transformIndex].SetRotation(subject.joints[x].rotation);
-			transforms[transformIndex].SetScale3D(FVector::OneVector);
+			const int32 transformIndex = transforms.AddUninitialized(1);
+			const int parentIndex = subject.joints[x].parentIndex - 2;
 
-			//UWorld *world = GWorld;//GEngine->GetWorld();
-			//DrawDebugSphere(world, subject.joints[x].position, 120, 12, FColor::Red, false, 0.0f, 0, 1);
+			if (parentIndex >= 0)
+			{
+				transforms[transformIndex] = subject.joints[x].transform.GetRelativeTransform(
+					subject.joints[parentIndex].transform);
+			}
+			else
+			{
+				transforms[transformIndex] = subject.joints[x].transform;
+			}
 		}
 		
 		AnimFrameData.Transforms.Append(transforms);
