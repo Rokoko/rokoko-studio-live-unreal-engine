@@ -186,19 +186,17 @@ struct FRokokoCharacterJoint
 	GENERATED_BODY()
 	
 	FRokokoCharacterJoint() {}
-	FRokokoCharacterJoint(FName Name, int32 ParentIndex, FVector Position, FQuat Rotation)
+	FRokokoCharacterJoint(FName Name, int32 ParentIndex, FTransform& Transform)
 		: name(Name)
 		, parentIndex(ParentIndex)
-		, position(Position)
-		, rotation(Rotation)
-		
+		, transform(Transform)
 	{}
 
 	FName name;
 	int32 parentIndex;
 	FVector position;
 	FQuat rotation;
-	
+	FTransform transform;
 };
 
 USTRUCT()

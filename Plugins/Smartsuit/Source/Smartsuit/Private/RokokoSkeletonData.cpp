@@ -180,23 +180,10 @@ void FSuitData::ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& Bon
 	}
 }
 
-FQuat NED2Unreal_test(FQuat InRotation)
-{
-	FQuat result(InRotation.X, InRotation.Y, InRotation.Z, InRotation.W);
-	result.Z = -result.Z;
-	result.Y = -result.Y;
-
-	//static FQuat modifier = FQuat::MakeFromEuler(FVector(180, 0, 90));
-	//static FQuat postModifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
-	const FQuat finalResult = result;//modifier * result * postModifier;
-
-	return FQuat(finalResult.X, finalResult.Y, finalResult.Z, finalResult.W);
-}
 
 FCharacterData::FCharacterData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 {
 	isLive = InIsLive;
-
 	charactername = jsonObject->GetStringField("name");
 	
 	TArray<TSharedPtr<FJsonValue>> JointsArray = jsonObject->GetArrayField("joints");
@@ -211,29 +198,30 @@ FCharacterData::FCharacterData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject
 		FVector JointPosition = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField("position"));
 		FQuat JointRotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField("rotation"));
 
-
 		FVector AdjustedJointPosition;
-		FQuat AdjustedJointRotation;
-
+		
 		//convert meters to centimeters since values coming from unity are in meters
-		double WORLD_SCALE = 100;
-		//FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, -90));
-		AdjustedJointPosition = FVector(JointPosition.X * WORLD_SCALE, -JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
-		AdjustedJointRotation = FQuat(JointRotation.X, JointRotation.Y, JointRotation.Z, JointRotation.W);// * modifier;
+		constexpr double WORLD_SCALE = 100.0;
+		AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
+		
+		// Quaternions - Convert Rotations from Studio to UE
+		const FVector jointRotationEuler = JointRotation.Euler();
+		const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
+		const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
+		const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Z));
 
+		FQuat qu = qy * qz * qx; // Change Rotation Order
 		
-		
-		if(JointName == "pelvis")
-		{
-			UE_LOG(LogTemp, Warning, TEXT("unadjusted hip location: %s         unadjusted hip rotation: %s"), *JointPosition.ToString(), *JointRotation.Rotator().ToString());
-			UE_LOG(LogTemp, Warning, TEXT("  adjusted hip location: %s      adjusted hip rotation:   %s"), *AdjustedJointPosition.ToString(), *AdjustedJointRotation.Rotator().ToString());
-		}
+		static FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, 0));
+		qu = qu * modifier;
+
+		FTransform jointTransform(qu, AdjustedJointPosition, FVector::OneVector);
 
 		//if(JointParentIndex != -1)
 		{
 			JointParentIndex += 2;
 		}
 
-		joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, AdjustedJointPosition, AdjustedJointRotation));
+		joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, jointTransform));
 	}
 }
