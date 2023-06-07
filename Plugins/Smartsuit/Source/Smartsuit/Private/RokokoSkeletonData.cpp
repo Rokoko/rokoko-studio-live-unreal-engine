@@ -207,20 +207,16 @@ FCharacterData::FCharacterData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject
 		// Quaternions - Convert Rotations from Studio to UE
 		const FVector jointRotationEuler = JointRotation.Euler();
 		const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
-		const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
 		const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Z));
+		const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
 
-		FQuat qu = qy * qz * qx; // Change Rotation Order
+		// Change Rotation Order
+		FQuat qu = qy * qz * qx;
 		
 		static FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, 0));
 		qu = qu * modifier;
 
 		FTransform jointTransform(qu, AdjustedJointPosition, FVector::OneVector);
-
-		//if(JointParentIndex != -1)
-		// {
-		// 	JointParentIndex += 2;
-		// }
 
 		joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, jointTransform));
 	}
