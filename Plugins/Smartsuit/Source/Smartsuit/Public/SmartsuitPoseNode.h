@@ -238,6 +238,14 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = RootMotion, meta = (PinShownByDefault))
 	bool bApplyRootMotion;
 
+	/** Use to shoulder space. Tweaks the clavicle/shoulder rotation, around approx. the character up axis. Make sure that skeleton axis are imported correctly into Unreal! Defaults to 0.0f */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Space, meta = (PinShownByDefault))
+	float ShoulderSpace{0.0f};
+
+	/** Use to tweak arm space. Tweaks the upper arm rotation around approx. the character forward axis. Make sure that skeleton axis are imported correctly into Unreal! Defaults to 0.0f */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Space, meta = (PinShownByDefault))
+	float ArmSpace{ 0.0f };
+
 	/// @private
 	SmartsuitTPose TPose;
 	/// @private
