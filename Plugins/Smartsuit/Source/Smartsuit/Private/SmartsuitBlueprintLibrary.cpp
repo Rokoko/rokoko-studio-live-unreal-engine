@@ -2,6 +2,7 @@
 
 #include "SmartsuitBlueprintLibrary.h"
 #include "VirtualProductionSource.h"
+#include "Engine/SkeletalMesh.h"
 
 ASmartsuitController* USmartsuitBlueprintLibrary::GetSmartsuitControllerByName(FString name)
 {

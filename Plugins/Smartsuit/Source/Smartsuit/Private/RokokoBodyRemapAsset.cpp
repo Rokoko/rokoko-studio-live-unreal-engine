@@ -270,7 +270,7 @@ void URokokoBodyMapData::InitializeTMap()
 //{
 //	InitializeTMap();
 //}
-PRAGMA_DISABLE_OPTIMIZATION
+//PRAGMA_DISABLE_OPTIMIZATION
 FName URokokoBodyMapData::GetRemappedBoneName_Implementation(FName CurveName) const
 {
 	if (auto RemappedName = NameMapping.Find(CurveName))
@@ -280,5 +280,5 @@ FName URokokoBodyMapData::GetRemappedBoneName_Implementation(FName CurveName) co
 
 	return "";
 }
-PRAGMA_ENABLE_OPTIMIZATION
+//PRAGMA_ENABLE_OPTIMIZATION
 

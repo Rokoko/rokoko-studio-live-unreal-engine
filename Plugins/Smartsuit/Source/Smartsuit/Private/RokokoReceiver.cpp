@@ -187,7 +187,7 @@ FProp* ARokokoReceiver::GetPropByNameFromVP(FString name, bool isLive)
 
 	return ReturnValue;
 }
-PRAGMA_DISABLE_OPTIMIZATION
+//PRAGMA_DISABLE_OPTIMIZATION
 TArray<FProp> ARokokoReceiver::GetAllProps()
 {
 	//TArray<FProp> result;
@@ -222,7 +222,7 @@ TArray<FProp> ARokokoReceiver::GetAllProps()
 
 	return AllProps;
 }
-PRAGMA_ENABLE_OPTIMIZATION
+//PRAGMA_ENABLE_OPTIMIZATION
 bool ARokokoReceiver::GetProp(FString name, /*bool isLive, */FProp& OutProp)
 {
 	//for (TObjectIterator<ARokokoReceiver> It; It; ++It)

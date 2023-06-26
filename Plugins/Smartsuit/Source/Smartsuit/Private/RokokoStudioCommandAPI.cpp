@@ -159,14 +159,14 @@ void URokokoStudioCommandAPI::Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, co
 	HttpRequest->ProcessRequest();
 }
 
-PRAGMA_DISABLE_OPTIMIZATION
+//PRAGMA_DISABLE_OPTIMIZATION
 void URokokoStudioCommandAPI::SaveConfigFile(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitname)
 {
 	Default_IPInfo = IPInfo;
 	Default_SmartSuitName = SmartSuitname;
 	SaveConfig();
 }
-PRAGMA_ENABLE_OPTIMIZATION
+//PRAGMA_ENABLE_OPTIMIZATION
 
 void URokokoStudioCommandAPI::OnProcessRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
 {

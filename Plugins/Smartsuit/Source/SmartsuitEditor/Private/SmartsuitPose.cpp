@@ -39,7 +39,7 @@ void USmartsuitPose::CheckForWarnings(FString name, FBoneReference bone, USkelet
 		}
 	}
 }
-PRAGMA_DISABLE_OPTIMIZATION
+//PRAGMA_DISABLE_OPTIMIZATION
 void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, FCompilerResultsLog& MessageLog)
 {
 	
@@ -378,5 +378,5 @@ void USmartsuitPose::PreloadRequiredAssets()
 
 }
 
-PRAGMA_ENABLE_OPTIMIZATION
+//PRAGMA_ENABLE_OPTIMIZATION
 #undef LOCTEXT_NAMESPACE

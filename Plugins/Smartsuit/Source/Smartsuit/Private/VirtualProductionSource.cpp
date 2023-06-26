@@ -1131,7 +1131,7 @@ void FVirtualProductionSource::SendCharactersToLiveLink(const TArray<FCharacterD
 	HandleCharacters(Characters);
 }
 
-PRAGMA_DISABLE_OPTIMIZATION
+//PRAGMA_DISABLE_OPTIMIZATION
 uint32 FVirtualProductionSource::Run()
 {
 	static LZ4F_decompressionContext_t g_dCtx;
@@ -1293,7 +1293,7 @@ uint32 FVirtualProductionSource::Run()
 	}
 	return 0;
 }
-PRAGMA_ENABLE_OPTIMIZATION
+//PRAGMA_ENABLE_OPTIMIZATION
 FProp* FVirtualProductionSource::GetPropByName(FString name, bool isLive)
 {
 	FProp* result = nullptr;
