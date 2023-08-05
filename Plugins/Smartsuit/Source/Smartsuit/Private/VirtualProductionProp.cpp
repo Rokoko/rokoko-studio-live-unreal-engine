@@ -50,7 +50,7 @@ void UVirtualProductionProp::TickComponent(float DeltaTime, ELevelTick TickType,
 	FProp* prop = listener->GetPropByNameFromVP(name, isLive);
 	if (!prop) 
 	{
-		UE_LOG(LogTemp, Warning, TEXT("could not get prop!!!"));
+		//UE_LOG(LogTemp, Warning, TEXT("could not get prop!!!"));
 		return;
 	}
 

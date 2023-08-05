@@ -36,6 +36,13 @@ struct SMARTSUIT_API FLiveLinkSmartsuitFrameData : public FLiveLinkAnimationFram
 
 };
 
+USTRUCT(BlueprintType)
+struct SMARTSUIT_API FLiveLinkCharactersFrameData : public FLiveLinkAnimationFrameData
+{
+	GENERATED_BODY()
+public:
+};
+
 /**
  * Facility structure to handle camera data in blueprint
  */

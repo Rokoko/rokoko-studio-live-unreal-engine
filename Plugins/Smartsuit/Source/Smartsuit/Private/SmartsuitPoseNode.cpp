@@ -565,6 +565,11 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	FQuat modifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
 	FQuat forwardModifier = FQuat::MakeFromEuler(FVector(0, 0, 90));
 
+	// These duplicate variables are a bit redundant in their current state, however lets keep these around in case we need to negate an axis for example
+	FQuat LeftShoulderSpace = FQuat::MakeFromEuler(FVector(ShoulderSpace, 0.0f, 0.0f));
+	FQuat RightShoulderSpace = FQuat::MakeFromEuler(FVector(ShoulderSpace, 0.0f, 0.0f));
+	FQuat LeftArmSpace = FQuat::MakeFromEuler(FVector(ArmSpace, 0.0f, 0.0f));
+	FQuat RightArmSpace = FQuat::MakeFromEuler(FVector(ArmSpace, 0.0f, 0.0f));
 
 	FQuat hipQuat =						GetRotation3(SmartsuitBones::hip, SubjectFrameData);// *modifier;
 	FVector hipPosition =				GetPosition3(SmartsuitBones::hip, SubjectFrameData);
@@ -572,12 +577,12 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	FQuat chestQuat =					GetRotation3(SmartsuitBones::chest, SubjectFrameData);
 	FQuat neckQuat =					GetRotation3(SmartsuitBones::neck, SubjectFrameData);
 	FQuat headQuat =					GetRotation3(SmartsuitBones::head, SubjectFrameData);
-	FQuat leftShoulderQuat =			GetRotation3(SmartsuitBones::leftShoulder, SubjectFrameData);
-	FQuat leftArmQuat =					GetRotation3(SmartsuitBones::leftUpperArm, SubjectFrameData);
+	FQuat leftShoulderQuat =			GetRotation3(SmartsuitBones::leftShoulder, SubjectFrameData) * LeftShoulderSpace;
+	FQuat leftArmQuat =					GetRotation3(SmartsuitBones::leftUpperArm, SubjectFrameData) * LeftArmSpace;
 	FQuat leftForearmQuat =				GetRotation3(SmartsuitBones::leftLowerArm, SubjectFrameData);
 	FQuat leftHandQuat =				GetRotation3(SmartsuitBones::leftHand, SubjectFrameData);
-	FQuat rightShoulderQuat =			GetRotation3(SmartsuitBones::rightShoulder, SubjectFrameData);
-	FQuat rightArmQuat =				GetRotation3(SmartsuitBones::rightUpperArm, SubjectFrameData);
+	FQuat rightShoulderQuat =			GetRotation3(SmartsuitBones::rightShoulder, SubjectFrameData) * RightShoulderSpace;
+	FQuat rightArmQuat =				GetRotation3(SmartsuitBones::rightUpperArm, SubjectFrameData) * RightArmSpace;
 	FQuat rightForearmQuat =			GetRotation3(SmartsuitBones::rightLowerArm, SubjectFrameData);
 	FQuat rightHandQuat =				GetRotation3(SmartsuitBones::rightHand, SubjectFrameData);
 	FQuat leftUpLegQuat =				GetRotation3(SmartsuitBones::leftUpLeg, SubjectFrameData);
