@@ -186,7 +186,7 @@ struct FRokokoCharacterJoint
 	GENERATED_BODY()
 	
 	FRokokoCharacterJoint() {}
-	FRokokoCharacterJoint(FName Name, int32 ParentIndex, FTransform& Transform)
+	FRokokoCharacterJoint(FName Name, int32 ParentIndex, const FTransform& Transform)
 		: name(Name)
 		, parentIndex(ParentIndex)
 		, transform(Transform)

@@ -702,6 +702,7 @@ void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& ch
 
 		TArray<FTransform> transforms;
 		transforms.Reset(subject.joints.Num());
+		FTransform tm;
 
 		for(int x = 0; x < subject.joints.Num(); x++)
 		{
@@ -710,12 +711,30 @@ void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& ch
 
 			if (parentIndex >= 0)
 			{
-				transforms[transformIndex] = subject.joints[x].transform.GetRelativeTransform( subject.joints[parentIndex].transform);
+				tm = subject.joints[x].transform.GetRelativeTransform(subject.joints[parentIndex].transform);
 			}
 			else
 			{
-				transforms[transformIndex] = subject.joints[x].transform;
+				tm = subject.joints[x].transform;
 			}
+			
+			const FVector JointPosition = tm.GetLocation();
+			const FQuat JointRotation = tm.GetRotation();
+
+			//convert meters to centimeters since values coming from unity are in meters
+			constexpr double WORLD_SCALE = 100.0;
+			FVector AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
+
+			// Quaternions - Convert Rotations from Studio to UE
+			const FVector jointRotationEuler = JointRotation.Euler();
+			const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
+			const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Z));
+			const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
+
+			// Change Rotation Order
+			const FQuat qu = qy * qz * qx;
+
+			transforms[transformIndex].SetComponents(qu, AdjustedJointPosition, FVector::One());
 		}
 		
 		AnimFrameData.Transforms.Append(transforms);
