@@ -198,26 +198,7 @@ FCharacterData::FCharacterData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject
 		FVector JointPosition = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField("position"));
 		FQuat JointRotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField("rotation"));
 
-		FVector AdjustedJointPosition;
-		
-		//convert meters to centimeters since values coming from unity are in meters
-		constexpr double WORLD_SCALE = 100.0;
-		AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
-		
-		// Quaternions - Convert Rotations from Studio to UE
-		const FVector jointRotationEuler = JointRotation.Euler();
-		const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
-		const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Z));
-		const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
-
-		// Change Rotation Order
-		FQuat qu = qy * qz * qx;
-		
-		static FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, 0));
-		qu = qu * modifier;
-
-		FTransform jointTransform(qu, AdjustedJointPosition, FVector::OneVector);
-
-		joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, jointTransform));
+		FTransform JointTransform(JointRotation, JointPosition, FVector::OneVector);
+		joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, JointTransform));
 	}
 }
