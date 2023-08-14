@@ -1,7 +1,7 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "SmartsuitController.h"
-
+#include "VirtualProductionSource.h"
 
 // Sets default values
 ASmartsuitController::ASmartsuitController()
@@ -24,35 +24,19 @@ void ASmartsuitController::BeginPlay()
 	}
 }
 
-ARokokoReceiver* ASmartsuitController::GetReceiver() 
-{
-	ARokokoReceiver* listener = nullptr;
-	// Find UObjects by type
-	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
-	{
-		if (It->enabled) 
-		{
-			listener = *It;
-			break;
-		}
-		// ...
-	}
-	return listener;
-}
-
 // Called every frame
 void ASmartsuitController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	ARokokoReceiver* listener = GetReceiver();
-	if (!listener) 
+	auto livelink = FVirtualProductionSource::Get();
+	if (!livelink.IsValid())
 	{
 		return;
 	}
 
 	if (AutoConnect) 
 	{
-		TArray<FString> suitnames = listener->GetAvailableSmartsuitNames();
+		TArray<FString> suitnames = livelink->GetAvailableSmartsuitNames();
 		if (suitnames.Num() > 0)
 		{
 			suitname = suitnames[0];
@@ -64,7 +48,7 @@ void ASmartsuitController::Tick(float DeltaTime)
 		return;
 	}
 
-	FSuitData *data = listener->GetSmartsuit(suitname);
+	FSuitData *data = livelink->GetSmartsuitByName(suitname);
 	if (!data) 
 	{
 		return;

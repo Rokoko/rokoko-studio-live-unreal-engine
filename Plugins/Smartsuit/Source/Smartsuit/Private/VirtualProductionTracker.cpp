@@ -1,7 +1,8 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "VirtualProductionTracker.h"
-
+#include "VirtualProductionFrame.h"
+#include "VirtualProductionSource.h"
 
 UVirtualProductionTracker::UVirtualProductionTracker()
 {
@@ -21,32 +22,18 @@ void UVirtualProductionTracker::BeginPlay()
 	CurrentLocation = parent->GetActorLocation();
 }
 
-ARokokoReceiver* UVirtualProductionTracker::GetReceiver() 
-{
-	ARokokoReceiver* listener = nullptr;
-
-	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
-	{
-		if (It->enabled) 
-		{
-			listener = *It;
-			break;
-		}
-	}
-	return listener;
-}
-
 void UVirtualProductionTracker::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	ARokokoReceiver* listener = GetReceiver();
-	if (!listener) 
+	auto livelink = FVirtualProductionSource::Get();
+	if (!livelink.IsValid())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
 		return;
 	}
 
-	FTracker* tracker = listener->GetTrackerByNameFromVP(name, isLive);
+	FTracker* tracker = livelink->GetTrackerByName(name, isLive);
 	if (!tracker) 
 	{
 		return;

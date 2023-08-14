@@ -1,7 +1,7 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "VirtualProductionProp.h"
-
+#include "VirtualProductionSource.h"
 
 UVirtualProductionProp::UVirtualProductionProp()
 {
@@ -21,50 +21,23 @@ void UVirtualProductionProp::BeginPlay()
 	CurrentLocation = parent->GetActorLocation();
 }
 
-ARokokoReceiver* UVirtualProductionProp::GetReceiver()
-{
-	ARokokoReceiver* listener = nullptr;
-	
-	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
-	{
-		//if (It->enabled) 
-		{
-			listener = *It;
-			break;
-		}
-	}
-	return listener;
-}
-
 void UVirtualProductionProp::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	ARokokoReceiver* listener = GetReceiver();
-	if (!listener) 
+	auto livelink = FVirtualProductionSource::Get();
+	if (!livelink.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("could not get receiver!!!"));
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
 		return;
 	}
 
-	FProp* prop = listener->GetPropByNameFromVP(name, isLive);
+	FProp* prop = livelink->GetPropByName(name, isLive);
 	if (!prop) 
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("could not get prop!!!"));
 		return;
 	}
-
-	//FVector LocalOffset(10.f, 10.f, 0.f);
-
-	//FTransform TestTransform(prop->FQuatToRotator(), prop->UPosition(), FVector(scalePosition, scalePosition, scalePosition));
-
-	//if (useLocalSpace)
-	//{
-	//	TestTransform.TransformPosition(LocalOffset);
-	//}
-
-	//parent->SetActorLocation(TestTransform.GetLocation());
-	//parent->SetActorRotation(TestTransform.GetRotation());
 
 	if (useLocalSpace)
 	{
@@ -76,6 +49,4 @@ void UVirtualProductionProp::TickComponent(float DeltaTime, ELevelTick TickType,
 		parent->SetActorLocation(prop->UPosition() * scalePosition);
 		parent->SetActorRotation(prop->FQuatToRotator());
 	}
-
-	//parent->SetActorRotation(prop->FQuatToRotator());
 }

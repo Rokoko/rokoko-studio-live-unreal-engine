@@ -4,7 +4,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameFramework/Actor.h"
-#include "RokokoReceiver.h"
 #include "VirtualProductionProp.generated.h"
 
 
@@ -43,6 +42,4 @@ public:
 	FVector CurrentLocation;
 	AActor* parent;
 
-private:
-	ARokokoReceiver* GetReceiver();
 };

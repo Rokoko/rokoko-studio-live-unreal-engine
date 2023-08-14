@@ -371,19 +371,7 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	//	return;
 	//}
 
-	ARokokoReceiver *receiver = GetReceiver();
-	if (!receiver) 
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("No receiver"));
-		//return;
-	}
-	FSuitData* data = nullptr;//receiver->GetSmartsuit(Controller->suitname);
-	if (!data) 
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("No data for %s"), *Controller->suitname);
-		//return;
-	}
-
+	
 	if (!LiveLinkClient_AnyThread /*|| !CurrentRetargetAsset*/)
 	{
 		return;

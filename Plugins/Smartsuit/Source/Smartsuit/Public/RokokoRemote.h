@@ -9,43 +9,15 @@
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonWriter.h"
 #include "Serialization/JsonSerializer.h"
+#include "RokokoStudioCommandAPI.h"
 
 #include "RokokoRemote.generated.h"
 
 class FUdpSocketReceiver;
 
-USTRUCT()
-struct FRokokoRemoteInstance /*: IValuable*/
-{
-public:
-	GENERATED_BODY()
 
-	FRokokoRemoteInstance() {}
-	FRokokoRemoteInstance(TSharedPtr<FJsonObject> jsonObject);
-
-	FString Serialize();
-
-	void DisplayValues();
-
-	FString type;
-	int version;
-	FString provider;
-	FString faceId;
-	FString deviceName;
-	FString connectedTo;
-	FString requestedFrom;
-	FString commandKey;
-	int commandPort;
-	bool recording;
-	float currentRecordingTime;
-	int numberOfLiveSuits;
-	bool commandApiOn;
-	bool commandApiLicense;
-	bool faceLicense;
-};
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnConnected, const FString&, ResponseContentString);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDisconnected);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnConnected, const FString&, ResponseContentString);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDisconnected);
 
 UCLASS()
 class SMARTSUIT_API ARokokoRemote : public AActor
@@ -61,46 +33,18 @@ public:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Default)
-	FString IPAddress;
+	static ARokokoRemote *GetFirstAvailableActor();
 
-	UPROPERTY()
-	FTimerHandle FTH_TestHandle;
+	UPROPERTY(BlueprintAssignable, Category = "Command API")
+	FOnCompletedRequest OnCompletedRequest;
 
-	UPROPERTY(BlueprintAssignable)
-	FOnConnected OnConnected;
+	UPROPERTY(BlueprintAssignable, Category = "Command API")
+	FOnInfoRequest OnInfoRequest;
 
-	UPROPERTY(BlueprintAssignable)
-	FOnDisconnected OnDisconnected;
+	UPROPERTY(BlueprintAssignable, Category = "Command API")
+	FOnTrackerRequest OnTrackerRequest;
 
-	UFUNCTION(BlueprintPure, Category = Default)
-	FString GetCommandAPIKey();
-
-	UFUNCTION(BlueprintPure, Category = Default)
-	int32 GetCommandAPIPort();
-
-	TSharedPtr<FInternetAddr> RemoteAddr;
-
-	FSocket* SenderSocket;
-
-	bool StartUDPSender(const FString& YourChosenSocketName, const FString& TheIP, const int32 ThePort);
-
-	bool Sender_SendData();
-
-	void SendData();
-
-	bool StartUDPReceiver(const FString& YourChosenSocketName, const FString& TheIP, const int32 ThePort);
-
-	FSocket* ListenSocket;
-
-	FUdpSocketReceiver* UDPReceiver;
-	void Recv(const FArrayReaderPtr& ArrayReaderPtr, const FIPv4Endpoint& EndPt);
-
-	FRokokoRemoteInstance CurrentData;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Default)
-	int SenderPort;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Default)
-	int ReceiverPort;
+	void OnProcessRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
+	void OnInfoRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
+	void OnTrackerRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 };

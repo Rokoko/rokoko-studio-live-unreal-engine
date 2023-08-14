@@ -25,12 +25,86 @@ class USmartsuitBlueprintLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+	
+	UFUNCTION(BlueprintCallable, Category = "Rokoko")
+	FFace GetFaceByFaceID(FString faceName);
+
+	UFUNCTION(BlueprintCallable, Category = "Rokoko")
+	FFace GetFaceByProfileName(const FString& faceName, bool& found);
+
+	UFUNCTION(BlueprintCallable, Category = "Rokoko")
+	TArray<FFace> GetAllFaces();
+
+	UFUNCTION(BlueprintCallable, Category = "Rokoko")
+	TArray<FFace> GetFacesNotAssociatedWithActor();
+
+	/**
+	* This function returns the last frame of data received from a Smartsuit with the given name.
+	* If there is no data for the given name, then nullptr will return.
+	*
+	* @param suitName The smartsuit name to get the last data for.
+	* @return Returns the last frame received for the smartsuit with name suitName. If no frame is found, it will return nullptr.
+	*/
+	FSuitData* GetSmartsuit(FString suitName);
+
+	UFUNCTION(BlueprintCallable, Category = Default)
+	bool GetSmartsuitByName(const FString& suitName, FSuitData& SuitData);
+
+	/**
+	* Lists the names of all known Smartsuits connected to this computer.
+	* It will only list the currently active Smartsuits.
+	*
+	* @return Returns an array with all the available in the network Smartsuit names.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Rokoko", meta = (BlueprintThreadSafe, ToolTip = "Returns actor names in the current live link source"))
+	static TArray<FString> GetAvailableActorNames();
+
+	UFUNCTION(BlueprintCallable, Category = Default)
+	TArray<FSuitData> GetAllSmartsuits();
+
+	FProp* GetPropByNameFromVP(FString name, bool isLive);
+	FTracker* GetTrackerByNameFromVP(FString name, bool isLive);
+
+	UFUNCTION(BlueprintPure, Category = "VirtualProduction")
+	FTracker GetTrackerByConnectionIDFromVP(const FString& name, bool isLive, bool& found);
+
+
+	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve all props."))
+	static TArray<FProp> GetAllProps(); 
+	
+
+	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a prop by name."))
+	bool GetProp(FString name, /*bool isLive, */FProp& OutProp);
+	
+
+	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a tracker by name."))
+	static FTracker GetTracker(FString name, bool isLive);
+	
+
+	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Converts Quaternions into rotators."))
+	static FRotator FQuatToRotator(FQuat rotation) 
+	{
+		FQuat result(rotation.Z, rotation.X, rotation.Y, rotation.W);
+		FRotator Rotator = result.Rotator();
+		return Rotator;
+	}
+
+	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Converts position into Unreal position."))
+	static FVector UPosition(FVector position) 
+	{
+		return FVector(100.0f*position.Z, 100.0f*position.X, 100.0f*position.Y);
+	}
+	/// @endcond
+
+
+	
+
 	/*! \brief Returns a SmartsuitController by the name.
 	*
 	* @param name The name of the Smartsuit to look for.
 	* @return A SmartsuitController that has the specified Smartsuit name, if non found, it will return nullptr.
 	*/
-	UFUNCTION(BlueprintPure, Category = "Smartsuit", meta = (BlueprintThreadSafe, ToolTip = "Returns the SmartsuitController given the Smartsuit name."))
+	UFUNCTION(BlueprintPure, Category = "Rokoko", meta = (BlueprintThreadSafe, ToolTip = "Returns the SmartsuitController given the Smartsuit name."))
 	static ASmartsuitController* GetSmartsuitControllerByName(FString name);
 
 	/*! \brief Returns a SmartsuitController from its index ID.
@@ -38,7 +112,7 @@ public:
 	* @param id The index id that will look up for.
 	* @return A SmartsuitController that has the specified index id, if non found, it will return nullptr.
 	*/
-	UFUNCTION(BlueprintPure, Category = "Smartsuit", meta = (BlueprintThreadSafe, ToolTip = "Returns a SmartsuitController given it's Index ID. The Index ID is specified in the SmartsuitController details."))
+	UFUNCTION(BlueprintPure, Category = "Rokoko", meta = (BlueprintThreadSafe, ToolTip = "Returns a SmartsuitController given it's Index ID. The Index ID is specified in the SmartsuitController details."))
 	static ASmartsuitController* GetSmartsuitController(int id);
 
 	UFUNCTION(BlueprintCallable, Category=Test)
