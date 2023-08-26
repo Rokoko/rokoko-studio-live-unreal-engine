@@ -27,16 +27,16 @@ class USmartsuitBlueprintLibrary : public UBlueprintFunctionLibrary
 public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Rokoko")
-	FFace GetFaceByFaceID(FString faceName);
+	static FFace GetFaceByFaceID(FString faceName);
 
 	UFUNCTION(BlueprintCallable, Category = "Rokoko")
-	FFace GetFaceByProfileName(const FString& faceName, bool& found);
+	static FFace GetFaceByProfileName(const FString& faceName, bool& found);
 
 	UFUNCTION(BlueprintCallable, Category = "Rokoko")
-	TArray<FFace> GetAllFaces();
+	static TArray<FFace> GetAllFaces();
 
 	UFUNCTION(BlueprintCallable, Category = "Rokoko")
-	TArray<FFace> GetFacesNotAssociatedWithActor();
+	static TArray<FFace> GetFacesNotAssociatedWithActor();
 
 	/**
 	* This function returns the last frame of data received from a Smartsuit with the given name.
@@ -45,10 +45,10 @@ public:
 	* @param suitName The smartsuit name to get the last data for.
 	* @return Returns the last frame received for the smartsuit with name suitName. If no frame is found, it will return nullptr.
 	*/
-	FSuitData* GetSmartsuit(FString suitName);
+	static FSuitData* GetSmartsuit(FString suitName);
 
-	UFUNCTION(BlueprintCallable, Category = Default)
-	bool GetSmartsuitByName(const FString& suitName, FSuitData& SuitData);
+	UFUNCTION(BlueprintCallable, Category = "Rokoko")
+	static bool GetSmartsuitByName(const FString& suitName, FSuitData& SuitData);
 
 	/**
 	* Lists the names of all known Smartsuits connected to this computer.
@@ -59,29 +59,29 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Rokoko", meta = (BlueprintThreadSafe, ToolTip = "Returns actor names in the current live link source"))
 	static TArray<FString> GetAvailableActorNames();
 
-	UFUNCTION(BlueprintCallable, Category = Default)
-	TArray<FSuitData> GetAllSmartsuits();
+	UFUNCTION(BlueprintCallable, Category = "Rokoko")
+	static TArray<FSuitData> GetAllSmartsuits();
 
-	FProp* GetPropByNameFromVP(FString name, bool isLive);
+	static FProp* GetPropByNameFromVP(FString name, bool isLive);
 	FTracker* GetTrackerByNameFromVP(FString name, bool isLive);
 
-	UFUNCTION(BlueprintPure, Category = "VirtualProduction")
-	FTracker GetTrackerByConnectionIDFromVP(const FString& name, bool isLive, bool& found);
+	UFUNCTION(BlueprintPure, Category = "Rokoko")
+	static FTracker GetTrackerByConnectionIDFromVP(const FString& name, bool isLive, bool& found);
 
 
-	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve all props."))
+	UFUNCTION(BlueprintPure, Category = "Rokoko", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve all props."))
 	static TArray<FProp> GetAllProps(); 
 	
 
-	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a prop by name."))
-	bool GetProp(FString name, /*bool isLive, */FProp& OutProp);
+	UFUNCTION(BlueprintPure, Category = "Rokoko", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a prop by name."))
+	static bool GetProp(FString name, /*bool isLive, */FProp& OutProp);
 	
 
-	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a tracker by name."))
+	UFUNCTION(BlueprintPure, Category = "Rokoko", meta = (ToolTip = "Calls a function in VPStreamingNetwork to retrieve a tracker by name."))
 	static FTracker GetTracker(FString name, bool isLive);
 	
 
-	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Converts Quaternions into rotators."))
+	UFUNCTION(BlueprintPure, Category = "Rokoko", meta = (ToolTip = "Converts Quaternions into rotators."))
 	static FRotator FQuatToRotator(FQuat rotation) 
 	{
 		FQuat result(rotation.Z, rotation.X, rotation.Y, rotation.W);
@@ -89,15 +89,13 @@ public:
 		return Rotator;
 	}
 
-	UFUNCTION(BlueprintPure, Category = "VirtualProduction", meta = (ToolTip = "Converts position into Unreal position."))
+	UFUNCTION(BlueprintPure, Category = "Rokoko", meta = (ToolTip = "Converts position into Unreal position."))
 	static FVector UPosition(FVector position) 
 	{
 		return FVector(100.0f*position.Z, 100.0f*position.X, 100.0f*position.Y);
 	}
 	/// @endcond
 
-
-	
 
 	/*! \brief Returns a SmartsuitController by the name.
 	*
@@ -126,7 +124,7 @@ public:
 
 	static FQuat GetQuaternionField(TSharedPtr<FJsonObject> jsonObject);
 
-	UFUNCTION(BlueprintCallable, Category = "Smartsuit")
+	UFUNCTION(BlueprintCallable, Category = "Rokoko")
 	static void CreateVirtualProductionSource();
 
 	static FTransform GetWorldSpaceTransform(FReferenceSkeleton RefSkel, int32 BoneIdx);
@@ -135,9 +133,9 @@ public:
 
 	static FTransform GetBoneTransform(USkeletalMeshComponent* SkelMesh, FName BoneName);
 
-	UFUNCTION(BlueprintPure, Category = "Smartsuit")
+	UFUNCTION(BlueprintPure, Category = "Rokoko")
 	static FVector GetPropLocation(FProp InProp);
 
-	UFUNCTION(BlueprintPure, Category = "Smartsuit")
+	UFUNCTION(BlueprintPure, Category = "Rokoko")
 	static FRotator GetPropRotation(FProp InProp);
 };
