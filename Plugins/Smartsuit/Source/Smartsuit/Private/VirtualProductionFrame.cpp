@@ -14,13 +14,11 @@ VirtualProductionFrame::~VirtualProductionFrame()
 FProp::FProp(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 {
 	name = jsonObject->GetStringField("name");
-	//id = jsonObject->GetStringField("id");
 	color = USmartsuitBlueprintLibrary::GetColorField(jsonObject);
 	position = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField("position"));
 	rotation = USmartsuitBlueprintLibrary::GetQuaternionField(jsonObject->GetObjectField("rotation"));
-	//isLive = jsonObject->GetBoolField("isLive");
+	
 	isLive = InIsLive;
-	//profile = FProfile(jsonObject->GetObjectField("profile"));
 }
 
 FProfile::FProfile(TSharedPtr<FJsonObject> jsonObject)

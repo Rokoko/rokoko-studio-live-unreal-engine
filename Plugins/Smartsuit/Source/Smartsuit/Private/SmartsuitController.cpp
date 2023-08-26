@@ -59,34 +59,9 @@ void ASmartsuitController::Tick(float DeltaTime)
 		GetHubInfo();
 		return;
 	}
-	//hasProfile = data->hasProfile;
-	//isBroadcast = data->isBroadcasting;
-	//fps = data->fps;
-	//if (fps > 0 && profileToggleState != data->profileToggle) 
-	//{
-	//	profileToggleState = data->profileToggle;
-	//}
+	
 }
 
-//void ASmartsuitController::SendCommand(unsigned char cmd, uint8 *customData = nullptr, int customDataLength = 0) {
-//	if (!SupportsWiFi() && cmd != SMARTSUIT_COMMAND_READ_HUB_INFO) {
-//		UE_LOG(LogTemp, Warning, TEXT("Can't execute command, since this suit has an unsupported WiFi API version"));
-//		return;
-//	}
-//	
-//	uint32 myIp = GetLocalIP();
-//
-//	ARokokoReceiver * receiver = GetReceiver();
-//	if (receiver && myIp != 0) {
-//		if (customData != nullptr) {
-//			//receiver->SendCommand(suitname, customData, customDataLength);
-//		}
-//		else {
-//			unsigned char data[4] = { GetByte(myIp, 3), GetByte(myIp, 2), cmd, cmd };
-//			//receiver->SendCommand(suitname, data, sizeof(char) * 4);
-//		}
-//	}
-//}
 
 void ASmartsuitController::Restart() {
 	//SendCommand(SMARTSUIT_COMMAND_RESET_KALMAN_FILTER);
@@ -135,45 +110,6 @@ uint8 ASmartsuitController::GetByte(uint32 value, int i)
 		return 0;
 	}
 }
-
-//uint32 ASmartsuitController::GetLocalIP() {
-//	
-//	ARokokoReceiver *receiver = GetReceiver();
-//	if (!receiver) {
-//		return 0;
-//	}
-//	SuitData* data = receiver->GetSmartsuit(suitname);
-//	if (!data) {
-//		return 0;
-//	}
-//    
-//    bool canBind = false;
-//    TArray<TSharedPtr<FInternetAddr>> addresses;
-//    if(!ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalAdapterAddresses(addresses))
-//        UE_LOG(LogTemp, Warning, TEXT("Failed to get local adapter addresses"));
-//
-//    uint32 myIp;
-//	for (int i = 0; i < addresses.Num(); i++) {
-//		TSharedPtr<FInternetAddr> anIp = addresses[i];
-//		if (anIp->IsValid()) {
-//			anIp->GetIp(myIp);
-//			if (GetByte(myIp, 2) == GetByte(data->url, 2)) {
-//				return myIp;
-//			}
-//		}
-//	}
-//    
-//#if PLATFORM_MAC
-//    // On Mac, the GetLocalAdapterAddresses function only returns the single wildcard ip 0.0.0.0,
-//    // so we use the linux function getifaddrs() to obtain the local ip in that case (see GetLocalMacIP)
-//    myIp = GetLocalMacIP();
-//    if (GetByte(myIp, 2) == GetByte(data->url, 2)) {
-//        return myIp;
-//    }
-//#endif
-//    
-//	return 0;
-//}
 
 bool ASmartsuitController::SupportsWiFi() {
 	return hubInfo && ((hubInfo->wifiApiVersion >> 24) & 0xff) == SUPPORTED_MAJOR_WIFI_API;

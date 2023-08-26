@@ -39,9 +39,6 @@ void UVirtualProductionTracker::TickComponent(float DeltaTime, ELevelTick TickTy
 		return;
 	}
 
-	//parent->SetActorLocation(tracker->UPosition() * scalePosition);
-	//parent->SetActorRotation(tracker->FQuatToRotator());
-
 	if (useLocalSpace)
 	{
 		parent->SetActorRelativeLocation(tracker->UPosition() * scalePosition);
