@@ -7,7 +7,7 @@
     "Category": "Animation",
     "CreatedBy": "Rokoko Electronics ApS",
     "CreatedByURL": "https://www.rokoko.com",
-    "EngineVersion": "5.2.0",
+    "EngineVersion": [ "5.0", "5.1", "5.2", "5.3" ],
     "DocsURL": "https://github.com/Rokoko/rokoko-studio-live-unreal-engine/wiki/Rokoko-Studio-Live-Plugin-for-Unreal-Engine",
     "MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/7e20fe7d4247410cb4f7d3e162d61c21",
     "SupportURL": "",
