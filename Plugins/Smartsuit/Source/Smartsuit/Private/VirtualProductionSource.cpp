@@ -13,11 +13,11 @@
 
 #include "VirtualProductionFrame.h"
 #include "Runtime/Core/Public/Containers/UnrealString.h"
-//#include "Engine.h"
+
 #include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
 #include "Serialization/BufferArchive.h"
 #include "lz4frame.h"
-#include "RokokoReceiver.h"
+
 
 TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::instance = nullptr;
 
@@ -61,7 +61,6 @@ void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid In
 	Client = InClient;
 	
 	SourceGuid = InSourceGuid;
-	//instance = this;
 }
 
 bool FVirtualProductionSource::IsSourceStillValid() const
@@ -79,7 +78,6 @@ void FVirtualProductionSource::HandleClearSubject(const FName subjectName)
 		return;
 	}
 
-	//Client->ClearSubject(subjectName);
 	Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid,subjectName));
 }
 
@@ -523,8 +521,6 @@ void FVirtualProductionSource::HandleSuits(const TArray<FSuitData>& suits)
 			}
 		}
 
-		//FTimer timer;
-
 		#ifdef USE_SMARTSUIT_ANIMATION_ROLE
 		FLiveLinkFrameDataStruct FrameData1(FLiveLinkSmartsuitFrameData::StaticStruct());
 		FLiveLinkSmartsuitFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkSmartsuitFrameData>();
@@ -532,9 +528,7 @@ void FVirtualProductionSource::HandleSuits(const TArray<FSuitData>& suits)
 		FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
 		FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
 		#endif
-		//FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
 		
-
 		AnimFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 
 		TArray<FTransform> transforms;
@@ -987,13 +981,11 @@ void FVirtualProductionSource::HandleSubjectFrame(const TArray<FVirtualProductio
 			else
 			if (testval.StartsWith("light"))
 			{
-				//FTimer timer;
 				FLiveLinkFrameDataStruct FrameData1(FLiveLinkLightFrameData::StaticStruct());
 				FLiveLinkLightFrameData& LightFrameData = *FrameData1.Cast<FLiveLinkLightFrameData>();
 				LightFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 				LightFrameData.Transform = hardCodedTransform;
-				//CameraFrameData.LightColor = FColor::Green;
-
+			
 				Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.name), MoveTemp(FrameData1));
 
 			}
@@ -1175,8 +1167,7 @@ uint32 FVirtualProductionSource::Run()
 				{
 					continue;
 				}
-				//FGraphEventRef Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]()
-				//{
+				
 				if (Stopping) break;
 				
 				FVirtualProductionFrame VPFrame;
@@ -1186,13 +1177,6 @@ uint32 FVirtualProductionSource::Run()
 				TArray<uint8> UncompressedData;
 				UncompressedData.Empty(UncompressedSize);
 				UncompressedData.AddUninitialized(UncompressedSize);
-
-				//FName FormatName = NAME_LZ4;
-				//if (!FCompression::UncompressMemory(FormatName, UncompressedData.GetData(), UncompressedSize, data, static_cast<int32_t>(bytes_read)))
-				//{
-				//	UE_LOG(LogTemp, Error, TEXT("FCompression::UncompressMemory - Failed to uncompress memory (%d/%d) from address %p using format %s, this may indicate the asset is corrupt!"), bytes_read, UncompressedSize, data, *FormatName.ToString());
-				//}
-
 
 				uint32 WriteFlags = 0;
 
@@ -1208,7 +1192,6 @@ uint32 FVirtualProductionSource::Run()
 
 
 				FString result = BytesToStringFixed(UncompressedData.GetData(), static_cast<int32_t>(dstSize));
-				//FString test = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
 				
 				TSharedPtr<FJsonObject> JsonObject;
 				TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(result);
@@ -1302,11 +1285,7 @@ uint32 FVirtualProductionSource::Run()
 				
 				//UE_LOG(LogTemp, Warning, TEXT("Faces... %i"), GlobalVPFrame.faces.Num());
 				mtx.unlock();
-				//}, TStatId(), NULL, ENamedThreads::GameThread);
-
-				// If you want to wait for the code above to complete do this:
-				//FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
-
+				
 			}
 		}
 	}

@@ -7,7 +7,7 @@
 #include "LiveLinkCustomVersion.h"
 #include "LiveLinkRemapAsset.h"
 #include "LiveLinkTypes.h"
-#include "RokokoReceiver.h"
+
 #include "SmartsuitController.h"
 #include "SmartsuitTPose.h"
 #include "SmartsuitPoseNode.generated.h"
@@ -295,19 +295,6 @@ private:
 	void ApplyAllBonePositions(FBoneReference bone, float hipWidth, TArray<FTransform> transforms, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases);
 	// End of FAnimNode_SkeletalControlBase interface
 
-	ARokokoReceiver* GetReceiver() {
-		ARokokoReceiver * listener = nullptr;
-		// Find UObjects by type
-		for (TObjectIterator<ARokokoReceiver> It; It; ++It)
-		{
-			if (It->enabled) {
-				listener = *It;
-				break;
-			}
-			// ...
-		}
-		return listener;
-	}
 
 	FLiveLinkClientReference LiveLinkClient_GameThread;
 	ILiveLinkClient* LiveLinkClient_AnyThread;

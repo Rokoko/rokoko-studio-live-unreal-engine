@@ -431,6 +431,7 @@ public:
 	FFace* GetFaceByProfileName(const FString& profileName);
 	TArray<FFace> GetAllFaces();
 
+	// TODO: GetAllCharacters
 
 private:
 	std::mutex mtx;

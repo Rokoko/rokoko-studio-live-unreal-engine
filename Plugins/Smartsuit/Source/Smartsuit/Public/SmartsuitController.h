@@ -3,7 +3,6 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "RokokoReceiver.h"
 #include "RokokoSkeletonData.h"
 
 #include "SmartsuitController.generated.h"
@@ -297,7 +296,7 @@ public:
 
 	bool IsRealLife() { return realLife; }
 private:
-	ARokokoReceiver* GetReceiver();
+
 	uint32 GetLocalIP();
     uint32 GetLocalMacIP();
 	uint8 GetByte(uint32 val, int i);

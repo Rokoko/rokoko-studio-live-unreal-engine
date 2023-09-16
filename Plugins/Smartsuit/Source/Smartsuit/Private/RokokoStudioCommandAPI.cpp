@@ -6,14 +6,8 @@
 #include "Interfaces/IHttpResponse.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
+#include "RokokoRemote.h"
 
-URokokoStudioCommandAPI::URokokoStudioCommandAPI()
-{
-	Default_SmartSuitName = "H23";
-	Default_IPInfo.IPAddress = "127.0.0.1";
-	Default_IPInfo.Port = "14053";
-	Default_IPInfo.APIKey = "1234";
-}
 
 void URokokoStudioCommandAPI::Info(const FRokokoCommandAPI_IPInfo& IPInfo, bool ShouldIncludeDevices, bool ShouldIncludeClips)
 {
@@ -35,7 +29,13 @@ void URokokoStudioCommandAPI::Info(const FRokokoCommandAPI_IPInfo& IPInfo, bool 
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
 	HttpRequest->SetContentAsString(JsonString);
-	HttpRequest->OnProcessRequestComplete().BindUObject(this, &URokokoStudioCommandAPI::OnInfoRequestComplete);
+
+	ARokokoRemote* remote = ARokokoRemote::GetFirstAvailableActor();
+	if (remote)
+	{
+		HttpRequest->OnProcessRequestComplete().BindUObject(remote, &ARokokoRemote::OnInfoRequestComplete);
+	}
+
 	HttpRequest->ProcessRequest();
 }
 
@@ -58,7 +58,7 @@ void URokokoStudioCommandAPI::Restart(const FRokokoCommandAPI_IPInfo& IPInfo, co
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
 	HttpRequest->SetContentAsString(JsonString);
-	HttpRequest->OnProcessRequestComplete().BindUObject(this, &URokokoStudioCommandAPI::OnProcessRequestComplete);
+	//HttpRequest->OnProcessRequestComplete().BindUObject(this, &URokokoStudioCommandAPI::OnProcessRequestComplete);
 	HttpRequest->ProcessRequest();
 }
 
@@ -81,7 +81,13 @@ void URokokoStudioCommandAPI::ResetActor(const FRokokoCommandAPI_IPInfo& IPInfo,
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
 	HttpRequest->SetContentAsString(JsonString);
-	HttpRequest->OnProcessRequestComplete().BindUObject(this, &URokokoStudioCommandAPI::OnProcessRequestComplete);
+
+	ARokokoRemote* remote = ARokokoRemote::GetFirstAvailableActor();
+	if (remote)
+	{
+		HttpRequest->OnProcessRequestComplete().BindUObject(remote, &ARokokoRemote::OnProcessRequestComplete);
+	}
+	
 	HttpRequest->ProcessRequest();
 }
 
@@ -109,7 +115,13 @@ void URokokoStudioCommandAPI::Calibrate(const FRokokoCommandAPI_IPInfo& IPInfo, 
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
 	HttpRequest->SetContentAsString(JsonString);
-	HttpRequest->OnProcessRequestComplete().BindUObject(this, &URokokoStudioCommandAPI::OnProcessRequestComplete);
+	
+	ARokokoRemote* remote = ARokokoRemote::GetFirstAvailableActor();
+	if (remote)
+	{
+		HttpRequest->OnProcessRequestComplete().BindUObject(remote, &ARokokoRemote::OnProcessRequestComplete);
+	}
+	
 	HttpRequest->ProcessRequest();
 }
 
@@ -133,7 +145,11 @@ void URokokoStudioCommandAPI::StartRecording(const FRokokoCommandAPI_IPInfo& IPI
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
 	HttpRequest->SetContentAsString(JsonString);
-	HttpRequest->OnProcessRequestComplete().BindUObject(this, &URokokoStudioCommandAPI::OnProcessRequestComplete);
+	ARokokoRemote* remote = ARokokoRemote::GetFirstAvailableActor();
+	if (remote)
+	{
+		HttpRequest->OnProcessRequestComplete().BindUObject(remote, &ARokokoRemote::OnProcessRequestComplete);
+	}
 	HttpRequest->ProcessRequest();
 }
 
@@ -158,7 +174,11 @@ void URokokoStudioCommandAPI::StopRecording(const FRokokoCommandAPI_IPInfo& IPIn
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
 	HttpRequest->SetContentAsString(JsonString);
-	HttpRequest->OnProcessRequestComplete().BindUObject(this, &URokokoStudioCommandAPI::OnProcessRequestComplete);
+	ARokokoRemote* remote = ARokokoRemote::GetFirstAvailableActor();
+	if (remote)
+	{
+		HttpRequest->OnProcessRequestComplete().BindUObject(remote, &ARokokoRemote::OnProcessRequestComplete);
+	}
 	HttpRequest->ProcessRequest();
 }
 
@@ -204,10 +224,25 @@ void URokokoStudioCommandAPI::Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, co
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
 	HttpRequest->SetContentAsString(JsonString);
-	HttpRequest->OnProcessRequestComplete().BindUObject(this, &URokokoStudioCommandAPI::OnTrackerRequestComplete);
+	ARokokoRemote* remote = ARokokoRemote::GetFirstAvailableActor();
+	if (remote)
+	{
+		HttpRequest->OnProcessRequestComplete().BindUObject(remote, &ARokokoRemote::OnTrackerRequestComplete);
+	}
 	HttpRequest->ProcessRequest();
 }
 
+FRokokoCommandAPI_IPInfo URokokoStudioCommandAPI::GetDefaultIPInfo()
+{
+	FRokokoCommandAPI_IPInfo DefaultIPInfo;
+	DefaultIPInfo.IPAddress = "127.0.0.1";
+	DefaultIPInfo.Port = "14053";
+	DefaultIPInfo.APIKey = "1234";
+	return DefaultIPInfo;
+}
+
+
+/*
 //PRAGMA_DISABLE_OPTIMIZATION
 void URokokoStudioCommandAPI::SaveConfigFile(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitname)
 {
@@ -216,79 +251,5 @@ void URokokoStudioCommandAPI::SaveConfigFile(const FRokokoCommandAPI_IPInfo& IPI
 	SaveConfig();
 }
 //PRAGMA_ENABLE_OPTIMIZATION
+*/
 
-void URokokoStudioCommandAPI::OnProcessRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
-{
-	int32 ResponseCode = HttpResponse->GetResponseCode();
-	FString ResponseString = HttpResponse->GetContentAsString();
-	
-	OnCompletedRequest.Broadcast(ResponseCode, ResponseString, bSucceeded);
-}
-
-void URokokoStudioCommandAPI::OnInfoRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
-{
-	TSharedPtr<FJsonObject> JsonObject;
-	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(HttpResponse->GetContentAsString());
-
-	// Deserialize the json data given Reader and the actual object to deserialize
-	if (FJsonSerializer::Deserialize(Reader, JsonObject))
-	{
-		auto& Arr = JsonObject->GetArrayField("parameters");
-
-		if (!Arr.IsEmpty())
-		{
-			int Count = static_cast<int>(Arr[0]->AsNumber());
-
-			TArray<FString> Strings1;
-			TArray<FString> Strings2;
-
-			for (int i = 0; i < Count; ++i)
-			{
-				Strings1.Add(Arr[i + 1]->AsString());
-			}
-
-			if (Arr.Num() > Count)
-			{
-				int StartIndex = Count + 1;
-				// read next array
-				Count = static_cast<int>(Arr[StartIndex]->AsNumber());
-
-				for (int i = 0; i < Count; ++i)
-				{
-					Strings2.Add(Arr[i + StartIndex + 1]->AsString());
-				}
-			}
-
-			OnInfoRequest.Broadcast(Strings1, Strings2);
-		}
-	}
-}
-
-void URokokoStudioCommandAPI::OnTrackerRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
-{
-	const double WORLD_SCALE{ 100.0 };
-
-	TSharedPtr<FJsonObject> JsonObject;
-	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(HttpResponse->GetContentAsString());
-
-	// Deserialize the json data given Reader and the actual object to deserialize
-	if (FJsonSerializer::Deserialize(Reader, JsonObject)) 
-	{
-		auto& Arr = JsonObject->GetArrayField("parameters");
-		
-		if (!Arr.IsEmpty())
-		{
-			auto& ObjectPosition = Arr[0]->AsObject();
-			auto& ObjectRotation = Arr[1]->AsObject();
-
-			FVector Position(WORLD_SCALE * ObjectPosition->GetNumberField("X"), 
-				-WORLD_SCALE * ObjectPosition->GetNumberField("Z"),
-				WORLD_SCALE * ObjectPosition->GetNumberField("Y"));
-			// TODO: do we need to convert rotation to UE coord system ?!
-			FQuat Rotation(ObjectRotation->GetNumberField("X"), ObjectRotation->GetNumberField("Y"), ObjectRotation->GetNumberField("Z"),
-				ObjectRotation->GetNumberField("W"));
-
-			OnTrackerRequest.Broadcast(Position, Rotation);
-		}
-	}
-}
