@@ -22,23 +22,22 @@ FFace USmartsuitBlueprintLibrary::GetFaceByFaceID(FString faceId)
 FFace USmartsuitBlueprintLibrary::GetFaceByProfileName(const FString& faceName, bool& found)
 {
 	found = false;
-	FFace returnval;
-
+	
 	auto livelink = FVirtualProductionSource::Get();
 	if (livelink.IsValid())
 	{
 		FFace* temp = livelink->GetFaceByProfileName(faceName);
 		if (temp)
 		{
-			returnval = *temp;
 			found = true;
+			return FFace(*temp);
 		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
 	}
-	return returnval;
+	return FFace();
 }
 
 TArray<FFace> USmartsuitBlueprintLibrary::GetAllFaces()
@@ -59,11 +58,11 @@ TArray<FFace> USmartsuitBlueprintLibrary::GetAllFaces()
 TArray<FFace> USmartsuitBlueprintLibrary::GetFacesNotAssociatedWithActor()
 {
 	TArray<FFace> FacesNotPairedWithSuit;
-	for (auto CurrentFace : GetAllFaces())
+	for (auto& CurrentFace : GetAllFaces())
 	{
 		bool FoundExistingProfileForFace = false;
 
-		for (auto CurrentSuit : GetAllSmartsuits())
+		for (auto& CurrentSuit : GetAllSmartsuits())
 		{
 			if (CurrentSuit.id == CurrentFace.profileName)
 			{
@@ -199,6 +198,7 @@ TArray<FProp> USmartsuitBlueprintLibrary::GetAllProps()
 	auto livelink = FVirtualProductionSource::Get();
 	if (livelink.IsValid())
 	{
+	
 		AllProps = livelink->GetAllProps();
 	}
 	else

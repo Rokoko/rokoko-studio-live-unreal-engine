@@ -265,38 +265,38 @@ struct FSuitData
 	UPROPERTY(BlueprintReadOnly, Category=Default)
 	FString suitname;
 
-	uint32_t timestamp;
+	uint32_t timestamp{ 0 };
 	
 	UPROPERTY(BlueprintReadOnly, Category=Default)
 	FString id;
 
 	UPROPERTY(BlueprintReadOnly, Category=Default)
-	bool isLive;
+	bool isLive{ false };
 
 	/** The name of the profile. */
 	UPROPERTY(BlueprintReadOnly, Category = Default)
 	FString profileName;
 
 	UPROPERTY(BlueprintReadOnly, Category = Default)
-	bool hasGloves;
+	bool hasGloves{ false };
 
 	UPROPERTY(BlueprintReadOnly, Category = Default)
-	bool hasLeftGlove;
+	bool hasLeftGlove{ false };
 
 	UPROPERTY(BlueprintReadOnly, Category = Default)
-	bool hasRightGlove;
+	bool hasRightGlove{ false };
 
 	UPROPERTY(BlueprintReadOnly, Category = Default)
-	bool hasBody;
+	bool hasBody{ false };
 
 	UPROPERTY(BlueprintReadOnly, Category = Default)
-	bool hasFace;
+	bool hasFace{ false };
 
 	UPROPERTY(BlueprintReadOnly, Category = Default)
 	FString faceId;
 
 	UPROPERTY(BlueprintReadOnly, Category = Default)
-	FLinearColor color;
+	FLinearColor color{ FLinearColor::White };
 
 	TMap<FName, FSmartsuitBone> bones;
 
@@ -327,63 +327,27 @@ struct FCharacterData
 	GENERATED_BODY()
 
 	FCharacterData(){}
-
 	FCharacterData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject);
-
-	//void ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& BoneName);
 
 	/** The name of the Smartsuit. */
 	UPROPERTY(BlueprintReadOnly, Category=Default)
-	FString charactername;
+	FString CharacterName;
 
-	uint32_t timestamp;
+	uint32_t Timestamp{ 0 };
 	
 	UPROPERTY(BlueprintReadOnly, Category=Default)
-	FString id;
+	FString Id;
 
 	UPROPERTY(BlueprintReadOnly, Category=Default)
-	bool isLive;
+	bool IsLive{ false };
 
-	/** The name of the profile. */
-	UPROPERTY(BlueprintReadOnly, Category = Default)
-	FString profileName;
-
-	UPROPERTY(BlueprintReadOnly, Category = Default)
-	bool hasGloves;
-
-	UPROPERTY(BlueprintReadOnly, Category = Default)
-	bool hasLeftGlove;
-
-	UPROPERTY(BlueprintReadOnly, Category = Default)
-	bool hasRightGlove;
-
-	UPROPERTY(BlueprintReadOnly, Category = Default)
-	bool hasBody;
-
-	UPROPERTY(BlueprintReadOnly, Category = Default)
-	bool hasFace;
-
-	UPROPERTY(BlueprintReadOnly, Category = Default)
-	FString faceId;
-
-	UPROPERTY(BlueprintReadOnly, Category = Default)
-	FLinearColor color;
 
 	TArray<FRokokoCharacterJoint> joints;
 
-	// const FRokokoCharacterJoint* Hip() const
-	// {
-	// 	return GetJointByName("hip");
-	// }
-
-	// const FRokokoCharacterJoint* GetJointByName(const FName& BoneName) const
-	// {
-	// 	return joints.Find(BoneName);
-	// }
 
 	FName GetSubjectName() const
 	{
-		FString TempSubjectName = "character:" + charactername + ":body";
+		FString TempSubjectName = "character:" + CharacterName + ":body";
 #if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
 		return FName(TempSubjectName);
 #else
@@ -391,16 +355,3 @@ struct FCharacterData
 #endif
 	}
 };
-
-
-/// @cond doc_hidden
-/**
-*
-*/
-class SMARTSUIT_API SmartsuitDefinitions
-{
-public:
-	SmartsuitDefinitions();
-	~SmartsuitDefinitions();
-};
-/// @endcond

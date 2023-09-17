@@ -31,16 +31,16 @@ struct FRokokoCommandAPI_CalibrateInput
 	FString DeviceID;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Rokoko Command API")
-	int32 CountdownDelay;
+	int32 CountdownDelay{ 1 };
 
 	UPROPERTY(BlueprintReadWrite, Category = "Rokoko Command API")
-	bool ShouldSkipSuit;
+	bool ShouldSkipSuit{ false };
 
 	UPROPERTY(BlueprintReadWrite, Category = "Rokoko Command API")
-	bool ShouldSkipGloves;
+	bool ShouldSkipGloves{ false };
 
 	UPROPERTY(BlueprintReadWrite, Category = "Rokoko Command API")
-	bool UseCustomPose;
+	bool UseCustomPose{ false };
 
 	UPROPERTY(BlueprintReadWrite, Category = "Rokoko Command API")
 	FString CustomPoseName;
@@ -67,9 +67,40 @@ struct FRokokoCommandAPI_TrackerInput
 	bool ShouldQueryOnly{ false };
 };
 
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EPlaybackChange : uint8
+{
+	NONE = 0 UMETA(Hidden),
+	IsPlaying = 1 << 0,
+	CurrentTime = 1 << 1,
+	GotoFirstFrame = 1 << 2,
+	GotoLastFrame = 1 << 3,
+	PlaybackSpeed = 1 << 4,
+};
+ENUM_CLASS_FLAGS(EPlaybackChange);
+
+USTRUCT(BlueprintType)
+struct FRokokoCommandAPI_PlaybackInput
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, Category = "Rokoko Command API")
+	bool IsPlaying{ false };
+
+	UPROPERTY(BlueprintReadWrite, Category = "Rokoko Command API")
+	double CurrentTime{ 0.0 };
+
+	UPROPERTY(BlueprintReadWrite, Category = "Rokoko Command API")
+	float PlaybackSpeed{ 1.0f };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = EPlaybackChange))
+	int32 ChangeFlags = 0;
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnCompletedRequest, int32, ResponseCode, const FString&, ResponseContentString, bool, bSucceeded);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInfoRequest, const TArray<FString>&, Devices, const TArray<FString>&, Clips);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnInfoRequest, const TArray<FString>&, Devices, const TArray<FString>&, Clips, const TArray<FString>&, Actors, const TArray<FString>&, Characters);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTrackerRequest, FVector, Position, FQuat, Rotation);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnPlaybackRequest, double, CurrentTime, bool, IsPlaying, double, MinTime, double, MaxTime, double, PlaybackSpeedMultiplier );
 
 /**
  * Expose blueprint library of command API communication methods
@@ -84,7 +115,7 @@ class SMARTSUIT_API URokokoStudioCommandAPI : public UBlueprintFunctionLibrary
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Rokoko Command API", meta = (BlueprintThreadSafe, ToolTip = "Request info about scene clips, input devices, actors, etc."))
-	static void Info(const FRokokoCommandAPI_IPInfo& IPInfo, bool ShouldIncludeDevices, bool ShouldIncludeClips);
+	static void Info(const FRokokoCommandAPI_IPInfo& IPInfo, bool ShouldIncludeDevices, bool ShouldIncludeClips, bool ShouldIncludeActors, bool ShouldIncludeCharacters);
 
 	UFUNCTION(BlueprintCallable, Category = "Rokoko Command API", meta = (BlueprintThreadSafe, ToolTip = "Request a given actor restart operation"))
 	static void Restart(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitName);
@@ -104,29 +135,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Rokoko Command API", meta = (BlueprintThreadSafe, ToolTip = "Request a given actor global position correction"))
 	static void Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, const FRokokoCommandAPI_TrackerInput& Params);
 
+	UFUNCTION(BlueprintCallable, Category = "Rokoko Command API", meta = (BlueprintThreadSafe, ToolTip = "Take control over the scene timeline playback"))
+	static void Playback(const FRokokoCommandAPI_IPInfo& IPInfo, const FRokokoCommandAPI_PlaybackInput& Params);
+
+	UFUNCTION(BlueprintCallable, Category = "Rokoko Command API", meta = (BlueprintThreadSafe, ToolTip = "Take control over the custom live stream enabled state"))
+	static void Livestream(const FRokokoCommandAPI_IPInfo& IPInfo, bool ShouldLiveStream);
+
 	UFUNCTION(BlueprintPure, Category = "Rokoko Command API", meta = (BlueprintThreadSafe, ToolTip = "Returns a default configuration for a command api calls"))
 	static FRokokoCommandAPI_IPInfo GetDefaultIPInfo();
 
-	//UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = CMDAPI_CATEGORY)
-	//static void OnCompletedRequest(int32 ResponseCode, const FString& ResponseContentString, bool bSucceeded);
-
-	//UPROPERTY(BlueprintAssignable, Category = CMDAPI_CATEGORY)
-	//FOnCompletedRequest OnCompletedRequest;
-
-	//UPROPERTY(BlueprintAssignable, Category = CMDAPI_CATEGORY)
-	//FOnInfoRequest OnInfoRequest;
-
-	//UPROPERTY(BlueprintAssignable, Category = CMDAPI_CATEGORY)
-	//FOnTrackerRequest OnTrackerRequest;
-
-	//UPROPERTY(Config, BlueprintReadOnly, Category = CMDAPI_CATEGORY)
-	//FRokokoCommandAPI_IPInfo Default_IPInfo;
-
-	//UPROPERTY(Config, BlueprintReadOnly, Category = CMDAPI_CATEGORY)
-	//FString Default_SmartSuitName;
-
-	//UFUNCTION(BlueprintCallable, Category = CMDAPI_CATEGORY)
-	//void SaveConfigFile(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitname);
-
-	
 };

@@ -236,7 +236,7 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 
 	/** If enabled, root motion will be applied from this pose. This can help prevent characters from moving through walls etc. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = RootMotion, meta = (PinShownByDefault))
-	bool bApplyRootMotion;
+	bool bApplyRootMotion{ false };
 
 	/** Use to shoulder space. Tweaks the clavicle/shoulder rotation, around approx. the character up axis. Make sure that skeleton axis are imported correctly into Unreal! Defaults to 0.0f */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Space, meta = (PinShownByDefault))

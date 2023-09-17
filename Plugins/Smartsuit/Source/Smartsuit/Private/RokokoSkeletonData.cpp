@@ -70,13 +70,6 @@ namespace SmartsuitBones
 	const FName rightLittleTip = FName(TEXT("rightLittleTip"));
 }
 
-SmartsuitDefinitions::SmartsuitDefinitions()
-{
-}
-
-SmartsuitDefinitions::~SmartsuitDefinitions()
-{
-}
 
 FSuitData::FSuitData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 {
@@ -183,8 +176,8 @@ void FSuitData::ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& Bon
 
 FCharacterData::FCharacterData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 {
-	isLive = InIsLive;
-	charactername = jsonObject->GetStringField("name");
+	IsLive = InIsLive;
+	CharacterName = jsonObject->GetStringField("name");
 	
 	TArray<TSharedPtr<FJsonValue>> JointsArray = jsonObject->GetArrayField("joints");
 

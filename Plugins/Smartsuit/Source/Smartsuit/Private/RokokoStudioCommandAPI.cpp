@@ -9,11 +9,13 @@
 #include "RokokoRemote.h"
 
 
-void URokokoStudioCommandAPI::Info(const FRokokoCommandAPI_IPInfo& IPInfo, bool ShouldIncludeDevices, bool ShouldIncludeClips)
+void URokokoStudioCommandAPI::Info(const FRokokoCommandAPI_IPInfo& IPInfo, bool ShouldIncludeDevices, bool ShouldIncludeClips, bool ShouldIncludeActors, bool ShouldIncludeCharacters)
 {
 	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
 	JsonObject->SetBoolField("devices_info", ShouldIncludeDevices);
 	JsonObject->SetBoolField("clips_info", ShouldIncludeClips);
+	JsonObject->SetBoolField("actors_info", ShouldIncludeActors);
+	JsonObject->SetBoolField("characters_info", ShouldIncludeCharacters);
 	FString JsonString;
 	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
 	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
@@ -38,6 +40,8 @@ void URokokoStudioCommandAPI::Info(const FRokokoCommandAPI_IPInfo& IPInfo, bool 
 
 	HttpRequest->ProcessRequest();
 }
+
+
 
 void URokokoStudioCommandAPI::Restart(const FRokokoCommandAPI_IPInfo& IPInfo, const FString& SmartSuitName)
 {
@@ -122,6 +126,71 @@ void URokokoStudioCommandAPI::Calibrate(const FRokokoCommandAPI_IPInfo& IPInfo, 
 		HttpRequest->OnProcessRequestComplete().BindUObject(remote, &ARokokoRemote::OnProcessRequestComplete);
 	}
 	
+	HttpRequest->ProcessRequest();
+}
+
+
+void URokokoStudioCommandAPI::Playback(const FRokokoCommandAPI_IPInfo& IPInfo, const FRokokoCommandAPI_PlaybackInput& Params)
+{
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+	
+	JsonObject->SetBoolField("is_playing", Params.IsPlaying);
+	JsonObject->SetNumberField("current_time", Params.CurrentTime);
+	JsonObject->SetNumberField("playback_speed", Params.PlaybackSpeed);
+	JsonObject->SetNumberField("change_flag", Params.ChangeFlags);
+
+	FString JsonString;
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
+	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+
+	const FString URLPath = FString::Printf(TEXT("http://%s:%s/v2/%s/playback"), *IPInfo.IPAddress, *IPInfo.Port, *IPInfo.APIKey);
+
+#if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 26)
+	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
+#else
+	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+#endif
+	HttpRequest->SetURL(URLPath);
+	HttpRequest->SetVerb(TEXT("POST"));
+	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
+	HttpRequest->SetContentAsString(JsonString);
+
+	if (ARokokoRemote* remote = ARokokoRemote::GetFirstAvailableActor())
+	{
+		HttpRequest->OnProcessRequestComplete().BindUObject(remote, &ARokokoRemote::OnPlaybackRequestComplete);
+	}
+
+	HttpRequest->ProcessRequest();
+}
+
+
+void URokokoStudioCommandAPI::Livestream(const FRokokoCommandAPI_IPInfo& IPInfo, bool ShouldLivestream)
+{
+	TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+
+	JsonObject->SetBoolField("enabled", ShouldLivestream);
+
+	FString JsonString;
+	TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&JsonString);
+	FJsonSerializer::Serialize(JsonObject.ToSharedRef(), Writer);
+
+	const FString URLPath = FString::Printf(TEXT("http://%s:%s/v2/%s/livestream"), *IPInfo.IPAddress, *IPInfo.Port, *IPInfo.APIKey);
+
+#if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 26)
+	FHttpRequestRef HttpRequest = FHttpModule::Get().CreateRequest();
+#else
+	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get().CreateRequest();
+#endif
+	HttpRequest->SetURL(URLPath);
+	HttpRequest->SetVerb(TEXT("POST"));
+	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
+	HttpRequest->SetContentAsString(JsonString);
+
+	if (ARokokoRemote* remote = ARokokoRemote::GetFirstAvailableActor())
+	{
+		HttpRequest->OnProcessRequestComplete().BindUObject(remote, &ARokokoRemote::OnProcessRequestComplete);
+	}
+
 	HttpRequest->ProcessRequest();
 }
 
@@ -224,8 +293,8 @@ void URokokoStudioCommandAPI::Tracker(const FRokokoCommandAPI_IPInfo& IPInfo, co
 	HttpRequest->SetVerb(TEXT("POST"));
 	HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json; charset=utf-8"));
 	HttpRequest->SetContentAsString(JsonString);
-	ARokokoRemote* remote = ARokokoRemote::GetFirstAvailableActor();
-	if (remote)
+	
+	if (ARokokoRemote* remote = ARokokoRemote::GetFirstAvailableActor())
 	{
 		HttpRequest->OnProcessRequestComplete().BindUObject(remote, &ARokokoRemote::OnTrackerRequestComplete);
 	}

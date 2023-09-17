@@ -85,10 +85,16 @@ TSharedPtr<ILiveLinkSource> UVirtualProductionSourceFactory::CreateSource(const 
 	FIPv4Endpoint DeviceEndPoint;
 	if (!FIPv4Endpoint::Parse(ConnectionString, DeviceEndPoint))
 	{
-		return TSharedPtr<ILiveLinkSource>();
+		// use default address, failed to parse connection address
+		UE_LOG(LogTemp, Warning, TEXT("use default address, failed to parse connection address"));
+		DeviceEndPoint.Address = FIPv4Address::Any;
+		DeviceEndPoint.Port = 14043;
 	}
 
-	return MakeShared<FVirtualProductionSource>(DeviceEndPoint, FText::FromString(Name), FText::GetEmpty(), FMessageAddress());
+	TSharedPtr<FVirtualProductionSource> newSource = MakeShared<FVirtualProductionSource>(DeviceEndPoint, FText::FromString(Name), FText::GetEmpty(), FMessageAddress());
+	FVirtualProductionSource::SetInstance(newSource);
+
+	return newSource;
 }
 
 #undef LOCTEXT_NAMESPACE

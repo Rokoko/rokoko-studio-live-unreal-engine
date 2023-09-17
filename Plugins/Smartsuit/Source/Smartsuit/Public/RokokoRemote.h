@@ -44,7 +44,11 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Command API")
 	FOnTrackerRequest OnTrackerRequest;
 
+	UPROPERTY(BlueprintAssignable, Category = "Command API")
+	FOnPlaybackRequest OnPlaybackRequest;
+
 	void OnProcessRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 	void OnInfoRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 	void OnTrackerRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
+	void OnPlaybackRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded);
 };

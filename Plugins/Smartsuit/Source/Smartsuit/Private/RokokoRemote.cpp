@@ -54,32 +54,56 @@ void ARokokoRemote::OnInfoRequestComplete(FHttpRequestPtr HttpRequest, FHttpResp
 	{
 		auto& Arr = JsonObject->GetArrayField("parameters");
 
-		if (!Arr.IsEmpty())
+		TArray<FString> StringsDevices;
+		TArray<FString> StringsClips;
+		TArray<FString> StringsActors;
+		TArray<FString> StringsCharacters;
+
+		int i = 0;
+		while (!Arr.IsEmpty())
 		{
-			int Count = static_cast<int>(Arr[0]->AsNumber());
-
-			TArray<FString> Strings1;
-			TArray<FString> Strings2;
-
-			for (int i = 0; i < Count; ++i)
+			const FString ArgName = Arr[i]->AsString();
+			if (ArgName == "DevicesIDs")
 			{
-				Strings1.Add(Arr[i + 1]->AsString());
-			}
+				int Count = static_cast<int>(Arr[i+1]->AsNumber());
 
-			if (Arr.Num() > Count)
-			{
-				int StartIndex = Count + 1;
-				// read next array
-				Count = static_cast<int>(Arr[StartIndex]->AsNumber());
-
-				for (int i = 0; i < Count; ++i)
+				for (int j = 0; j < Count; ++j)
 				{
-					Strings2.Add(Arr[i + StartIndex + 1]->AsString());
+					StringsDevices.Add(Arr[i + 1 + j]->AsString());
+				}
+			}
+			else if (ArgName == "Clips")
+			{
+				int Count = static_cast<int>(Arr[i + 1]->AsNumber());
+
+				for (int j = 0; j < Count; ++j)
+				{
+					StringsClips.Add(Arr[i + 1 + j]->AsString());
+				}
+			}
+			else if (ArgName == "Actors")
+			{
+				int Count = static_cast<int>(Arr[i + 1]->AsNumber());
+
+				for (int j = 0; j < Count; ++j)
+				{
+					StringsActors.Add(Arr[i + 1 + j]->AsString());
+				}
+			}
+			else if (ArgName == "Characters")
+			{
+				int Count = static_cast<int>(Arr[i + 1]->AsNumber());
+
+				for (int j = 0; j < Count; ++j)
+				{
+					StringsCharacters.Add(Arr[i + 1 + j]->AsString());
 				}
 			}
 
-			OnInfoRequest.Broadcast(Strings1, Strings2);
+			i += 1;
 		}
+
+		OnInfoRequest.Broadcast(StringsDevices, StringsClips, StringsActors, StringsCharacters);
 	}
 }
 
@@ -108,6 +132,30 @@ void ARokokoRemote::OnTrackerRequestComplete(FHttpRequestPtr HttpRequest, FHttpR
 				ObjectRotation->GetNumberField("W"));
 
 			OnTrackerRequest.Broadcast(Position, Rotation);
+		}
+	}
+}
+
+
+void ARokokoRemote::OnPlaybackRequestComplete(FHttpRequestPtr HttpRequest, FHttpResponsePtr HttpResponse, bool bSucceeded)
+{
+	TSharedPtr<FJsonObject> JsonObject;
+	TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(HttpResponse->GetContentAsString());
+
+	// Deserialize the json data given Reader and the actual object to deserialize
+	if (FJsonSerializer::Deserialize(Reader, JsonObject))
+	{
+		auto& Arr = JsonObject->GetArrayField("parameters");
+
+		if (!Arr.IsEmpty())
+		{
+			const double CurrentTime = Arr[0]->AsNumber();
+			const bool IsPlaying = Arr[1]->AsBool();
+			const double MinTime = Arr[2]->AsNumber();
+			const double MaxTime = Arr[3]->AsNumber();
+			const double PlaybackSpeed = Arr[4]->AsNumber();
+
+			OnPlaybackRequest.Broadcast(CurrentTime, IsPlaying, MinTime, MaxTime, PlaybackSpeed);
 		}
 	}
 }
