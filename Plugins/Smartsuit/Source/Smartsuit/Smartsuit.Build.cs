@@ -96,7 +96,7 @@ public class Smartsuit : ModuleRules
 			}
             );
 
-        LoadSmartsuitMagic(Target);
+        //LoadSmartsuitMagic(Target);
 
         //PublicDefinitions.Add("LZ4F_STATIC_LINKING_ONLY");
 

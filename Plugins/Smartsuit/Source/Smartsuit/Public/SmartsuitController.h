@@ -63,61 +63,6 @@ struct FBodyModel
 		HeelOffset = 0.08;
 	}
 
-	/**
-	* Breaks the BodyModel into individual body dimensions and returns a Body struct representing these dimensions.
-	*/
-	Body GetBody()
-	{
-		Body b;
-		b.first_buffer = SMARTSUIT_COMMAND_SET_BODY_DIMENSIONS;
-		b.first_buffer1 = SMARTSUIT_COMMAND_SET_BODY_DIMENSIONS;
-		b.first_buffer2 = SMARTSUIT_COMMAND_SET_BODY_DIMENSIONS;
-		b.first_buffer3 = SMARTSUIT_COMMAND_SET_BODY_DIMENSIONS;//put last byte of ip here.
-		b._head = (fabs(TotalHeight) - fabs(ShoulderHeight)) * .7f;
-		b._neck = (fabs(TotalHeight) - fabs(ShoulderHeight)) * .3f;
-		b._middle_back = (fabs(ShoulderHeight) - fabs(HipHeight)) * .414f;
-		b._low_back = (fabs(ShoulderHeight) - fabs(HipHeight)) * .433f;
-		b._hip = (fabs(ShoulderHeight) - fabs(HipHeight)) * .153f;
-		b._shoulder_blade = fabs(ShoulderWidth) * .5f;
-		float arm = (fabs(ArmSpan) - fabs(ShoulderWidth)) / 2.0f;
-		b._upper_arm = arm * .391f;
-		b._forearm = arm * .352f;
-		b._hand = arm * .257f;
-		float leg = (fabs(HipHeight) - fabs(AnkleHeight));
-		b._thigh = leg * .517f;
-		b._leg = leg * .483f;
-		b._foot_height = fabs(AnkleHeight);
-		b._foot_length = fabs(FootLength);
-		b._foot_heel_offset = fabs(HeelOffset);
-		b._foot_width = fabs(FootLength) * .25f;
-		b._hip_width = fabs(HipWidth);
-		//strcpy(b.name, "unreal\0\0");
-		return b;
-	}
-
-	/**
-	* Calculates and sets the BodyModel dimensions from a detailed Body dimensions struct.
-	*
-	* @param value the Body dimensions to set to this BodyModel.
-	*/
-	void SetBody(Body value)
-	{
-
-		Name = "unreal";
-
-		HipHeight = value._foot_height + value._leg + value._thigh;
-		ShoulderHeight = HipHeight + value._hip + value._low_back + value._middle_back;
-		TotalHeight = ShoulderHeight + value._neck + value._head;
-		HipWidth = value._hip_width;
-		ShoulderWidth = value._shoulder_blade * 2.0f;
-		ArmSpan = (value._shoulder_blade + value._upper_arm + value._forearm + value._hand) * 2.0f;
-		AnkleHeight = value._foot_height;
-		FootLength = value._foot_length;
-		HeelOffset = value._foot_heel_offset;
-	}
-
-
-
 };
 
 /*! \brief SmartsuitController is an UE Actor that provides methods to communicate with a Smartsuit and send commands to it.
@@ -177,136 +122,18 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = SmartsuitReadOnly, meta = (ToolTip = "Read-only: Indicates the current known BodyProfile for the Smartsuit connected to this SmartsuitController."))
 		FBodyModel bodyModel;
 
-	/*! \brief Restart the Smartsuit binded to this Controller.
-	*
-	* Restart the Smartsuit binded to this Controller.
-	*/
-	UFUNCTION(BlueprintCallable, Category = "Smartsuit", meta = (ToolTip = "Send a restart command to the Smartsuit binded to this Controller."))
-		void Restart();
-
-	/*! \brief Performs an A-pose calibration to the Smartsuit.
-	*
-	* Performs an A-pose calibration to the Smartsuit.
-	*/
-	UFUNCTION(BlueprintCallable, Category = "Smartsuit", meta = (ToolTip = "Send an A-pose calibration command to the Smartsuit binded to this Controller."))
-		void Calibrate();
-
-	/*! \brief Set the Smartsuit in broadcast mode.
-	*
-	* Requests the Smartsuit to broadcast its live streaming. This way more devices can listen to the same Smartsuit, as well as more applications in the same computer.
-	* This setting may affect the WiFi performance.
-	*/
-	UFUNCTION(BlueprintCallable, Category = "Smartsuit", meta = (ToolTip = "Send a request to make the Smartsuit, Broadcast it's UDP messages. This only applies for the real-time motion data. Not command responses."))
-		void Broadcast();
-
-	/*! \brief Set the Smartsuit in unicast mode.
-	*
-	* Requests the Smartsuit to unicast its live streaming. This way only one application in one device will have access to data from the Smartsuit.
-	* This setting provides the best WiFiPerformance.
-	*/
-	UFUNCTION(BlueprintCallable, Category = "Smartsuit", meta = (ToolTip = "Send a request to make the Smartsuit, Unicast it's UDP messages to the current device. This only applies for the real-time motion data. Not command responses."))
-		void Unicast();
-
-	/*! \brief Set the BodyModel in the Smartsuit.
-	*
-	* Sends a BodyModel to the Smartsuit. If the Smartsuit received the BodyModel successfully, the SmartsuitController updates its own BodyModel reference to match the one it sent.
-	*/
-	UFUNCTION(BlueprintCallable, Category = "Smartsuit", meta = (ToolTip = "Send a command to set a BodyModel to the Smartsuit binded to this Controller."))
-		void SetBodyModel(FBodyModel bodyToSet);
-
-	/*! \brief Get the BodyModel from the Smartsuit.
-	*
-	* Asks the Smartsuit about the BodyModel it is running. When the Smartsuit responds, the SmartsuitController updates its BodyModel reference to match the one received from the Smartsuit.
-	*/
-	UFUNCTION(BlueprintCallable, Category = "Smartsuit", meta = (ToolTip = "Sends a request to the Smartsuit to ask what BodyModel the Smartsuit is using. Once the Controller receives the response. It updates it's BodyModel to match the one the Smartsuit is using."))
-		void GetBodyModel();
-
 	/*! \brief Various Developer Tests.*/
 	UFUNCTION(BlueprintCallable, Category = "Smartsuit", meta = (ToolTip = "Tests"))
 		void DoTests();
 		
-	///*! \brief Returns a SmartsuitController by the name.
-	//*
-	//* @param name The name of the Smartsuit to look for.
-	//* @return A SmartsuitController that has the specified Smartsuit name, if non found, it will return nullptr.
-	//*/
-	//UFUNCTION(BlueprintPure, Category = "Smartsuit", meta = (BlueprintThreadSafe, ToolTip = "Returns the SmartsuitController given the Smartsuit name."))
-	//static ASmartsuitController* GetSmartsuitControllerByName(FString name){
-	//	ASmartsuitController * actor = nullptr;
-	//	// Find UObjects by type
-	//	//UE_LOG(LogTemp, Warning, TEXT("Looking for actors...%s"), *name);
-
-	//	for (TObjectIterator<ASmartsuitController> It; It; ++It)
-	//	{
-	//		if (It->realLife) {
-	//			ASmartsuitController* curActor = *It;
-	//			FString mySuitName = curActor->suitname;
-	//			//UE_LOG(LogTemp, Warning, TEXT("Looking for actor.. %s == %s"), *mySuitName, *name);
-	//			if (name.Compare(mySuitName) == 0) {
-	//				//UE_LOG(LogTemp, Warning, TEXT("Actors match!!"));
-	//				actor = curActor;
-	//				break;
-	//			}
-	//		}
-	//		//else {
-	//		//	UE_LOG(LogTemp, Warning, TEXT("Actors no match.."));
-	//		//}
-	//		// ...
-	//	}
-
-
-	//	return actor;
-	//}
-	//
-	///*! \brief Returns a SmartsuitController from its index ID.
-	//*
-	//* @param id The index id that will look up for.
-	//* @return A SmartsuitController that has the specified index id, if non found, it will return nullptr.
-	//*/
-	//UFUNCTION(BlueprintPure, Category = "Smartsuit", meta = (BlueprintThreadSafe, ToolTip = "Returns a SmartsuitController given it's Index ID. The Index ID is specified in the SmartsuitController details."))
-	//static ASmartsuitController* GetSmartsuitController(int id){
-	//	ASmartsuitController * actor = nullptr;
-	//	// Find UObjects by type
-	//	//UE_LOG(LogTemp, Warning, TEXT("Looking for actors...%s"), *name);
-
-	//	for (TObjectIterator<ASmartsuitController> It; It; ++It)
-	//	{
-	//		if (It->realLife) {
-	//			ASmartsuitController* curActor = *It;
-	//			//UE_LOG(LogTemp, Warning, TEXT("Looking for actor.. %s == %s"), *mySuitName, *name);
-	//			if (id == curActor->IndexID) {
-	//				//UE_LOG(LogTemp, Warning, TEXT("Actors match!!"));
-	//				actor = curActor;
-	//				break;
-	//			}
-	//		}
-	//		//else {
-	//		//	UE_LOG(LogTemp, Warning, TEXT("Actors no match.."));
-	//		//}
-	//		// ...
-	//	}
-
-
-	//	return actor;
-	//}
-
-	/// @cond no_doc
-	bool SupportsWiFi();
-	/// @endcond
-
 	bool IsRealLife() { return realLife; }
 private:
 
-	uint32 GetLocalIP();
     uint32 GetLocalMacIP();
 	uint8 GetByte(uint32 val, int i);
-	bool hubInfoRequested;
-	bool bodyModelRequested;
-	HubInfo* hubInfo;
-	void GetHubInfo();
-	void UpdateWiFiApiString();
-	void SendCommand(unsigned char cmd, uint8 *customData, int customDataLength);
 
+	bool bodyModelRequested;
+	
 protected:
 	/*! \brief Indicates if this instance of the actor is in play mode and not an instance from the editor.*/
 	bool realLife = false;

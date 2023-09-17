@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "../Lib/V8/Includes/SmartsuitDef.h"
 #include "Runtime/Launch/Resources/Version.h"
 
 #include "RokokoSkeletonData.generated.h"

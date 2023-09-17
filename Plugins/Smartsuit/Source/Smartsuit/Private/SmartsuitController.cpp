@@ -8,9 +8,7 @@ ASmartsuitController::ASmartsuitController()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	hubInfoRequested = false;
 	bodyModelRequested = false;
-	hubInfo = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -53,47 +51,9 @@ void ASmartsuitController::Tick(float DeltaTime)
 	{
 		return;
 	}
-	if (!hubInfoRequested) 
-	{
-		hubInfoRequested = true;
-		GetHubInfo();
-		return;
-	}
 	
 }
 
-
-void ASmartsuitController::Restart() {
-	//SendCommand(SMARTSUIT_COMMAND_RESET_KALMAN_FILTER);
-}
-
-void ASmartsuitController::Calibrate() {
-	//SendCommand(SMARTSUIT_COMMAND_PERFORM_APOSE);
-}
-
-void ASmartsuitController::Broadcast() {
-	//SendCommand(SMARTSUIT_COMMAND_USE_BROADCAST_ADDR);
-}
-
-void ASmartsuitController::Unicast() {
-	//SendCommand(SMARTSUIT_COMMAND_USE_SPECIFIC_ADDR);
-}
-
-void ASmartsuitController::SetBodyModel(FBodyModel bodyToSet) {
-	//unsigned char b[sizeof(Body)];
-	//Body body = bodyToSet.GetBody();
-	//memcpy(b, &body, sizeof(Body));
-
-	//SendCommand(0, b, sizeof(Body));
-}
-
-void ASmartsuitController::GetBodyModel() {
-	//SendCommand(SMARTSUIT_COMMAND_GET_BODY_DIMENSIONS);
-}
-
-void ASmartsuitController::GetHubInfo() {
-	//SendCommand(SMARTSUIT_COMMAND_READ_HUB_INFO);
-}
 
 uint8 ASmartsuitController::GetByte(uint32 value, int i) 
 {
@@ -109,19 +69,6 @@ uint8 ASmartsuitController::GetByte(uint32 value, int i)
 	default:
 		return 0;
 	}
-}
-
-bool ASmartsuitController::SupportsWiFi() {
-	return hubInfo && ((hubInfo->wifiApiVersion >> 24) & 0xff) == SUPPORTED_MAJOR_WIFI_API;
-}
-
-void ASmartsuitController::UpdateWiFiApiString() {
-	if (hubInfo) {
-		uint32 version = hubInfo->wifiApiVersion;
-		wifiApiVersion = FString::Printf(TEXT("%d.%d.%d"), ((version >> 24) & 0xff), ((version >> 16) & 0xff), ((version >> 8) & 0xff));
-		if (!SupportsWiFi())
-			wifiApiVersion.Append(TEXT(" - Unsupported!"));
-	}	
 }
 
 #if PLATFORM_MAC
