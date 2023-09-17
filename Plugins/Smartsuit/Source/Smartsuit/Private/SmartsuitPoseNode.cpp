@@ -1,12 +1,15 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "SmartsuitPoseNode.h"
-#include "Smartsuit.h"
 #include "AnimationRuntime.h"
-#include "SmartsuitDefinitions.h"
+#include "LiveLinkCustomVersion.h"
+#include "LiveLinkClient.h"
+#include "RokokoSkeletonData.h"
 #include "Animation/AnimInstanceProxy.h"
 #include "Roles/LiveLinkAnimationRole.h"
 #include "SmartsuitBlueprintLibrary.h"
+#include "Roles/LiveLinkSmartsuitRole.h"
+#include "Roles/LiveLinkSmartsuitTypes.h"
 
 
 
@@ -15,59 +18,15 @@
 
 FSmartsuitPoseNode::FSmartsuitPoseNode()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Smartsuit Pose Node: Initializing..."));
-	//TPose = new SmartsuitTPose();
-
-	//Controller = nullptr;
-	//RelativeToStart = false;
-	//ScaleBones = false;
-
-	//if (Bone_Map_Override_OLD->IsValidLowLevel())
-	//{
-	//	BoneMap.hip = Bone_Map_Override_OLD->hip;
-	//	BoneMap.stomach = Bone_Map_Override_OLD->stomach;
-	//	BoneMap.chest = Bone_Map_Override_OLD->chest;
-	//	BoneMap.neck = Bone_Map_Override_OLD->neck;
-	//	BoneMap.head = Bone_Map_Override_OLD->head;
-	//	BoneMap.headTop = Bone_Map_Override_OLD->headTop;
-	//	BoneMap.leftShoulder = Bone_Map_Override_OLD->leftShoulder;
-	//	BoneMap.leftArm = Bone_Map_Override_OLD->leftArm;
-	//	BoneMap.leftForearm = Bone_Map_Override_OLD->leftForearm;
-	//	BoneMap.leftHand = Bone_Map_Override_OLD->leftHand;
-	//	BoneMap.leftFingerTip = Bone_Map_Override_OLD->leftFingerTip;
-	//	BoneMap.rightShoulder = Bone_Map_Override_OLD->rightShoulder;
-	//	BoneMap.rightArm = Bone_Map_Override_OLD->rightArm;
-	//	BoneMap.rightForearm = Bone_Map_Override_OLD->rightForearm;
-	//	BoneMap.rightHand = Bone_Map_Override_OLD->rightHand;
-	//	BoneMap.rightFingerTip = Bone_Map_Override_OLD->rightFingerTip;
-	//	BoneMap.leftUpleg = Bone_Map_Override_OLD->leftUpleg;
-	//	BoneMap.leftLeg = Bone_Map_Override_OLD->leftLeg;
-	//	BoneMap.leftFoot = Bone_Map_Override_OLD->leftFoot;
-	//	BoneMap.leftToe = Bone_Map_Override_OLD->leftToe;
-	//	BoneMap.rightUpleg = Bone_Map_Override_OLD->rightUpleg;
-	//	BoneMap.rightLeg = Bone_Map_Override_OLD->rightLeg;
-	//	BoneMap.rightFoot = Bone_Map_Override_OLD->rightFoot;
-	//	BoneMap.rightToe = Bone_Map_Override_OLD->rightToe;
-	//}
-
-	CurrentRetargetAsset = nullptr;
 }
 
 FSmartsuitPoseNode::~FSmartsuitPoseNode()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("Smartsuit Pose Node: Cleaning up..."));
-	/*if (TPose) {
-	delete TPose;
-	}*/
 }
 
 void FSmartsuitPoseNode::GatherDebugData(FNodeDebugData& DebugData)
 {
 	FString DebugLine = DebugData.GetNodeName(this);
-
-	//DebugLine += "(";
-	//AddDebugNodeData(DebugLine);
-	//DebugLine += FString::Printf(TEXT(" Will affect the whole body)"));
 	DebugData.AddDebugItem(DebugLine);
 
 	ComponentPose.GatherDebugData(DebugData);
@@ -89,13 +48,8 @@ void FSmartsuitPoseNode::ApplySmartsuitRotation(FBoneReference bone, FQuat quat,
 	FAnimationRuntime::ConvertCSTransformToBoneSpace(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
 	const FQuat BoneQuat(quat);
 	NewBoneTM.SetRotation(BoneQuat);
-	//FTransform relativeTransform = MeshBases.GetComponentSpaceTransform(BoneMap.hipBone.GetCompactPoseIndex(BoneContainer));
-	////NewBoneTM.SetTranslation(dir)
-	//NewBoneTM = NewBoneTM * relativeTransform;
-	//UE_LOG(LogTemp, Warning, TEXT("position is : %f, %f, %f"), NewBoneTM.GetTranslation().X, NewBoneTM.GetTranslation().Y, NewBoneTM.GetTranslation().Z);
 	FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
 	MeshBases.SetComponentSpaceTransform(CompactPoseBoneToModify, NewBoneTM);
-	//OutBoneTransforms.Add(FBoneTransform(bone.GetCompactPoseIndex(BoneContainer), NewBoneTM));
 }
 
 void FSmartsuitPoseNode::ApplySmartsuitPosition(FBoneReference bone, FVector position, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
@@ -130,13 +84,12 @@ void FSmartsuitPoseNode::ApplySmartsuitTransform(FBoneReference bone, FQuat quat
 	FTransform NewBoneTM = MeshBases.GetComponentSpaceTransform(CompactPoseBoneToModify);
 
 	FAnimationRuntime::ConvertCSTransformToBoneSpace(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
-	//NewBoneTM.SetScale3D(scale);
+	
 	const FQuat BoneQuat(quat);
 	NewBoneTM.SetRotation(BoneQuat);
 	NewBoneTM.SetTranslation(position);
 	FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
 	MeshBases.SetComponentSpaceTransform(CompactPoseBoneToModify, NewBoneTM);
-	//OutBoneTransforms.Add(FBoneTransform(bone.GetCompactPoseIndex(BoneContainer), NewBoneTM));
 }
 
 void FSmartsuitPoseNode::ApplySmartsuitRotationScale(FBoneReference bone, FQuat quat, FVector scale, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
@@ -151,7 +104,6 @@ void FSmartsuitPoseNode::ApplySmartsuitRotationScale(FBoneReference bone, FQuat 
 	NewBoneTM.SetRotation(BoneQuat);
 	FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
 	MeshBases.SetComponentSpaceTransform(CompactPoseBoneToModify, NewBoneTM);
-	//OutBoneTransforms.Add(FBoneTransform(bone.GetCompactPoseIndex(BoneContainer), NewBoneTM));
 }
 
 float FSmartsuitPoseNode::DistanceBetweenTwoBones(FBoneReference bone1, FBoneReference bone2, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
@@ -187,9 +139,7 @@ FTransform OriginalTransform(FBoneReference bone, EBoneControlSpace space, USkel
 	FTransform NewBoneTM = MeshBases.GetComponentSpaceTransform(CompactPoseBoneToModify);
 
 	FAnimationRuntime::ConvertCSTransformToBoneSpace(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
-	//UE_LOG(LogTemp, Warning, TEXT("%s: %f, %f, %f, %f"), *name, NewBoneTM.GetRotation().X, NewBoneTM.GetRotation().Y, NewBoneTM.GetRotation().Z, NewBoneTM.GetRotation().W);
 	return NewBoneTM;
-	//OutBoneTransforms.Add(FBoneTransform(bone.GetCompactPoseIndex(BoneContainer), NewBoneTM));
 }
 
 TArray<FTransform> FSmartsuitPoseNode::GetAllBoneTransforms(FBoneReference bone, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
@@ -209,56 +159,11 @@ TArray<FTransform> FSmartsuitPoseNode::GetAllBoneTransforms(FBoneReference bone,
 		FAnimationRuntime::ConvertCSTransformToBoneSpace(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
 		result.Add(FTransform(NewBoneTM));
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("%s: %f, %f, %f, %f"), *name, NewBoneTM.GetRotation().X, NewBoneTM.GetRotation().Y, NewBoneTM.GetRotation().Z, NewBoneTM.GetRotation().W);
 	return result;
-	//OutBoneTransforms.Add(FBoneTransform(bone.GetCompactPoseIndex(BoneContainer), NewBoneTM));
 }
 
 void FSmartsuitPoseNode::ApplyAllBonePositions(FBoneReference bone, float hipWidth, TArray<FTransform> transforms, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
 {
-	//const FBoneContainer& BoneContainer = MeshBases.GetPose().GetBoneContainer();
-	//int index = 0;
-	//for (int i = bone.BoneIndex + 1; i < BoneContainer.GetNumBones(); i++) 
-	//{
-	//	if (i == BoneMap.leftUpleg.BoneIndex || i == BoneMap.rightUpleg.BoneIndex) 
-	//	{
-	//		FVector hipWPos = OriginalTransform(BoneMap.hip, space, SkelComp, MeshBases).GetTranslation();
-	//		
-	//		FVector upLegWPos;
-	//		if (i == BoneMap.leftUpleg.BoneIndex) 
-	//		{
-	//			upLegWPos = OriginalTransform(BoneMap.leftUpleg, space, SkelComp, MeshBases).GetTranslation();
-	//		}
-	//		else 
-	//		{
-	//			upLegWPos = OriginalTransform(BoneMap.rightUpleg, space, SkelComp, MeshBases).GetTranslation();
-	//		}
-	//		FVector diff = upLegWPos - hipWPos;
-	//		FVector dir;
-	//		float length;
-	//		diff.ToDirectionAndLength(dir, length);
-	//		FCompactPoseBoneIndex CompactPoseBoneToModify(i);
-	//		FTransform NewBoneTM = MeshBases.GetComponentSpaceTransform(CompactPoseBoneToModify);
-	//		//UE_LOG(LogTemp, Warning, TEXT("UpLeg found, will use world lenght: %f, with dir %f, %f, %f"), hipWidth / 2, diff.X, diff.Y, diff.Z);
-
-	//		//if (i == BoneMap.)
-	//		FAnimationRuntime::ConvertCSTransformToBoneSpace(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
-	//		NewBoneTM.SetTranslation(hipWPos + (dir * (hipWidth / 2)));
-	//		FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
-	//		MeshBases.SetComponentSpaceTransform(CompactPoseBoneToModify, NewBoneTM);
-	//	}
-	//	else 
-	//	{
-	//		FCompactPoseBoneIndex CompactPoseBoneToModify(i);
-	//		FTransform NewBoneTM = MeshBases.GetComponentSpaceTransform(CompactPoseBoneToModify);
-	//		//if (i == BoneMap.)
-	//		FAnimationRuntime::ConvertCSTransformToBoneSpace(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
-	//		NewBoneTM.SetTranslation(transforms[index].GetTranslation());
-	//		FAnimationRuntime::ConvertBoneSpaceTransformToCS(SkelComp->GetComponentTransform(), MeshBases, NewBoneTM, CompactPoseBoneToModify, space);
-	//		MeshBases.SetComponentSpaceTransform(CompactPoseBoneToModify, NewBoneTM);
-	//	}
-	//	index++;
-	//}
 }
 
 FVector FSmartsuitPoseNode::GetBoneScale(FBoneReference scaleBone, FBoneReference bone1, FBoneReference bone2, float desiredDistance, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
@@ -271,46 +176,17 @@ FVector FSmartsuitPoseNode::GetBoneScale(FBoneReference scaleBone, FBoneReferenc
 
 float FSmartsuitPoseNode::ScaleBonesToDistance(FBoneReference scaleBone, FBoneReference bone1, FBoneReference bone2, float desiredDistance, EBoneControlSpace space, USkeletalMeshComponent* SkelComp, FCSPose<FCompactPose>& MeshBases) 
 {
-	//scale bones...
-	//FVector nextBonePosition = OriginalTransform(nextBone, EBoneControlSpace::BCS_ParentBoneSpace, SkelComp, MeshBases).GetTranslation();
-
 	float currBoneDistance = DistanceBetweenTwoBones(bone1, bone2, space, SkelComp, MeshBases);
 	FVector currScale = OriginalTransform(scaleBone, space, SkelComp, MeshBases).GetTranslation();
 	float boneScale = desiredDistance / currBoneDistance;
-	//float boneScale = 10.f;
+	
 	ApplySmartsuitScale(scaleBone, FVector(boneScale, boneScale, boneScale), space, SkelComp, MeshBases);
-
-	//ApplySmartsuitPosition(nextBone, nextBonePosition, EBoneControlSpace::BCS_ParentBoneSpace, SkelComp, MeshBases);
 	return boneScale;
 }
 
-//FQuat GetRotation(uint8 sensor, Sensor *sensors, int numOfSensors) 
-//{
-//	for (int s = 0; s < numOfSensors; s++) 
-//	{
-//		if (sensors[s].addr == sensor) 
-//		{
-//			return sensors[s].Uquaternion();
-//		}
-//	}
-//	return FQuat::Identity;
-//}
-//
-//FVector GetPosition(uint8 sensor, Sensor *sensors, int numOfSensors) 
-//{
-//	for (int s = 0; s < numOfSensors; s++) 
-//	{
-//		if (sensors[s].addr == sensor) 
-//		{
-//			return sensors[s].UPosition();
-//		}
-//	}
-//	return FVector::ZeroVector;
-//}
-
 FQuat GetRotation2(const FName& BoneName, FSuitData* suitdata)
 {
-	if (auto SmartsuitBone = suitdata->SmartsuitBones.Find(BoneName))
+	if (auto SmartsuitBone = suitdata->bones.Find(BoneName))
 	{
 		return SmartsuitBone->Uquaternion();
 	}
@@ -320,7 +196,7 @@ FQuat GetRotation2(const FName& BoneName, FSuitData* suitdata)
 
 FVector GetPosition2(const FName& BoneName, FSuitData* suitdata)
 {
-	if (auto SmartsuitBone = suitdata->SmartsuitBones.Find(BoneName))
+	if (auto SmartsuitBone = suitdata->bones.Find(BoneName))
 	{
 		return SmartsuitBone->UPosition();
 	}
@@ -356,44 +232,46 @@ FVector GetPosition3(const FName& BoneName, FLiveLinkSubjectFrameData &InSubject
 	return FVector::ZeroVector;
 }
 
-PRAGMA_DISABLE_OPTIMIZATION
+//PRAGMA_DISABLE_OPTIMIZATION
 void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseContext& Output, TArray<FBoneTransform>& OutBoneTransforms)
 {
 	USkeletalMeshComponent* SkelComp = Output.AnimInstanceProxy->GetSkelMeshComponent();
 	FCSPose<FCompactPose>& MeshBases = Output.Pose;
 
 	check(OutBoneTransforms.Num() == 0);
-	//if (!Controller/* || !Controller->SupportsWiFi()*/) 
-	//{
-	//	return;
-	//}
-
-	ARokokoReceiver *receiver = GetReceiver();
-	if (!receiver) 
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("No receiver"));
-		//return;
-	}
-	FSuitData* data = nullptr;//receiver->GetSmartsuit(Controller->suitname);
-	if (!data) 
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("No data for %s"), *Controller->suitname);
-		//return;
-	}
-
-	if (!LiveLinkClient_AnyThread || !CurrentRetargetAsset)
+	
+	
+	if (!LiveLinkClient_AnyThread /*|| !CurrentRetargetAsset*/)
 	{
 		return;
 	}
 
-
 	FLiveLinkSubjectFrameData SubjectFrameData;
-
 	FLiveLinkSubjectName LiveLinkSubjectName = GetLiveLinkSubjectName();
 
-	TSubclassOf<ULiveLinkRole> SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole(LiveLinkSubjectName);
+	TSubclassOf<ULiveLinkRole> SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole_AnyThread(LiveLinkSubjectName);
 	if (SubjectRole)
 	{
+#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+		if (SubjectRole->IsChildOf(ULiveLinkSmartsuitRole::StaticClass()))
+		{
+			//Process animation data if the subject is from that type
+			if (LiveLinkClient_AnyThread->EvaluateFrame_AnyThread(LiveLinkSubjectName, ULiveLinkSmartsuitRole::StaticClass(), SubjectFrameData))
+			{
+
+			}
+			else
+			{
+				return;
+			}
+
+
+		}
+		else
+		{
+			return;
+		}
+#else
 		if (SubjectRole->IsChildOf(ULiveLinkAnimationRole::StaticClass()))
 		{
 			//Process animation data if the subject is from that type
@@ -405,58 +283,36 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 			{
 				return;
 			}
-		}
+
+
+	}
 		else
 		{
 			return;
 		}
+#endif
 	}
 	else
 	{
 		return;
 	}
 
-
+#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+	FLiveLinkSmartsuitStaticData* SkeletonData = SubjectFrameData.StaticData.Cast<FLiveLinkSmartsuitStaticData>();
+	FLiveLinkSmartsuitFrameData* FrameData = SubjectFrameData.FrameData.Cast<FLiveLinkSmartsuitFrameData>();
+#else
 	FLiveLinkSkeletonStaticData* SkeletonData = SubjectFrameData.StaticData.Cast<FLiveLinkSkeletonStaticData>();
 	FLiveLinkAnimationFrameData* FrameData = SubjectFrameData.FrameData.Cast<FLiveLinkAnimationFrameData>();
+#endif
+
 	check(SkeletonData);
 	check(FrameData);
 
 
-
-	//SkeletonData->PropertyNames.Find()
-
-
 	EBoneControlSpace TestBoneControlSpace = BCS_ComponentSpace;
 
-	if (!TPose.StoredTPose) 
+	if (!TPose.StoredTPose /*&& CurrentRetargetAsset*/)
 	{
-		
-		//if (RelativeToStart)
-		//{
-		//	if (data->Hip())
-		//	{
-		//		TPose.startPos = FVector(OriginalTransform(BoneMap.hip, TestBoneControlSpace, SkelComp, MeshBases).GetTranslation()) - data->Hip()->UPosition();//SkelComp->GetComponentLocation();
-
-		//		//TPose.startPos.X = 0;
-		//		//TPose.startPos.Y = 0;
-		//		//TPose.startPos.Z = 0;
-		//	}
-		//	else
-		//	{
-		//		TPose.startPos = FVector::ZeroVector;
-		//	}
-		//}
-		//else
-		//{
-		//	TPose.startPos = FVector::ZeroVector;
-		//	//SkelComp->SetWorldRotation(FRotator::ZeroRotator);
-		//}
-		
-
-
-		//TPose.startPos = FVector(OriginalTransform(BoneMap.hip, EBoneControlSpace::BCS_WorldSpace, SkelComp, MeshBases).GetTranslation());
-
 		TPose.Pose.hip =					OriginalTransform(BoneMap.hip, TestBoneControlSpace, SkelComp, MeshBases);
 		TPose.Pose.stomach =				OriginalTransform(BoneMap.stomach, TestBoneControlSpace, SkelComp, MeshBases);
 		TPose.Pose.chest =					OriginalTransform(BoneMap.chest, TestBoneControlSpace, SkelComp, MeshBases);
@@ -529,6 +385,11 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	FQuat modifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
 	FQuat forwardModifier = FQuat::MakeFromEuler(FVector(0, 0, 90));
 
+	// These duplicate variables are a bit redundant in their current state, however lets keep these around in case we need to negate an axis for example
+	FQuat LeftShoulderSpace = FQuat::MakeFromEuler(FVector(ShoulderSpace, 0.0f, 0.0f));
+	FQuat RightShoulderSpace = FQuat::MakeFromEuler(FVector(ShoulderSpace, 0.0f, 0.0f));
+	FQuat LeftArmSpace = FQuat::MakeFromEuler(FVector(ArmSpace, 0.0f, 0.0f));
+	FQuat RightArmSpace = FQuat::MakeFromEuler(FVector(ArmSpace, 0.0f, 0.0f));
 
 	FQuat hipQuat =						GetRotation3(SmartsuitBones::hip, SubjectFrameData);// *modifier;
 	FVector hipPosition =				GetPosition3(SmartsuitBones::hip, SubjectFrameData);
@@ -536,12 +397,12 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	FQuat chestQuat =					GetRotation3(SmartsuitBones::chest, SubjectFrameData);
 	FQuat neckQuat =					GetRotation3(SmartsuitBones::neck, SubjectFrameData);
 	FQuat headQuat =					GetRotation3(SmartsuitBones::head, SubjectFrameData);
-	FQuat leftShoulderQuat =			GetRotation3(SmartsuitBones::leftShoulder, SubjectFrameData);
-	FQuat leftArmQuat =					GetRotation3(SmartsuitBones::leftUpperArm, SubjectFrameData);
+	FQuat leftShoulderQuat =			GetRotation3(SmartsuitBones::leftShoulder, SubjectFrameData) * LeftShoulderSpace;
+	FQuat leftArmQuat =					GetRotation3(SmartsuitBones::leftUpperArm, SubjectFrameData) * LeftArmSpace;
 	FQuat leftForearmQuat =				GetRotation3(SmartsuitBones::leftLowerArm, SubjectFrameData);
 	FQuat leftHandQuat =				GetRotation3(SmartsuitBones::leftHand, SubjectFrameData);
-	FQuat rightShoulderQuat =			GetRotation3(SmartsuitBones::rightShoulder, SubjectFrameData);
-	FQuat rightArmQuat =				GetRotation3(SmartsuitBones::rightUpperArm, SubjectFrameData);
+	FQuat rightShoulderQuat =			GetRotation3(SmartsuitBones::rightShoulder, SubjectFrameData) * RightShoulderSpace;
+	FQuat rightArmQuat =				GetRotation3(SmartsuitBones::rightUpperArm, SubjectFrameData) * RightArmSpace;
 	FQuat rightForearmQuat =			GetRotation3(SmartsuitBones::rightLowerArm, SubjectFrameData);
 	FQuat rightHandQuat =				GetRotation3(SmartsuitBones::rightHand, SubjectFrameData);
 	FQuat leftUpLegQuat =				GetRotation3(SmartsuitBones::leftUpLeg, SubjectFrameData);
@@ -716,8 +577,29 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	//	ApplySmartsuitTransform(BoneMap.hip, SuitRotation, SuitLocation, FVector(1, 1, 1), SuitTransformBoneControlSpace, SkelComp, MeshBases);
 	//}
 
+	// Apply root motion, if relevant
+	if (bApplyRootMotion)
+	{
+		FVector NewRootPosition = hipPosition;
+		NewRootPosition.Z = 0.0f;
 
+		// Make sure to initialize root motion position, otherwise we will get erronous results
+		if (!bInitializedRootPosition)
+		{
+			OldRootPosition = NewRootPosition;
+			bInitializedRootPosition = true;
+		}
 
+		FVector RootDelta = NewRootPosition - OldRootPosition;
+		OldRootPosition = NewRootPosition;
+
+		FTransform NewRootTransform;
+		NewRootTransform.SetRotation(FQuat::Identity);
+		NewRootTransform.SetScale3D(FVector::OneVector);
+		NewRootTransform.SetTranslation(RootDelta);
+
+		Output.AnimInstanceProxy->GetExtractedRootMotion().Accumulate(NewRootTransform);
+	}
 
 	ApplySmartsuitRotation(BoneMap.stomach, stomachQuat* stomachExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 	ApplySmartsuitRotation(BoneMap.chest, chestQuat* chestExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
@@ -740,114 +622,86 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	ApplySmartsuitRotation(BoneMap.rightFoot, rightFootQuat* rightFootExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 	ApplySmartsuitRotation(BoneMap.rightToe, rightToeQuat* rightToeExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
 
-	ApplySmartsuitRotation(BoneMap.leftThumbProximal, leftThumbProximalQuat * leftThumbProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftThumbMedial, leftThumbMedialQuat * leftThumbMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftThumbDistal, leftThumbDistalQuat * leftThumbDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftThumbTip, leftThumbTipQuat * leftThumbTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftIndexProximal, leftIndexProximalQuat * leftIndexProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftIndexMedial, leftIndexMedialQuat * leftIndexMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftIndexDistal, leftIndexDistalQuat * leftIndexDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftIndexTip, leftIndexTipQuat * leftIndexTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftMiddleProximal, leftMiddleProximalQuat * leftMiddleProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftMiddleMedial, leftMiddleMedialQuat * leftMiddleMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftMiddleDistal, leftMiddleDistalQuat * leftMiddleDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftMiddleTip, leftMiddleTipQuat * leftMiddleTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftRingProximal, leftRingProximalQuat * leftRingProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftRingMedial, leftRingMedialQuat * leftRingMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftRingDistal, leftRingDistalQuat * leftRingDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftRingTip, leftRingTipQuat * leftRingTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftLittleProximal, leftLittleProximalQuat * leftLittleProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftLittleMedial, leftLittleMedialQuat * leftLittleMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftLittleDistal, leftLittleDistalQuat * leftLittleDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.leftLittleTip, leftLittleTipQuat * leftLittleTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightThumbProximal, rightThumbProximalQuat * rightThumbProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightThumbMedial, rightThumbMedialQuat * rightThumbMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightThumbDistal, rightThumbDistalQuat * rightThumbDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightThumbTip, rightThumbTipQuat * rightThumbTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightIndexProximal, rightIndexProximalQuat * rightIndexProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightIndexMedial, rightIndexMedialQuat * rightIndexMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightIndexDistal, rightIndexDistalQuat * rightIndexDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightIndexTip, rightIndexTipQuat * rightIndexTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightMiddleProximal, rightMiddleProximalQuat * rightMiddleProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightMiddleMedial, rightMiddleMedialQuat * rightMiddleMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightMiddleDistal, rightMiddleDistalQuat * rightMiddleDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightMiddleTip, rightMiddleTipQuat * rightMiddleTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightRingProximal, rightRingProximalQuat * rightRingProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightRingMedial, rightRingMedialQuat * rightRingMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightRingDistal, rightRingDistalQuat * rightRingDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightRingTip, rightRingTipQuat * rightRingTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightLittleProximal, rightLittleProximalQuat * rightLittleProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightLittleMedial, rightLittleMedialQuat * rightLittleMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightLittleDistal, rightLittleDistalQuat * rightLittleDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
-	ApplySmartsuitRotation(BoneMap.rightLittleTip, rightLittleTipQuat * rightLittleTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	bool HasLeftGlove = true;
+	bool HasRightGlove = true;
+
+	#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+	HasLeftGlove = FrameData->HasLeftGlove;
+	HasRightGlove = FrameData->HasRightGlove;
+	#endif
+
+	if(HasLeftGlove)
+	{
+		ApplySmartsuitRotation(BoneMap.leftThumbProximal, leftThumbProximalQuat * leftThumbProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftThumbMedial, leftThumbMedialQuat * leftThumbMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftThumbDistal, leftThumbDistalQuat * leftThumbDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftThumbTip, leftThumbTipQuat * leftThumbTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftIndexProximal, leftIndexProximalQuat * leftIndexProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftIndexMedial, leftIndexMedialQuat * leftIndexMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftIndexDistal, leftIndexDistalQuat * leftIndexDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftIndexTip, leftIndexTipQuat * leftIndexTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftMiddleProximal, leftMiddleProximalQuat * leftMiddleProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftMiddleMedial, leftMiddleMedialQuat * leftMiddleMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftMiddleDistal, leftMiddleDistalQuat * leftMiddleDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftMiddleTip, leftMiddleTipQuat * leftMiddleTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftRingProximal, leftRingProximalQuat * leftRingProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftRingMedial, leftRingMedialQuat * leftRingMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftRingDistal, leftRingDistalQuat * leftRingDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftRingTip, leftRingTipQuat * leftRingTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftLittleProximal, leftLittleProximalQuat * leftLittleProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftLittleMedial, leftLittleMedialQuat * leftLittleMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftLittleDistal, leftLittleDistalQuat * leftLittleDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.leftLittleTip, leftLittleTipQuat * leftLittleTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	}
+
+	if (HasRightGlove)
+	{
+		ApplySmartsuitRotation(BoneMap.rightThumbProximal, rightThumbProximalQuat * rightThumbProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightThumbMedial, rightThumbMedialQuat * rightThumbMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightThumbDistal, rightThumbDistalQuat * rightThumbDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightThumbTip, rightThumbTipQuat * rightThumbTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightIndexProximal, rightIndexProximalQuat * rightIndexProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightIndexMedial, rightIndexMedialQuat * rightIndexMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightIndexDistal, rightIndexDistalQuat * rightIndexDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightIndexTip, rightIndexTipQuat * rightIndexTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightMiddleProximal, rightMiddleProximalQuat * rightMiddleProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightMiddleMedial, rightMiddleMedialQuat * rightMiddleMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightMiddleDistal, rightMiddleDistalQuat * rightMiddleDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightMiddleTip, rightMiddleTipQuat * rightMiddleTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightRingProximal, rightRingProximalQuat * rightRingProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightRingMedial, rightRingMedialQuat * rightRingMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightRingDistal, rightRingDistalQuat * rightRingDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightRingTip, rightRingTipQuat * rightRingTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightLittleProximal, rightLittleProximalQuat * rightLittleProximalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightLittleMedial, rightLittleMedialQuat * rightLittleMedialExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightLittleDistal, rightLittleDistalQuat * rightLittleDistalExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+		ApplySmartsuitRotation(BoneMap.rightLittleTip, rightLittleTipQuat * rightLittleTipExpected, hipQuat, TestBoneControlSpace, SkelComp, MeshBases);
+	}
 }
-PRAGMA_ENABLE_OPTIMIZATION
+//PRAGMA_ENABLE_OPTIMIZATION
 
 bool FSmartsuitPoseNode::IsValidToEvaluate(const USkeleton* Skeleton, const FBoneContainer& RequiredBones)
 {
 	return true;
-//
-//	// if both bones are valid
-//	return (BoneMap.hip.IsValidToEvaluate(RequiredBones) && /*BoneMap.chest.IsValidToEvaluate(RequiredBones) &&*/ BoneMap.stomach.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.neck.IsValidToEvaluate(RequiredBones) && BoneMap.head.IsValidToEvaluate(RequiredBones) /*&& BoneMap.headTop.IsValidToEvaluate(RequiredBones)*/ &&
-//		BoneMap.leftShoulder.IsValidToEvaluate(RequiredBones) && BoneMap.leftArm.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftForearm.IsValidToEvaluate(RequiredBones) && BoneMap.leftHand.IsValidToEvaluate(RequiredBones) /*&& BoneMap.leftFingerTip.IsValidToEvaluate(RequiredBones)*/ &&
-//		BoneMap.rightShoulder.IsValidToEvaluate(RequiredBones) && BoneMap.rightArm.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightForearm.IsValidToEvaluate(RequiredBones) && BoneMap.rightHand.IsValidToEvaluate(RequiredBones) /*&& BoneMap.rightFingerTip.IsValidToEvaluate(RequiredBones)*/ &&
-//		BoneMap.leftUpleg.IsValidToEvaluate(RequiredBones) && BoneMap.leftLeg.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftFoot.IsValidToEvaluate(RequiredBones) && BoneMap.rightUpleg.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightLeg.IsValidToEvaluate(RequiredBones) && BoneMap.rightFoot.IsValidToEvaluate(RequiredBones) &&
-//		/*BoneMap.leftToe.IsValidToEvaluate(RequiredBones)*/ /*&& BoneMap.rightToe.IsValidToEvaluate(RequiredBones)*/
-//		BoneMap.leftThumbProximal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftThumbMedial.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftThumbDistal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftThumbTip.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftIndexProximal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftIndexMedial.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftIndexDistal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftIndexTip.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftMiddleProximal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftMiddleMedial.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftMiddleDistal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftMiddleTip.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftRingProximal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftRingMedial.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftRingDistal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftRingTip.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftLittleProximal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftLittleMedial.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftLittleDistal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.leftLittleTip.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightThumbProximal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightThumbMedial.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightThumbDistal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightThumbTip.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightIndexProximal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightIndexMedial.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightIndexDistal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightIndexTip.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightMiddleProximal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightMiddleMedial.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightMiddleDistal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightMiddleTip.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightRingProximal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightRingMedial.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightRingDistal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightRingTip.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightLittleProximal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightLittleMedial.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightLittleDistal.IsValidToEvaluate(RequiredBones) &&
-//		BoneMap.rightLittleTip.IsValidToEvaluate(RequiredBones)
-//		);
-
 }
 
 void FSmartsuitPoseNode::PreUpdate(const UAnimInstance* InAnimInstance)
 {
 	Super::PreUpdate(InAnimInstance);
+	
+	ILiveLinkClient* ThisFrameClient = nullptr;
+	IModularFeatures& ModularFeatures = IModularFeatures::Get();
+	if (ModularFeatures.IsModularFeatureAvailable(ILiveLinkClient::ModularFeatureName))
+	{
+		ThisFrameClient = &IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
+	}
+	LiveLinkClient_AnyThread = ThisFrameClient;
 
-	LiveLinkClient_AnyThread = LiveLinkClient_GameThread.GetClient();
+	CreateRetargetAsset(InAnimInstance);
+}
 
+void FSmartsuitPoseNode::CreateRetargetAsset(const UAnimInstance* InAnimInstance)
+{
 	// Protection as a class graph pin does not honor rules on abstract classes and NoClear
 	UClass* RetargetAssetPtr = RetargetAsset.Get();
 	if (!RetargetAssetPtr || RetargetAssetPtr->HasAnyClassFlags(CLASS_Abstract))
@@ -867,69 +721,6 @@ void FSmartsuitPoseNode::InitializeBoneReferences(const FBoneContainer& Required
 {
 	if (CurrentRetargetAsset->IsValidLowLevel())
 	{
-		//BoneMap.hip =					Bone_Map_Override_OLD->hip;
-		//BoneMap.stomach =				Bone_Map_Override_OLD->stomach;
-		//BoneMap.chest =					Bone_Map_Override_OLD->chest;
-		//BoneMap.neck =					Bone_Map_Override_OLD->neck;
-		//BoneMap.head =					Bone_Map_Override_OLD->head;
-		//BoneMap.leftShoulder =			Bone_Map_Override_OLD->leftShoulder;
-		//BoneMap.leftArm =				Bone_Map_Override_OLD->leftArm;
-		//BoneMap.leftForearm =			Bone_Map_Override_OLD->leftForearm;
-		//BoneMap.leftHand =				Bone_Map_Override_OLD->leftHand;
-		//BoneMap.rightShoulder =			Bone_Map_Override_OLD->rightShoulder;
-		//BoneMap.rightArm =				Bone_Map_Override_OLD->rightArm;
-		//BoneMap.rightForearm =			Bone_Map_Override_OLD->rightForearm;
-		//BoneMap.rightHand =				Bone_Map_Override_OLD->rightHand;
-		//BoneMap.leftUpleg =				Bone_Map_Override_OLD->leftUpleg;
-		//BoneMap.leftLeg =				Bone_Map_Override_OLD->leftLeg;
-		//BoneMap.leftFoot =				Bone_Map_Override_OLD->leftFoot;
-		//BoneMap.leftToe =				Bone_Map_Override_OLD->leftToe;
-		//BoneMap.rightUpleg =			Bone_Map_Override_OLD->rightUpleg;
-		//BoneMap.rightLeg =				Bone_Map_Override_OLD->rightLeg;
-		//BoneMap.rightFoot =				Bone_Map_Override_OLD->rightFoot;
-		//BoneMap.rightToe =				Bone_Map_Override_OLD->rightToe;
-
-		//BoneMap.leftThumbProximal =		Bone_Map_Override_OLD->leftThumbProximal;
-		//BoneMap.leftThumbMedial =		Bone_Map_Override_OLD->leftThumbMedial;
-		//BoneMap.leftThumbDistal =		Bone_Map_Override_OLD->leftThumbDistal;
-		//BoneMap.leftThumbTip =			Bone_Map_Override_OLD->leftThumbTip;
-		//BoneMap.leftIndexProximal =		Bone_Map_Override_OLD->leftIndexProximal;
-		//BoneMap.leftIndexMedial =		Bone_Map_Override_OLD->leftIndexMedial;
-		//BoneMap.leftIndexDistal =		Bone_Map_Override_OLD->leftIndexDistal;
-		//BoneMap.leftIndexTip =			Bone_Map_Override_OLD->leftIndexTip;
-		//BoneMap.leftMiddleProximal =	Bone_Map_Override_OLD->leftMiddleProximal;
-		//BoneMap.leftMiddleMedial =		Bone_Map_Override_OLD->leftMiddleMedial;
-		//BoneMap.leftMiddleDistal =		Bone_Map_Override_OLD->leftMiddleDistal;
-		//BoneMap.leftMiddleTip =			Bone_Map_Override_OLD->leftMiddleTip;
-		//BoneMap.leftRingProximal =		Bone_Map_Override_OLD->leftRingProximal;
-		//BoneMap.leftRingMedial =		Bone_Map_Override_OLD->leftRingMedial;
-		//BoneMap.leftRingDistal =		Bone_Map_Override_OLD->leftRingDistal;
-		//BoneMap.leftRingTip =			Bone_Map_Override_OLD->leftRingTip;
-		//BoneMap.leftLittleProximal =	Bone_Map_Override_OLD->leftLittleProximal;
-		//BoneMap.leftLittleMedial =		Bone_Map_Override_OLD->leftLittleMedial;
-		//BoneMap.leftLittleDistal =		Bone_Map_Override_OLD->leftLittleDistal;
-		//BoneMap.leftLittleTip =			Bone_Map_Override_OLD->leftLittleTip;
-		//BoneMap.rightThumbProximal =	Bone_Map_Override_OLD->rightThumbProximal;
-		//BoneMap.rightThumbMedial =		Bone_Map_Override_OLD->rightThumbMedial;
-		//BoneMap.rightThumbDistal =		Bone_Map_Override_OLD->rightThumbDistal;
-		//BoneMap.rightThumbTip =			Bone_Map_Override_OLD->rightThumbTip;
-		//BoneMap.rightIndexProximal =	Bone_Map_Override_OLD->rightIndexProximal;
-		//BoneMap.rightIndexMedial =		Bone_Map_Override_OLD->rightIndexMedial;
-		//BoneMap.rightIndexDistal =		Bone_Map_Override_OLD->rightIndexDistal;
-		//BoneMap.rightIndexTip =			Bone_Map_Override_OLD->rightIndexTip;
-		//BoneMap.rightMiddleProximal =	Bone_Map_Override_OLD->rightMiddleProximal;
-		//BoneMap.rightMiddleMedial =		Bone_Map_Override_OLD->rightMiddleMedial;
-		//BoneMap.rightMiddleDistal =		Bone_Map_Override_OLD->rightMiddleDistal;
-		//BoneMap.rightMiddleTip =		Bone_Map_Override_OLD->rightMiddleTip;
-		//BoneMap.rightRingProximal =		Bone_Map_Override_OLD->rightRingProximal;
-		//BoneMap.rightRingMedial =		Bone_Map_Override_OLD->rightRingMedial;
-		//BoneMap.rightRingDistal =		Bone_Map_Override_OLD->rightRingDistal;
-		//BoneMap.rightRingTip =			Bone_Map_Override_OLD->rightRingTip;
-		//BoneMap.rightLittleProximal =	Bone_Map_Override_OLD->rightLittleProximal;
-		//BoneMap.rightLittleMedial =		Bone_Map_Override_OLD->rightLittleMedial;
-		//BoneMap.rightLittleDistal =		Bone_Map_Override_OLD->rightLittleDistal;
-		//BoneMap.rightLittleTip =		Bone_Map_Override_OLD->rightLittleTip;
-
 		BoneMap.hip = CurrentRetargetAsset->GetRemappedBoneName("hip");
 		BoneMap.stomach = CurrentRetargetAsset->GetRemappedBoneName("stomach");
 		BoneMap.chest = CurrentRetargetAsset->GetRemappedBoneName("chest");
@@ -1067,88 +858,30 @@ FLiveLinkSubjectName FSmartsuitPoseNode::GetLiveLinkSubjectName()
 #endif
 }
 
-//USmartsuitBodyMapData::USmartsuitBodyMapData()
-//{
-//	hip = "hip";
-//	stomach = "stomach";
-//	chest = "chest";
-//	neck = "neck";
-//	head = "head";
-//	leftShoulder = "leftShoulder";
-//	leftArm = "leftArm";
-//	leftForearm = "leftForearm";
-//	leftHand = "leftHand";
-//	rightShoulder = "rightShoulder";
-//	rightArm = "rightArm";
-//	rightForearm = "rightForearm";
-//	rightHand = "rightHand";
-//	leftUpleg = "leftUpleg";
-//	leftLeg = "leftLeg";
-//	leftFoot = "leftFoot";
-//	leftToe = "leftToe";
-//	rightUpleg = "rightUpleg";
-//	rightLeg = "rightLeg";
-//	rightFoot = "rightFoot";
-//	rightToe = "rightToe";
-//	leftThumbProximal = "leftThumbProximal";
-//	leftThumbMedial = "leftThumbMedial";
-//	leftThumbDistal = "leftThumbDistal";
-//	leftThumbTip = "leftThumbTip";
-//	leftIndexProximal = "leftIndexProximal";
-//	leftIndexMedial = "leftIndexMedial";
-//	leftIndexDistal = "leftIndexDistal";
-//	leftIndexTip = "leftIndexTip";
-//	leftMiddleProximal = "leftMiddleProximal";
-//	leftMiddleMedial = "leftMiddleMedial";
-//	leftMiddleDistal = "leftMiddleDistal";
-//	leftMiddleTip = "leftMiddleTip";
-//	leftRingProximal = "leftRingProximal";
-//	leftRingMedial = "leftRingMedial";
-//	leftRingDistal = "leftRingDistal";
-//	leftRingTip = "leftRingTip";
-//	leftLittleProximal = "leftLittleProximal";
-//	leftLittleMedial = "leftLittleMedial";
-//	leftLittleDistal = "leftLittleDistal";
-//	leftLittleTip = "leftLittleTip";
-//	rightThumbProximal = "rightThumbProximal";
-//	rightThumbMedial = "rightThumbMedial";
-//	rightThumbDistal = "rightThumbDistal";
-//	rightThumbTip = "rightThumbTip";
-//	rightIndexProximal = "rightIndexProximal";
-//	rightIndexMedial = "rightIndexMedial";
-//	rightIndexDistal = "rightIndexDistal";
-//	rightIndexTip = "rightIndexTip";
-//	rightMiddleProximal = "rightMiddleProximal";
-//	rightMiddleMedial = "rightMiddleMedial";
-//	rightMiddleDistal = "rightMiddleDistal";
-//	rightMiddleTip = "rightMiddleTip";
-//	rightRingProximal = "rightRingProximal";
-//	rightRingMedial = "rightRingMedial";
-//	rightRingDistal = "rightRingDistal";
-//	rightRingTip = "rightRingTip";
-//	rightLittleProximal = "rightLittleProximal";
-//	rightLittleMedial = "rightLittleMedial";
-//	rightLittleDistal = "rightLittleDistal";
-//	rightLittleTip = "rightLittleTip";
-//}
-
-//FName URokokoBodyMapData::GetRemappedBoneName_Implementation(FName CurveName) const
-//{
-//	if (auto RemappedName = NameMapping.Find(CurveName))
-//	{
-//		return *RemappedName;
-//	}
-//	return "";
-//}
-//
-//void URokokoBodyMapData::Initialize()
-//{
-//	InitializeTMap();
-//}
 
 void FSmartsuitPoseNode::OnInitializeAnimInstance(const FAnimInstanceProxy* InProxy, const UAnimInstance* InAnimInstance)
 {
-	CurrentRetargetAsset = nullptr;
-
 	Super::OnInitializeAnimInstance(InProxy, InAnimInstance);
+}
+
+void FSmartsuitPoseNode::UpdateComponentPose_AnyThread(const FAnimationUpdateContext& Context)
+{
+	// Evaluate any BP logic plugged into this node
+	GetEvaluateGraphExposedInputs().Execute(Context);
+
+	Super::UpdateComponentPose_AnyThread(Context);
+}
+
+void FSmartsuitPoseNode::UpdateInternal(const FAnimationUpdateContext & Context)
+{
+	GetEvaluateGraphExposedInputs().Execute(Context);
+
+	Super::UpdateInternal(Context);
+}
+
+void FSmartsuitPoseNode::Initialize_AnyThread(const FAnimationInitializeContext& Context)
+{
+	GetEvaluateGraphExposedInputs().Execute(Context);
+	
+	Super::Initialize_AnyThread(Context);
 }

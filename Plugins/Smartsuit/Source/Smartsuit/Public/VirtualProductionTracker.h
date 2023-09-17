@@ -4,7 +4,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "GameFramework/Actor.h"
-#include "SmartsuitReceiver.h"
 #include "VirtualProductionTracker.generated.h"
 
 
@@ -42,7 +41,4 @@ public:
 		
 	FVector CurrentLocation;
 	AActor* parent;
-
-private:
-	ARokokoReceiver* GetReceiver();
 };

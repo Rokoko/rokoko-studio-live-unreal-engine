@@ -5,6 +5,7 @@
 #include "VirtualProductionSourceEditor.h"
 #include "LiveLinkMessageBusFinder.h"
 #include "Features/IModularFeatures.h"
+#include "Interfaces/IPv4/IPv4Endpoint.h"
 
 #define LOCTEXT_NAMESPACE "VirtualProductionSourceFactory"
 
@@ -21,7 +22,7 @@ FText UVirtualProductionSourceFactory::GetSourceTooltip() const
 TSharedPtr<SWidget> UVirtualProductionSourceFactory::BuildCreationPanel(FOnLiveLinkSourceCreated OnLiveLinkSourceCreated) const
 {
 	return SNew(SVirtualProductionSourceEditor)
-		.OnSourceSelected(FOnVirtualProductionSourceSelected::CreateUObject(this, &UVirtualProductionSourceFactory::OnSourceSelected, OnLiveLinkSourceCreated));
+		.OnSourceSelected(SVirtualProductionSourceEditor::FOnVirtualProductionSourceSelected::CreateUObject(this, &UVirtualProductionSourceFactory::OnSourceSelected, OnLiveLinkSourceCreated));
 }
 
 UVirtualProductionSourceFactory::EMenuType UVirtualProductionSourceFactory::GetMenuType() const
@@ -39,7 +40,7 @@ UVirtualProductionSourceFactory::EMenuType UVirtualProductionSourceFactory::GetM
 	return EMenuType::Disabled;
 }
 
-void UVirtualProductionSourceFactory::OnSourceSelected(FProviderPollResultPtr SelectedSource, FOnLiveLinkSourceCreated InOnLiveLinkSourceCreated) const
+void UVirtualProductionSourceFactory::OnSourceSelected(SCreationInfo info, FProviderPollResultPtr SelectedSource, FOnLiveLinkSourceCreated InOnLiveLinkSourceCreated) const
 {
 	if (SelectedSource.IsValid())
 	{
@@ -67,7 +68,7 @@ void UVirtualProductionSourceFactory::OnSourceSelected(FProviderPollResultPtr Se
 		}
 #endif
 
-		TSharedPtr<FVirtualProductionSource> SharedPtr = MakeShared<FVirtualProductionSource>(FText::FromString(SelectedSource->Name), FText::FromString(SelectedSource->MachineName), SelectedSource->Address);
+		TSharedPtr<FVirtualProductionSource> SharedPtr = MakeShared<FVirtualProductionSource>(info.m_Address, FText::FromString(SelectedSource->Name), FText::FromString(SelectedSource->MachineName), SelectedSource->Address);
 		FVirtualProductionSource::SetInstance(SharedPtr);
 		FString ConnectionString = FString::Printf(TEXT("Name=\"%s\""), *SelectedSource->Name);
 		InOnLiveLinkSourceCreated.ExecuteIfBound(SharedPtr, MoveTemp(ConnectionString));
@@ -81,8 +82,19 @@ TSharedPtr<ILiveLinkSource> UVirtualProductionSourceFactory::CreateSource(const 
 	{
 		return TSharedPtr<ILiveLinkSource>();
 	}
+	FIPv4Endpoint DeviceEndPoint;
+	if (!FIPv4Endpoint::Parse(ConnectionString, DeviceEndPoint))
+	{
+		// use default address, failed to parse connection address
+		UE_LOG(LogTemp, Warning, TEXT("use default address, failed to parse connection address"));
+		DeviceEndPoint.Address = FIPv4Address::Any;
+		DeviceEndPoint.Port = 14043;
+	}
 
-	return MakeShared<FVirtualProductionSource>(FText::FromString(Name), FText::GetEmpty(), FMessageAddress());
+	TSharedPtr<FVirtualProductionSource> newSource = MakeShared<FVirtualProductionSource>(DeviceEndPoint, FText::FromString(Name), FText::GetEmpty(), FMessageAddress());
+	FVirtualProductionSource::SetInstance(newSource);
+
+	return newSource;
 }
 
 #undef LOCTEXT_NAMESPACE
