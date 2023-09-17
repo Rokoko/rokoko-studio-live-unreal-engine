@@ -5,12 +5,10 @@
 #include "CoreMinimal.h"
 #include "Dom/JsonValue.h"
 #include "Dom/JsonObject.h"
-//#include "SmartsuitBlueprintLibrary.h"
-#include "SmartsuitDefinitions.h"
+#include "Runtime/Launch/Resources/Version.h"
+#include "RokokoSkeletonData.h"
 #include "VirtualProductionFrame.generated.h"
 
-
-//#include "JsonUtilities.h"
 
 class VirtualProductionFrame
 {
@@ -26,15 +24,15 @@ struct FRadiusReferencePoint {
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Grip radius."))
 	/**Holds information about the radius.*/
-	float radius;
+	float radius{ 0.0f };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Grip position."))
 	/**Holds information about the position during the last frame.*/
-	FVector position;
+	FVector position{ FVector::ZeroVector };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Grip rotation."))
 	/**Holds information about the rotation during the last frame.*/
-	FQuat rotation;
+	FQuat rotation{ FQuat::Identity };
 
 	FRadiusReferencePoint() {}
 	FRadiusReferencePoint(TSharedPtr<FJsonObject> jsonObject);
@@ -47,11 +45,11 @@ struct FReferencePoint {
 
 	/**Holds information about the position during the last frame.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Pivot position."))
-	FVector position;
+	FVector position{ FVector::ZeroVector };
 
 	/**Holds information about the rotation during the last frame.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Pivot rotation."))
-	FQuat rotation;
+	FQuat rotation{ FQuat::Identity };
 
 	FReferencePoint() {}
 	FReferencePoint(TSharedPtr<FJsonObject> jsonObject);
@@ -73,11 +71,11 @@ struct FProfile
 
 	/** Holds information about the dimensions. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Profile's dimensions."))
-	FVector dimensions;
+	FVector dimensions{ FVector::OneVector };
 
 	/** Holds information about the color. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Profile's color."))
-	FLinearColor color;
+	FLinearColor color{ FLinearColor::White };
 
 	/** Tracker offset position and rotation. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Tracker Offset."))
@@ -93,22 +91,25 @@ struct FProfile
 
 	/** Prop type. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Profile's prop type."))
-	int propType;
+	int propType{ 0 };
 
 	FProfile() {}
 
 	FProfile(TSharedPtr<FJsonObject> jsonObject);
 };
 
+/// <summary>
+/// One tracker or prop in the scene
+/// </summary>
 struct FVirtualProductionSubject {
-	FVector position;
-	FQuat rotation;
-	FName name;
+	FVector Position;
+	FQuat Rotation;
+	FName Name;
 
 	FVirtualProductionSubject(FVector in_position, FQuat in_rotation, FName in_name) {
-		position = in_position;
-		rotation = in_rotation;
-		name = in_name;
+		Position = in_position;
+		Rotation = in_rotation;
+		Name = in_name;
 	}
 };
 
@@ -123,7 +124,7 @@ struct FProp {
 	FString name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Rotation information."))
-	FColor color;
+	FColor color{ FColor::White };
 
 	/** ID of the prop. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Prop's id."))
@@ -131,15 +132,15 @@ struct FProp {
 
 	/**Holds information about the position during the last frame.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Position information."))
-	FVector position;
+	FVector position{ FVector::ZeroVector };
 
 	/**Holds information about the rotation during the last frame.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Rotation information."))
-	FQuat rotation;
+	FQuat rotation{ FQuat::Identity };
 
 	/**Indicates wether the prop is live.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Information about whether a prop is live or not."))
-	bool isLive;
+	bool isLive{ false };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Information about prop's profile."))
 	FProfile profile;
@@ -190,23 +191,23 @@ struct FTracker {
 
 	/**Holds information about the position during the last frame.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Position information."))
-	FVector position;
+	FVector position{ FVector::ZeroVector };
 
 	/**Holds information about the rotation during the last frame.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Rotation information."))
-	FQuat rotation;
+	FQuat rotation{ FQuat::Identity };
 
 	/**Indicates whether the tracker is live.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Information about whether a tracker is live or not."))
-	bool isLive;
+	bool isLive{ false };
 
 	/**Holds the tracking result.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Information about the result of the tracking."))
-	int trackingResult;
+	int trackingResult{ 0 };
 
 	/**Indicates the type of the tracker.*/
 	UPROPERTY()
-	int trackerType;
+	int trackerType{ 0 };
 
 	/**.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Render Model Name."))
@@ -214,7 +215,7 @@ struct FTracker {
 
 	/**.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Battery information."))
-	float battery;
+	float battery{ 0.0f };
 
 	///**
 	//* Get sensor position in Unreal coordinate system.
@@ -247,12 +248,16 @@ struct FFace
 	GENERATED_USTRUCT_BODY()
 
 	FFace() {}
+	FFace(const FFace& otherFace);
+	FFace(FFace&& otherFace);
 	FFace(TSharedPtr<FJsonObject> jsonObject, const FString& InActorName);
+
+	FFace& operator = (const FFace& otherFace) = default;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Virtual Production")
 	FString profileName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's version."))
-	int version;
+	int version{ 0 };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's provider."))
 	FString provider;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's ID."))
@@ -260,111 +265,111 @@ struct FFace
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Face's ID."))
 	FString actorName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeBlinkLeft;
+	float eyeBlinkLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeLookDownLeft;
+	float eyeLookDownLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeLookInLeft;
+	float eyeLookInLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeLookOutLeft;
+	float eyeLookOutLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeLookUpLeft;
+	float eyeLookUpLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeSquintLeft;
+	float eyeSquintLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeWideLeft;
+	float eyeWideLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeBlinkRight;
+	float eyeBlinkRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeLookDownRight;
+	float eyeLookDownRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeLookInRight;
+	float eyeLookInRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeLookOutRight;
+	float eyeLookOutRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeLookUpRight;
+	float eyeLookUpRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeSquintRight;
+	float eyeSquintRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float eyeWideRight;
+	float eyeWideRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float jawForward;
+	float jawForward{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float jawLeft;
+	float jawLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float jawRight;
+	float jawRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float jawOpen;
+	float jawOpen{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthClose;
+	float mouthClose{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthFunnel;
+	float mouthFunnel{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthPucker;
+	float mouthPucker{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthLeft;
+	float mouthLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthRight;
+	float mouthRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthSmileLeft;
+	float mouthSmileLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthSmileRight;
+	float mouthSmileRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthFrownLeft;
+	float mouthFrownLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthFrownRight;
+	float mouthFrownRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthDimpleLeft;
+	float mouthDimpleLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthDimpleRight;
+	float mouthDimpleRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthStretchLeft;
+	float mouthStretchLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthStretchRight;
+	float mouthStretchRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthRollLower;
+	float mouthRollLower{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthRollUpper;
+	float mouthRollUpper{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthShrugLower;
+	float mouthShrugLower{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthShrugUpper;
+	float mouthShrugUpper{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthPressLeft;
+	float mouthPressLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthPressRight;
+	float mouthPressRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthLowerDownLeft;
+	float mouthLowerDownLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthLowerDownRight;
+	float mouthLowerDownRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthUpperUpLeft;
+	float mouthUpperUpLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float mouthUpperUpRight;
+	float mouthUpperUpRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float browDownLeft;
+	float browDownLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float browDownRight;
+	float browDownRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float browInnerUp;
+	float browInnerUp{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float browOuterUpLeft;
+	float browOuterUpLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float browOuterUpRight;
+	float browOuterUpRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float cheekPuff;
+	float cheekPuff{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float cheekSquintLeft;
+	float cheekSquintLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float cheekSquintRight;
+	float cheekSquintRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float noseSneerLeft;
+	float noseSneerLeft{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float noseSneerRight;
+	float noseSneerRight{ 0.0f };
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Faces blendshape"))
-	float tongueOut;
+	float tongueOut{ 0.0f };
 
-	FName GetSubjectName() 
+	FName GetSubjectName() const
 	{
 		FString TempSubjectName = "actor:" + actorName + ":face";
 #if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
@@ -383,25 +388,23 @@ struct FVirtualProductionFrame {
 
 	/**Indicates the VP frame version.*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "Virtual Production version."))
-	int version;
+	FString Version;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "List of props."))
 	/** Array of props. */
-	TArray<FProp> props;
+	TArray<FProp> Props;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "List of trackers."))
 	/** Array of trackers. */
-	TArray<FTracker> trackers;
+	TArray<FTracker> Trackers;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Virtual Production", meta = (ToolTip = "List of faces."))
-	TArray<FFace> faces;
+	TArray<FFace> Faces;
 
 	UPROPERTY()
-	TArray<FSuitData> suits;
+	TArray<FSuitData> Actors;
 
-	//FVirtualProductionFrame (){}
-};
-
-struct LiveLinkSuit {
+	UPROPERTY()
+	TArray<FCharacterData> Characters;
 
 };

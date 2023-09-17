@@ -83,7 +83,7 @@ void FAnimNode_RokokoFacePose::Evaluate_AnyThread(FPoseContext& Output)
 
 	FLiveLinkSubjectName LiveLinkSubjectName = GetLiveLinkSubjectName();
 
-	TSubclassOf<ULiveLinkRole> SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole(LiveLinkSubjectName);
+	TSubclassOf<ULiveLinkRole> SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole_AnyThread(LiveLinkSubjectName);
 	if (SubjectRole)
 	{
 		if (SubjectRole->IsChildOf(ULiveLinkAnimationRole::StaticClass()))

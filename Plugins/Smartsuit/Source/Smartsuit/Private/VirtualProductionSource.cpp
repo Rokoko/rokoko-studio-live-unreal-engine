@@ -8,42 +8,38 @@
 #include "Roles/LiveLinkLightRole.h"
 #include "Roles/LiveLinkLightTypes.h"
 #include "Features/IModularFeatures.h"
+#include "Roles/LiveLinkSmartsuitRole.h"
+#include "Roles/LiveLinkSmartsuitTypes.h"
 
 #include "VirtualProductionFrame.h"
-#include "Smartsuit.h"
 #include "Runtime/Core/Public/Containers/UnrealString.h"
-//#include "Engine.h"
+
 #include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
 #include "Serialization/BufferArchive.h"
 #include "lz4frame.h"
-#include "SmartsuitReceiver.h"
+
 
 TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::instance = nullptr;
 
-FVirtualProductionSource::FVirtualProductionSource(const FText& InSourceType, const FText& InSourceMachineName, const FMessageAddress& InConnectionAddress)
+FVirtualProductionSource::FVirtualProductionSource(FIPv4Endpoint address, const FText& InSourceType, const FText& InSourceMachineName, const FMessageAddress& InConnectionAddress)
 	: SourceType(InSourceType)
 	, SourceMachineName(InSourceMachineName)
 {
 	Client = nullptr;
-
-	int32 RokokoPort;
-	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
-	{
-		RokokoPort = It->RokokoPortNumber;
-		UE_LOG(LogTemp, Warning, TEXT("setting port to... %i"), RokokoPort);
-	}
-
+	
+	m_NetworkAddress = address;
+	
 	UE_LOG(LogTemp, Warning, TEXT("Creating Virtual production source!!!"));
 
-	InitSocket(RokokoPort);
-	StartRunnable(RokokoPort);
+	if (InitSocket())
+	{
+		StartRunnable();
+	}
 }
 
 FVirtualProductionSource::~FVirtualProductionSource()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Destroying Virtual production source!!!"));
-
-
 
 	// Stop the runnable
 	Stop();
@@ -55,7 +51,7 @@ FVirtualProductionSource::~FVirtualProductionSource()
 	}
 
 	// And last but not least stop the main thread
-	if (Thread != NULL)
+	if (Thread != nullptr)
 	{
 		Thread->Kill(true);
 		delete Thread;
@@ -65,9 +61,7 @@ FVirtualProductionSource::~FVirtualProductionSource()
 void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid InSourceGuid)
 {
 	Client = InClient;
-	
 	SourceGuid = InSourceGuid;
-	//instance = this;
 }
 
 bool FVirtualProductionSource::IsSourceStillValid() const
@@ -85,7 +79,6 @@ void FVirtualProductionSource::HandleClearSubject(const FName subjectName)
 		return;
 	}
 
-	//Client->ClearSubject(subjectName);
 	Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid,subjectName));
 }
 
@@ -99,14 +92,14 @@ void FVirtualProductionSource::ClearAllSubjects()
 	{
 		HandleClearSubject(faceNames[i]);
 	}
-	for (int i = 0; i < suitNames.Num(); i++) 
+	for (int i = 0; i < actorNames.Num(); i++) 
 	{
-		HandleClearSubject(suitNames[i]);
+		HandleClearSubject(actorNames[i]);
 	}
 
 	subjectNames.Empty();
 	faceNames.Empty();
-	suitNames.Empty();
+	actorNames.Empty();
 }
 
 bool FVirtualProductionSource::RequestSourceShutdown()
@@ -116,7 +109,7 @@ bool FVirtualProductionSource::RequestSourceShutdown()
 	return true;
 }
 
-void FVirtualProductionSource::HandleFaceData(FFace face) 
+void FVirtualProductionSource::HandleFaceData(const FFace& face) 
 {
 	//verify(Client != nullptr);
 
@@ -134,64 +127,66 @@ void FVirtualProductionSource::HandleFaceData(FFace face)
 	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
 	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
 
-	
-	SkeletonData->PropertyNames.Add("browDownLeft");
-	SkeletonData->PropertyNames.Add("browDownRight");
-	SkeletonData->PropertyNames.Add("browInnerUp");
-	SkeletonData->PropertyNames.Add("browOuterUpLeft");
-	SkeletonData->PropertyNames.Add("browOuterUpRight");
-	SkeletonData->PropertyNames.Add("cheekPuff");
-	SkeletonData->PropertyNames.Add("cheekSquintLeft");
-	SkeletonData->PropertyNames.Add("cheekSquintRight");
-	SkeletonData->PropertyNames.Add("eyeBlinkLeft");
-	SkeletonData->PropertyNames.Add("eyeBlinkRight");
-	SkeletonData->PropertyNames.Add("eyeLookDownLeft");
-	SkeletonData->PropertyNames.Add("eyeLookDownRight");
-	SkeletonData->PropertyNames.Add("eyeLookInLeft");
-	SkeletonData->PropertyNames.Add("eyeLookInRight");
-	SkeletonData->PropertyNames.Add("eyeLookOutLeft");
-	SkeletonData->PropertyNames.Add("eyeLookOutRight");
-	SkeletonData->PropertyNames.Add("eyeLookUpLeft");
-	SkeletonData->PropertyNames.Add("eyeLookUpRight");
-	SkeletonData->PropertyNames.Add("eyeSquintLeft");
-	SkeletonData->PropertyNames.Add("eyeSquintRight");
-	SkeletonData->PropertyNames.Add("eyeWideLeft");
-	SkeletonData->PropertyNames.Add("eyeWideRight");
-	SkeletonData->PropertyNames.Add("jawOpen");
-	SkeletonData->PropertyNames.Add("jawForward");
-	SkeletonData->PropertyNames.Add("jawLeft");
-	SkeletonData->PropertyNames.Add("jawRight");
-	SkeletonData->PropertyNames.Add("mouthClose");
-	SkeletonData->PropertyNames.Add("mouthDimpleLeft");
-	SkeletonData->PropertyNames.Add("mouthDimpleRight");
-	SkeletonData->PropertyNames.Add("mouthFrownLeft");
-	SkeletonData->PropertyNames.Add("mouthFrownRight");
-	SkeletonData->PropertyNames.Add("mouthFunnel");
-	SkeletonData->PropertyNames.Add("mouthLeft");
-	SkeletonData->PropertyNames.Add("mouthLowerDownLeft");
-	SkeletonData->PropertyNames.Add("mouthLowerDownRight");
-	SkeletonData->PropertyNames.Add("mouthPressLeft");
-	SkeletonData->PropertyNames.Add("mouthPressRight");
-	SkeletonData->PropertyNames.Add("mouthPucker");
-	SkeletonData->PropertyNames.Add("mouthRight");
-	SkeletonData->PropertyNames.Add("mouthRollLower");
-	SkeletonData->PropertyNames.Add("mouthRollUpper");
-	SkeletonData->PropertyNames.Add("mouthShrugLower");
-	SkeletonData->PropertyNames.Add("mouthShrugUpper");
-	SkeletonData->PropertyNames.Add("mouthSmileLeft");
-	SkeletonData->PropertyNames.Add("mouthSmileRight");
-	SkeletonData->PropertyNames.Add("mouthStretchLeft");
-	SkeletonData->PropertyNames.Add("mouthStretchRight");
-	SkeletonData->PropertyNames.Add("mouthUpperUpLeft");
-	SkeletonData->PropertyNames.Add("mouthUpperUpRight");
-	SkeletonData->PropertyNames.Add("noseSneerLeft");
-	SkeletonData->PropertyNames.Add("noseSneerRight");
-	SkeletonData->PropertyNames.Add("tongueOut");
+	SkeletonData->PropertyNames.Append(
+		{ 
+			"browDownLeft",
+			"browDownRight",
+			"browInnerUp",
+			"browOuterUpLeft",
+			"browOuterUpRight",
+			"cheekPuff",
+			"cheekSquintLeft",
+			"cheekSquintRight",
+			"eyeBlinkLeft",
+			"eyeBlinkRight",
+			"eyeLookDownLeft",
+			"eyeLookDownRight",
+			"eyeLookInLeft",
+			"eyeLookInRight",
+			"eyeLookOutLeft",
+			"eyeLookOutRight",
+			"eyeLookUpLeft",
+			"eyeLookUpRight",
+			"eyeSquintLeft",
+			"eyeSquintRight",
+			"eyeWideLeft",
+			"eyeWideRight",
+			"jawOpen",
+			"jawForward",
+			"jawLeft",
+			"jawRight",
+			"mouthClose",
+			"mouthDimpleLeft",
+			"mouthDimpleRight",
+			"mouthFrownLeft",
+			"mouthFrownRight",
+			"mouthFunnel",
+			"mouthLeft",
+			"mouthLowerDownLeft",
+			"mouthLowerDownRight",
+			"mouthPressLeft",
+			"mouthPressRight",
+			"mouthPucker",
+			"mouthRight",
+			"mouthRollLower",
+			"mouthRollUpper",
+			"mouthShrugLower",
+			"mouthShrugUpper",
+			"mouthSmileLeft",
+			"mouthSmileRight",
+			"mouthStretchLeft",
+			"mouthStretchRight",
+			"mouthUpperUpLeft",
+			"mouthUpperUpRight",
+			"noseSneerLeft",
+			"noseSneerRight",
+			"tongueOut"
+		});
 
 	Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
 }
 
-void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtualProductionObject)
+void FVirtualProductionSource::HandleSubjectData(const FVirtualProductionSubject& virtualProductionObject)
 {
 	//verify(Client != nullptr);
 
@@ -201,14 +196,14 @@ void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtu
 		return;
 	}
 
-	subjectNames.Add(virtualProductionObject.name);
+	subjectNames.Add(virtualProductionObject.Name);
 
-	FLiveLinkSubjectKey Key = FLiveLinkSubjectKey(SourceGuid, virtualProductionObject.name);
+	FLiveLinkSubjectKey Key = FLiveLinkSubjectKey(SourceGuid, virtualProductionObject.Name);
 	Client->RemoveSubject_AnyThread(Key);
 
-	if (virtualProductionObject.name.ToString().StartsWith("prop"))
+	if (virtualProductionObject.Name.ToString().StartsWith("prop"))
 	{
-		FString subjectname = virtualProductionObject.name.ToString();
+		FString subjectname = virtualProductionObject.Name.ToString();
 		int32 indexlastchar = -1;
 		subjectname.FindLastChar(':', indexlastchar);
 		FString testval = subjectname.RightChop(indexlastchar + 1);
@@ -260,367 +255,261 @@ void FVirtualProductionSource::HandleSubjectData(FVirtualProductionSubject virtu
 	//UE_LOG(LogTemp, Warning, TEXT("SKELETON!! "), skeleton);
 }
 	
-void FVirtualProductionSource::HandleSuitData(FSuitData suit) 
+void FVirtualProductionSource::HandleSuitData(const FSuitData& suit) 
 {
-	suitNames.Add(suit.GetSubjectName());
+	actorNames.Add(suit.GetSubjectName());
 
 	FLiveLinkSubjectKey Key = FLiveLinkSubjectKey(SourceGuid, suit.GetSubjectName());
 
-	TArray<FName> boneNames;
-	boneNames.Add("Base");
-	boneNames.Add("hip");
-	boneNames.Add("spine");
-	boneNames.Add("chest");
-	boneNames.Add("neck");
-	boneNames.Add("head");
+	static TArray<FName> boneNames = 
+	{ 
+		"Base",
+		"hip",
+		"spine",
+		"chest",
+		"neck",
+		"head",
 
-	boneNames.Add("leftShoulder");
-	boneNames.Add("leftUpperArm");
-	boneNames.Add("leftLowerArm");
-	boneNames.Add("leftHand");
+		"leftShoulder",
+		"leftUpperArm",
+		"leftLowerArm",
+		"leftHand",
+
+		"rightShoulder",
+		"rightUpperArm",
+		"rightLowerArm",
+		"rightHand",
+
+		"leftUpLeg",
+		"leftLeg",
+		"leftFoot",
+
+		"rightUpLeg",
+		"rightLeg",
+		"rightFoot",
+
+		"leftThumbProximal",
+		"leftThumbMedial",
+		"leftThumbDistal",
+		"leftThumbTip",
+
+		"leftIndexProximal",
+		"leftIndexMedial",
+		"leftIndexDistal",
+		"leftIndexTip",
+
+		"leftMiddleProximal",
+		"leftMiddleMedial",
+		"leftMiddleDistal",
+		"leftMiddleTip",
+
+		"leftRingProximal",
+		"leftRingMedial",
+		"leftRingDistal",
+		"leftRingTip",
+
+		"leftLittleProximal",
+		"leftLittleMedial",
+		"leftLittleDistal",
+		"leftLittleTip",
+
+		"rightThumbProximal",
+		"rightThumbMedial",
+		"rightThumbDistal",
+		"rightThumbTip",
+
+		"rightIndexProximal",
+		"rightIndexMedial",
+		"rightIndexDistal",
+		"rightIndexTip",
+
+		"rightMiddleProximal",
+		"rightMiddleMedial",
+		"rightMiddleDistal",
+		"rightMiddleTip",
+
+		"rightRingProximal",
+		"rightRingMedial",
+		"rightRingDistal",
+		"rightRingTip",
+
+		"rightLittleProximal",
+		"rightLittleMedial",
+		"rightLittleDistal",
+		"rightLittleTip",
+
+		"leftToe",
+		"rightToe",
+	};
 	
-	boneNames.Add("rightShoulder");
-	boneNames.Add("rightUpperArm");
-	boneNames.Add("rightLowerArm");
-	boneNames.Add("rightHand");
 
-	boneNames.Add("leftUpLeg");
-	boneNames.Add("leftLeg");
-	boneNames.Add("leftFoot");
+	static TArray<int32> boneParents =
+	{
+		0, //0 - root
+		0, //1 - hip
+		1, //2 - spine
+		2, //3 - spine2
+		3, //4 - neck
+		4, //5 - head
 
-	boneNames.Add("rightUpLeg");
-	boneNames.Add("rightLeg");
-	boneNames.Add("rightFoot");
+		3, //6 - LeftShoulder
+		6, //7 - LeftArm
+		7, //8 - LeftForearm
+		8, //9 - LeftHand
 
-	boneNames.Add("leftThumbProximal");
-	boneNames.Add("leftThumbMedial");
-	boneNames.Add("leftThumbDistal");
-	boneNames.Add("leftThumbTip");
+		3, //10 - RightShoulder
+		10, //11 - RightArm
+		11, //12 - RightForearm
+		12, //13 - RightHand
 
-	boneNames.Add("leftIndexProximal");
-	boneNames.Add("leftIndexMedial");
-	boneNames.Add("leftIndexDistal");
-	boneNames.Add("leftIndexTip");
+		1, //14 - LeftUpLeg
+		14, //15 - LeftLeg
+		15, //16 - LeftFoot
 
-	boneNames.Add("leftMiddleProximal");
-	boneNames.Add("leftMiddleMedial");
-	boneNames.Add("leftMiddleDistal");
-	boneNames.Add("leftMiddleTip");
+		1, //17 - RightUpLeg
+		17, //18 - RightLeg
+		18, //19 - RightFoot
 
-	boneNames.Add("leftRingProximal");
-	boneNames.Add("leftRingMedial");
-	boneNames.Add("leftRingDistal");
-	boneNames.Add("leftRingTip");
+		9, //20 - leftThumbProximal
+		20, //21 - leftThumbMedial
+		21, //22 - leftThumbDistal
+		22, //23 - leftThumbTip
 
-	boneNames.Add("leftLittleProximal");
-	boneNames.Add("leftLittleMedial");
-	boneNames.Add("leftLittleDistal");
-	boneNames.Add("leftLittleTip");
+		9, //24 - leftIndexProximal
+		24, //25 - leftIndexMedial
+		25, //26 - leftIndexDistal
+		26, //27 - leftIndexTip
 
-	boneNames.Add("rightThumbProximal");
-	boneNames.Add("rightThumbMedial");
-	boneNames.Add("rightThumbDistal");
-	boneNames.Add("rightThumbTip");
+		9, //28 - leftMiddleProximal
+		28, //29 - leftMiddleMedial
+		29, //30 - leftMiddleDistal
+		30, //31 - leftMiddleTip
 
-	boneNames.Add("rightIndexProximal");
-	boneNames.Add("rightIndexMedial");
-	boneNames.Add("rightIndexDistal");
-	boneNames.Add("rightIndexTip");
+		9, //32 - leftRingProximal
+		32, //33 - leftRingMedial
+		33, //34 - leftRingDistal
+		34, //35 - leftRingTip
 
-	boneNames.Add("rightMiddleProximal");
-	boneNames.Add("rightMiddleMedial");
-	boneNames.Add("rightMiddleDistal");
-	boneNames.Add("rightMiddleTip");
+		9, //36 - leftLittleProximal
+		36, //37 - leftLittleMedial
+		37, //38 - leftLittleDistal
+		38, //39 - leftLittleTip
 
-	boneNames.Add("rightRingProximal");
-	boneNames.Add("rightRingMedial");
-	boneNames.Add("rightRingDistal");
-	boneNames.Add("rightRingTip");
+		13, //40 - rightThumbProximal
+		40, //41 - rightThumbMedial
+		41, //42 - rightThumbDistal
+		42, //43 - rightThumbTip
 
-	boneNames.Add("rightLittleProximal");
-	boneNames.Add("rightLittleMedial");
-	boneNames.Add("rightLittleDistal");
-	boneNames.Add("rightLittleTip");
+		13, //44 - rightIndexProximal
+		44, //45 - rightIndexMedial
+		45, //46 - rightIndexDistal
+		46, //47 - rightIndexTip
 
-	boneNames.Add("leftToe");
-	boneNames.Add("rightToe");
+		13, //48 - rightMiddleProximal
+		48, //49 - rightMiddleMedial
+		49, //50 - rightMiddleDistal
+		50, //51 - rightMiddleTip
 
-	TArray<int32> boneParents;
-	boneParents.Add(0); //0 - root
-	boneParents.Add(0); //1 - hip
-	boneParents.Add(1); //2 - spine
-	boneParents.Add(2); //3 - spine2
-	boneParents.Add(3); //4 - neck
-	boneParents.Add(4); //5 - head
+		13, //52 - rightRingProximal
+		52, //53 - rightRingMedial
+		53, //54 - rightRingDistal
+		54, //55 - rightRingTip
 
-	boneParents.Add(3); //6 - LeftShoulder
-	boneParents.Add(6); //7 - LeftArm
-	boneParents.Add(7); //8 - LeftForearm
-	boneParents.Add(8); //9 - LeftHand
+		13, //56 - rightLittleProximal
+		56, //57 - rightLittleMedial
+		57, //58 - rightLittleDistal
+		58, //59 - rightLittleTip
 
-	boneParents.Add(3); //10 - RightShoulder
-	boneParents.Add(10); //11 - RightArm
-	boneParents.Add(11); //12 - RightForearm
-	boneParents.Add(12); //13 - RightHand
+		16, //60 - LeftToe
+		19 //61 - RightToe
+	};
+	
 
-	boneParents.Add(1); //14 - LeftUpLeg
-	boneParents.Add(14); //15 - LeftLeg
-	boneParents.Add(15); //16 - LeftFoot
-
-	boneParents.Add(1); //17 - RightUpLeg
-	boneParents.Add(17); //18 - RightLeg
-	boneParents.Add(18); //19 - RightFoot
-
-	boneParents.Add(9); //20 - leftThumbProximal
-	boneParents.Add(20); //21 - leftThumbMedial
-	boneParents.Add(21); //22 - leftThumbDistal
-	boneParents.Add(22); //23 - leftThumbTip
-
-	boneParents.Add(9); //24 - leftIndexProximal
-	boneParents.Add(24); //25 - leftIndexMedial
-	boneParents.Add(25); //26 - leftIndexDistal
-	boneParents.Add(26); //27 - leftIndexTip
-
-	boneParents.Add(9); //28 - leftMiddleProximal
-	boneParents.Add(28); //29 - leftMiddleMedial
-	boneParents.Add(29); //30 - leftMiddleDistal
-	boneParents.Add(30); //31 - leftMiddleTip
-
-	boneParents.Add(9); //32 - leftRingProximal
-	boneParents.Add(32); //33 - leftRingMedial
-	boneParents.Add(33); //34 - leftRingDistal
-	boneParents.Add(34); //35 - leftRingTip
-
-	boneParents.Add(9); //36 - leftLittleProximal
-	boneParents.Add(36); //37 - leftLittleMedial
-	boneParents.Add(37); //38 - leftLittleDistal
-	boneParents.Add(38); //39 - leftLittleTip
-
-	boneParents.Add(13); //40 - rightThumbProximal
-	boneParents.Add(40); //41 - rightThumbMedial
-	boneParents.Add(41); //42 - rightThumbDistal
-	boneParents.Add(42); //43 - rightThumbTip
-
-	boneParents.Add(13); //44 - rightIndexProximal
-	boneParents.Add(44); //45 - rightIndexMedial
-	boneParents.Add(45); //46 - rightIndexDistal
-	boneParents.Add(46); //47 - rightIndexTip
-
-	boneParents.Add(13); //48 - rightMiddleProximal
-	boneParents.Add(48); //49 - rightMiddleMedial
-	boneParents.Add(49); //50 - rightMiddleDistal
-	boneParents.Add(50); //51 - rightMiddleTip
-
-	boneParents.Add(13); //52 - rightRingProximal
-	boneParents.Add(52); //53 - rightRingMedial
-	boneParents.Add(53); //54 - rightRingDistal
-	boneParents.Add(54); //55 - rightRingTip
-
-	boneParents.Add(13); //56 - rightLittleProximal
-	boneParents.Add(56); //57 - rightLittleMedial
-	boneParents.Add(57); //58 - rightLittleDistal
-	boneParents.Add(58); //59 - rightLittleTip
-
-	boneParents.Add(16); //60 - LeftToe
-	boneParents.Add(19); //61 - RightToe
-
+	#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+	FLiveLinkStaticDataStruct StaticData(FLiveLinkSmartsuitStaticData::StaticStruct());
+	FLiveLinkSmartsuitStaticData* SkeletonData = StaticData.Cast<FLiveLinkSmartsuitStaticData>();
+	#else
 	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
 	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
+	#endif
+
+
 	SkeletonData->SetBoneNames(boneNames);
 	SkeletonData->SetBoneParents(boneParents);
 
 	if(Client)
-		Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
+	{
+		#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+			Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkSmartsuitRole::StaticClass(), MoveTemp(StaticData));
+		#else
+			Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
+		#endif
+	}
 }
 
 
-void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32 index, FSmartsuitBone* parent, FSmartsuitBone* sensor)
+void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32 index, const FSmartsuitBone* parent, const FSmartsuitBone* sensor)
 {
 
 	int32 transformIndex = transforms.AddUninitialized(1);
 	if (!sensor)
 	{
-		transforms[transformIndex].SetLocation(FVector(0, 0, 0));
+		transforms[transformIndex].SetLocation(FVector::ZeroVector);
 		transforms[transformIndex].SetRotation(FQuat::Identity);
-		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
+		transforms[transformIndex].SetScale3D(FVector::OneVector);
 	}
-	//else if (parent)
-	//{
-	//	FQuat parentRealRotation;
-	//	if (index == -1)
-	//	{
-	//		parentRealRotation = parent->Uquaternion() * FQuat::MakeFromEuler(FVector(0, 0, 180));
-	//	}
-	//	else
-	//	{
-	//		parentRealRotation = parent->Uquaternion();
-	//	}
-
-	//	//FVector realSensorPosition;
-	//	//float chestOffset = 20;
-	//	//if (sensor->addr == SENSOR_NECK) {
-	//	//	realSensorPosition
-	//	//
-	//	//} else if (sensor->addr == SENSOR_LEFT_SHOULDER || sensor->addr == SENSOR_RIGHT_SHOULDER) {
-	//	//	FVector direction = sensor->UPosition();
-	//	//	direction.Normalize();
-	//	//	realSensorPosition = sensor->UPosition() + (direction * (-chestOffset));
-	//	//}
-	//	//else {
-	//	//	realSensorPosition = sensor->UPosition();
-	//	//}
-
-
-	//	//FVector realParentPosition;
-	//	//if (parent->addr == SENSOR_CHEST) {
-
-	//	//}
-	//	//else {
-	//	//	realParentPosition = parent->UPosition();
-	//	//}
-	//	if (sensor->name == SmartsuitBones::neck)
-	//	{
-	//		transforms[transformIndex].SetLocation(FVector(0, 20.150345, 0));
-	//	}
-	//	else if (sensor->name == SmartsuitBones::rightShoulder)
-	//	{
-	//		transforms[transformIndex].SetLocation(FVector(7, 12.368073, 1.90378));
-	//	}
-	//	else if (sensor->name == SmartsuitBones::leftShoulder)
-	//	{
-	//		transforms[transformIndex].SetLocation(FVector(-7, 12.368073, 1.90378));
-	//	}
-	//	else
-	//	{
-	//		transforms[transformIndex].SetLocation(parentRealRotation.Inverse() * (sensor->UPosition() - parent->UPosition()));
-	//	}
-	//	transforms[transformIndex].SetRotation(parentRealRotation.Inverse() * sensor->Uquaternion());
-	//	transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
-	//}
 	else
 	{
 		FQuat modifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
 		transforms[transformIndex].SetLocation(sensor->UPosition());
 		transforms[transformIndex].SetRotation(sensor->Uquaternion() /** modifier*/);
-		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
+		transforms[transformIndex].SetScale3D(FVector::OneVector);
 	}
 }
 
 
-/*
-void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32 index, Sensor* parent, Sensor* sensor) {
-	
-	int32 transformIndex = transforms.AddUninitialized(1);
-	if (!sensor) 
-	{
-		transforms[transformIndex].SetLocation(FVector(0, 0, 0));
-		transforms[transformIndex].SetRotation(FQuat::Identity);
-		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
-	} 
-	else if (parent) 
-	{
-		FQuat parentRealRotation;
-		if (index == -1) 
-		{
-			parentRealRotation = parent->Uquaternion() * FQuat::MakeFromEuler(FVector(0, 0, 180));
-		}
-		else 
-		{
-			parentRealRotation = parent->Uquaternion();
-		}
-
-		//FVector realSensorPosition;
-		//float chestOffset = 20;
-		//if (sensor->addr == SENSOR_NECK) {
-		//	realSensorPosition 
-		//	
-		//} else if (sensor->addr == SENSOR_LEFT_SHOULDER || sensor->addr == SENSOR_RIGHT_SHOULDER) {
-		//	FVector direction = sensor->UPosition();
-		//	direction.Normalize();
-		//	realSensorPosition = sensor->UPosition() + (direction * (-chestOffset));
-		//}
-		//else {
-		//	realSensorPosition = sensor->UPosition();
-		//}
-
-		
-		//FVector realParentPosition;
-		//if (parent->addr == SENSOR_CHEST) {
-
-		//}
-		//else {
-		//	realParentPosition = parent->UPosition();
-		//}
-		if (sensor->addr == SENSOR_NECK) 
-		{
-			transforms[transformIndex].SetLocation(FVector(0, 20.150345, 0));
-		}
-		else if (sensor->addr == SENSOR_RIGHT_SHOULDER) 
-		{
-			transforms[transformIndex].SetLocation(FVector(7, 12.368073, 1.90378));
-		}
-		else if (sensor->addr == SENSOR_LEFT_SHOULDER) 
-		{
-			transforms[transformIndex].SetLocation(FVector(-7, 12.368073, 1.90378));
-		}
-		else 
-		{
-			transforms[transformIndex].SetLocation(parentRealRotation.Inverse() * (sensor->UPosition() - parent->UPosition()));
-		}
-		transforms[transformIndex].SetRotation(parentRealRotation.Inverse() * sensor->Uquaternion());
-		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
-	}
-	else 
-	{
-		FQuat modifier = FQuat::MakeFromEuler(FVector(0, 0, 180));
-		transforms[transformIndex].SetLocation(sensor->UPosition());
-		transforms[transformIndex].SetRotation(sensor->Uquaternion() * modifier);
-		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
-	}
-}
-*/
-void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits) 
+void FVirtualProductionSource::HandleSuits(const TArray<FSuitData>& suits) 
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Handling faces %d"), faces.Num());
-	existingSuits.Empty();
+	existingActors.Empty();
 	notExistingSubjects.Empty();
 	for (int subjectIndex = 0; subjectIndex < suits.Num(); subjectIndex++) 
 	{
-		FSuitData subject = suits[subjectIndex];
+		const FSuitData& subject = suits[subjectIndex];
 
 		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
 		bool nameExists = false;
-		for (int suitNameIndex = 0; suitNameIndex < suitNames.Num(); suitNameIndex++) 
+		for (int suitNameIndex = 0; suitNameIndex < actorNames.Num(); suitNameIndex++) 
 		{
-			if (subject.GetSubjectName() == suitNames[suitNameIndex]) 
+			if (subject.GetSubjectName() == actorNames[suitNameIndex]) 
 			{
 				nameExists = true;
-				existingSuits.Add(subject);
+				existingActors.Add(subject);
 				break;
 			}
 		}
 
 		if (!nameExists) 
 		{
-			existingSuits.Add(subject);
+			existingActors.Add(subject);
 			HandleSuitData(subject);
 		}
 		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
 		if (subjectIndex == suits.Num() - 1) 
 		{
-			for (int i = 0; i < suitNames.Num(); i++) 
+			for (int i = 0; i < actorNames.Num(); i++) 
 			{
 				bool subjectExists = false;
-				for (int j = 0; j < existingSuits.Num(); j++) 
+				for (int j = 0; j < existingActors.Num(); j++) 
 				{
-					if (suitNames[i] == existingSuits[j].GetSubjectName()) 
+					if (actorNames[i] == existingActors[j].GetSubjectName()) 
 					{
 						subjectExists = true;
 					}
 				}
 				if (!subjectExists) 
 				{
-					notExistingSubjects.Add(suitNames[i]);
+					notExistingSubjects.Add(actorNames[i]);
 				}
 			}
 
@@ -628,23 +517,28 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("Removing face"));
 				Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, notExistingSubjects[i]));
-				suitNames.RemoveSingle(notExistingSubjects[i]);
+				actorNames.RemoveSingle(notExistingSubjects[i]);
 				notExistingSubjects.RemoveAt(i);
 			}
 		}
 
-		//FTimer timer;
+		#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+		FLiveLinkFrameDataStruct FrameData1(FLiveLinkSmartsuitFrameData::StaticStruct());
+		FLiveLinkSmartsuitFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkSmartsuitFrameData>();
+		#else
 		FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
 		FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
+		#endif
+		
 		AnimFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 
 		TArray<FTransform> transforms;
 		transforms.Reset(62);
 		int32 transformIndex = transforms.AddUninitialized(1);
 		
-		transforms[transformIndex].SetLocation(FVector(0, 0, 0));
+		transforms[transformIndex].SetLocation(FVector::ZeroVector);
 		transforms[transformIndex].SetRotation(FQuat::Identity);
-		transforms[transformIndex].SetScale3D(FVector(1, 1, 1));
+		transforms[transformIndex].SetScale3D(FVector::OneVector);
 
 		
 		CreateJoint(transforms, 0, nullptr, subject.Hip());
@@ -726,12 +620,155 @@ void FVirtualProductionSource::HandleSuits(TArray<FSuitData> suits)
 
 		AnimFrameData.Transforms.Append(transforms);
 
+		#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+		AnimFrameData.HasLeftGlove = subject.hasLeftGlove;
+		AnimFrameData.HasRightGlove = subject.hasRightGlove;
+		#endif
+
 		if(Client)
 			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData1));
 	}
 }
 
-void FVirtualProductionSource::HandleFace(TArray<FFace> faces) 
+void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& characters)
+{
+	if (Client == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client was null!!!!!!"));
+		return;
+	}
+
+	existingCharacters.Empty();
+	notExistingSubjects.Empty();
+
+	for (int subjectIndex = 0; subjectIndex < characters.Num(); subjectIndex++)
+	{
+		const FCharacterData& subject = characters[subjectIndex];
+
+		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
+		bool nameExists = false;
+		for (int characterNameIndex = 0; characterNameIndex < characterNames.Num(); characterNameIndex++) 
+		{
+			if (subject.GetSubjectName() == characterNames[characterNameIndex]) 
+			{
+				nameExists = true;
+				existingCharacters.Add(subject);
+				break;
+			}
+		}
+
+		if (!nameExists) 
+		{
+			existingCharacters.Add(subject);
+			HandleCharacterData(subject);
+		}
+		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
+		if (subjectIndex == characters.Num() - 1) 
+		{
+			for (int i = 0; i < actorNames.Num(); i++) 
+			{
+				bool subjectExists = false;
+				for (int j = 0; j < existingCharacters.Num(); j++) 
+				{
+					if (characterNames[i] == existingCharacters[j].GetSubjectName()) 
+					{
+						subjectExists = true;
+					}
+				}
+				if (!subjectExists) 
+				{
+					notExistingSubjects.Add(characterNames[i]);
+				}
+			}
+
+			for (int i = 0; i < notExistingSubjects.Num(); i++) 
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("Removing face"));
+				Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, notExistingSubjects[i]));
+				actorNames.RemoveSingle(notExistingSubjects[i]);
+				notExistingSubjects.RemoveAt(i);
+			}
+		}
+		
+		FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
+		FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
+		
+		AnimFrameData.WorldTime = FLiveLinkWorldTime();
+
+		TArray<FTransform> transforms;
+		transforms.Reset(subject.joints.Num());
+		FTransform tm;
+
+		for(int x = 0; x < subject.joints.Num(); x++)
+		{
+			const int32 transformIndex = transforms.AddUninitialized(1);
+			const int parentIndex = subject.joints[x].parentIndex;
+
+			if (parentIndex >= 0)
+			{
+				tm = subject.joints[x].transform.GetRelativeTransform(subject.joints[parentIndex].transform);
+			}
+			else
+			{
+				tm = subject.joints[x].transform;
+			}
+			
+			const FVector JointPosition = tm.GetLocation();
+			const FQuat JointRotation = tm.GetRotation();
+
+			//convert meters to centimeters since values coming from unity are in meters
+			constexpr double WORLD_SCALE = 100.0;
+			FVector AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
+
+			// Quaternions - Convert Rotations from Studio to UE
+			const FVector jointRotationEuler = JointRotation.Euler();
+			const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
+			const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Z));
+			const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
+
+			// Change Rotation Order
+			const FQuat qu = qy * qz * qx;
+
+			transforms[transformIndex].SetComponents(qu, AdjustedJointPosition, FVector::One());
+		}
+		
+		AnimFrameData.Transforms.Append(transforms);
+		
+		if(Client)
+		{
+			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData1));
+		}
+	}
+}
+
+void FVirtualProductionSource::HandleCharacterData(const FCharacterData& character) 
+{
+	characterNames.Add(character.GetSubjectName());
+
+	FLiveLinkSubjectKey Key = FLiveLinkSubjectKey(SourceGuid, character.GetSubjectName());
+
+	TArray<FName> boneNames;
+	TArray<int32> boneParents;
+	
+	for(int x = 0; x < character.joints.Num(); x++)
+	{
+		boneNames.Add(character.joints[x].name);
+		boneParents.Add(character.joints[x].parentIndex );
+	}
+	
+	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
+	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
+	
+	SkeletonData->SetBoneNames(boneNames);
+	SkeletonData->SetBoneParents(boneParents);
+
+	if(Client)
+	{
+		Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
+	}
+}
+
+void FVirtualProductionSource::HandleFace(const TArray<FFace>& faces) 
 {
 	//verify(Client != nullptr);
 
@@ -746,7 +783,7 @@ void FVirtualProductionSource::HandleFace(TArray<FFace> faces)
 	notExistingSubjects.Empty();
 	for (int subjectIndex = 0; subjectIndex < faces.Num(); subjectIndex++) 
 	{
-		FFace subject = faces[subjectIndex];
+		const FFace& subject = faces[subjectIndex];
 
 		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
 		bool nameExists = false;
@@ -798,70 +835,69 @@ void FVirtualProductionSource::HandleFace(TArray<FFace> faces)
 		FLiveLinkAnimationFrameData& AnimFrameData = *FrameData.Cast<FLiveLinkAnimationFrameData>();
 		AnimFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 
-
-
-		AnimFrameData.PropertyValues.Add(subject.browDownLeft);
-		AnimFrameData.PropertyValues.Add(subject.browDownRight);
-		AnimFrameData.PropertyValues.Add(subject.browInnerUp);
-		AnimFrameData.PropertyValues.Add(subject.browOuterUpLeft);
-		AnimFrameData.PropertyValues.Add(subject.browOuterUpRight);
-		AnimFrameData.PropertyValues.Add(subject.cheekPuff);
-		AnimFrameData.PropertyValues.Add(subject.cheekSquintLeft);
-		AnimFrameData.PropertyValues.Add(subject.cheekSquintRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeBlinkLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeBlinkRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookDownLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookDownRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookInLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookInRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookOutLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookOutRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookUpLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeLookUpRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeSquintLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeSquintRight);
-		AnimFrameData.PropertyValues.Add(subject.eyeWideLeft);
-		AnimFrameData.PropertyValues.Add(subject.eyeWideRight);
-		AnimFrameData.PropertyValues.Add(subject.jawOpen);
-		AnimFrameData.PropertyValues.Add(subject.jawForward);
-		AnimFrameData.PropertyValues.Add(subject.jawLeft);
-		AnimFrameData.PropertyValues.Add(subject.jawRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthClose);
-		AnimFrameData.PropertyValues.Add(subject.mouthDimpleLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthDimpleRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthFrownLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthFrownRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthFunnel);
-		AnimFrameData.PropertyValues.Add(subject.mouthLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthLowerDownLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthLowerDownRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthPressLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthPressRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthPucker);
-		AnimFrameData.PropertyValues.Add(subject.mouthRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthRollLower);
-		AnimFrameData.PropertyValues.Add(subject.mouthRollUpper);
-		AnimFrameData.PropertyValues.Add(subject.mouthShrugLower);
-		AnimFrameData.PropertyValues.Add(subject.mouthShrugUpper);
-		AnimFrameData.PropertyValues.Add(subject.mouthSmileLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthSmileRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthStretchLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthStretchRight);
-		AnimFrameData.PropertyValues.Add(subject.mouthUpperUpLeft);
-		AnimFrameData.PropertyValues.Add(subject.mouthUpperUpRight);
-		AnimFrameData.PropertyValues.Add(subject.noseSneerLeft);
-		AnimFrameData.PropertyValues.Add(subject.noseSneerRight);
-		AnimFrameData.PropertyValues.Add(subject.tongueOut);
+		AnimFrameData.PropertyValues.Append(
+			{
+				subject.browDownLeft,
+				subject.browDownRight,
+				subject.browInnerUp,
+				subject.browOuterUpLeft,
+				subject.browOuterUpRight,
+				subject.cheekPuff,
+				subject.cheekSquintLeft,
+				subject.cheekSquintRight,
+				subject.eyeBlinkLeft,
+				subject.eyeBlinkRight,
+				subject.eyeLookDownLeft,
+				subject.eyeLookDownRight,
+				subject.eyeLookInLeft,
+				subject.eyeLookInRight,
+				subject.eyeLookOutLeft,
+				subject.eyeLookOutRight,
+				subject.eyeLookUpLeft,
+				subject.eyeLookUpRight,
+				subject.eyeSquintLeft,
+				subject.eyeSquintRight,
+				subject.eyeWideLeft,
+				subject.eyeWideRight,
+				subject.jawOpen,
+				subject.jawForward,
+				subject.jawLeft,
+				subject.jawRight,
+				subject.mouthClose,
+				subject.mouthDimpleLeft,
+				subject.mouthDimpleRight,
+				subject.mouthFrownLeft,
+				subject.mouthFrownRight,
+				subject.mouthFunnel,
+				subject.mouthLeft,
+				subject.mouthLowerDownLeft,
+				subject.mouthLowerDownRight,
+				subject.mouthPressLeft,
+				subject.mouthPressRight,
+				subject.mouthPucker,
+				subject.mouthRight,
+				subject.mouthRollLower,
+				subject.mouthRollUpper,
+				subject.mouthShrugLower,
+				subject.mouthShrugUpper,
+				subject.mouthSmileLeft,
+				subject.mouthSmileRight,
+				subject.mouthStretchLeft,
+				subject.mouthStretchRight,
+				subject.mouthUpperUpLeft,
+				subject.mouthUpperUpRight,
+				subject.noseSneerLeft,
+				subject.noseSneerRight,
+				subject.tongueOut
+			});
 
 		Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData));
 	}
 }
 
 
-void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubject> FrameSubjects)
+void FVirtualProductionSource::HandleSubjectFrame(const TArray<FVirtualProductionSubject>& FrameSubjects)
 {
-	//verify(Client != nullptr);
-
 	if (Client == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Client was null!!!!!!"));
@@ -874,9 +910,9 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 	for (int i = 0; i < subjectNames.Num(); i++) 
 	{
 		bool subjectExists = false;
-		for (int j = 0; j < subjects.Num(); j++) 
+		for (int j = 0; j < Subjects.Num(); j++) 
 		{
-			if (subjectNames[i] == subjects[j].name) 
+			if (subjectNames[i] == Subjects[j].Name) 
 			{
 				subjectExists = true;
 			}
@@ -893,15 +929,15 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 		subjectNames.RemoveSingle(notExistingSubjects[i]);
 	}
 
-	for (int subjectIndex = 0; subjectIndex < subjects.Num(); subjectIndex++) 
+	for (int subjectIndex = 0; subjectIndex < Subjects.Num(); subjectIndex++) 
 	{
-		FVirtualProductionSubject subject = subjects[subjectIndex];
+		FVirtualProductionSubject subject = Subjects[subjectIndex];
 		
 		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
 		bool nameExists = false;
 		for (int subjectNameIndex = 0; subjectNameIndex < subjectNames.Num(); subjectNameIndex++) 
 		{
-			if (subject.name == subjectNames[subjectNameIndex]) 
+			if (subject.Name == subjectNames[subjectNameIndex]) 
 			{
 				nameExists = true;
 				existingSubjects.Add(subject);
@@ -918,13 +954,13 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 
 
 		FTransform hardCodedTransform;
-		hardCodedTransform.SetTranslation(subject.position);
-		hardCodedTransform.SetRotation(subject.rotation);
-		hardCodedTransform.SetScale3D(FVector(1, 1, 1));
+		hardCodedTransform.SetTranslation(subject.Position);
+		hardCodedTransform.SetRotation(subject.Rotation);
+		hardCodedTransform.SetScale3D(FVector::OneVector);
 
-		if (subject.name.ToString().StartsWith("prop"))
+		if (subject.Name.ToString().StartsWith("prop"))
 		{
-			FString subjectname = subject.name.ToString();
+			FString subjectname = subject.Name.ToString();
 			int32 indexlastchar = -1;
 			subjectname.FindLastChar(':', indexlastchar);
 			FString testval = subjectname.RightChop(indexlastchar + 1);
@@ -939,19 +975,17 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 				CameraFrameData.AspectRatio = 1.11f;
 				CameraFrameData.FieldOfView = 130.f;
 				
-				Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.name), MoveTemp(FrameData1));
+				Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.Name), MoveTemp(FrameData1));
 			}
 			else
 			if (testval.StartsWith("light"))
 			{
-				//FTimer timer;
 				FLiveLinkFrameDataStruct FrameData1(FLiveLinkLightFrameData::StaticStruct());
 				FLiveLinkLightFrameData& LightFrameData = *FrameData1.Cast<FLiveLinkLightFrameData>();
 				LightFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 				LightFrameData.Transform = hardCodedTransform;
-				//CameraFrameData.LightColor = FColor::Green;
-
-				Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.name), MoveTemp(FrameData1));
+			
+				Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.Name), MoveTemp(FrameData1));
 
 			}
 			else
@@ -962,7 +996,7 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 				AnimFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 				AnimFrameData.Transforms.Add(hardCodedTransform);
 
-				Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.name), MoveTemp(FrameData1));
+				Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.Name), MoveTemp(FrameData1));
 			}
 		}
 		else
@@ -974,9 +1008,39 @@ void FVirtualProductionSource::HandleSubjectFrame(TArray<FVirtualProductionSubje
 			AnimFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 			AnimFrameData.Transforms.Add(hardCodedTransform);
 
-			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.name), MoveTemp(FrameData1));
+			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.Name), MoveTemp(FrameData1));
 		}
 	}
+}
+
+TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::Get()
+{ 
+	if (!instance)
+	{
+		IModularFeatures& ModularFeatures = IModularFeatures::Get();
+
+		if (ModularFeatures.IsModularFeatureAvailable(ILiveLinkClient::ModularFeatureName))
+		{
+			bool bDoesAlreadyExist = false;
+			{
+				ILiveLinkClient& LiveLinkClient = IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
+				TArray<FGuid> Sources = LiveLinkClient.GetSources();
+				for (FGuid SourceGuid : Sources)
+				{
+					if (LiveLinkClient.GetSourceType(SourceGuid).ToString() == "Studio")
+					{
+						//UE_LOG(LogTemp, Warning, TEXT("you can't add more than one instance of FVirtualProductionSource!!"));
+						bDoesAlreadyExist = true;
+
+						//SetInstance(LiveLinkClient.getsour)
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	return instance; 
 }
 
 TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::CreateLiveLinkSource()
@@ -1005,8 +1069,15 @@ TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::CreateLiveLinkSou
 
 		if (!bDoesAlreadyExist)
 		{
+			// TODO: start source with a default streaming address and port
+			FIPv4Address address(FIPv4Address::Any);
+
+			FIPv4Endpoint Endpoint;
+			Endpoint.Address = address;
+			Endpoint.Port = 14043;
+			
 			ILiveLinkClient* LiveLinkClient = &IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
-			TSharedPtr<FVirtualProductionSource> Source = MakeShared<FVirtualProductionSource>(FText::FromString("Studio"), FText::FromString(""), FMessageAddress::NewAddress());
+			TSharedPtr<FVirtualProductionSource> Source = MakeShared<FVirtualProductionSource>(Endpoint, FText::FromString("Studio"), FText::FromString(""), FMessageAddress::NewAddress());
 			FVirtualProductionSource::SetInstance(Source);
 			LiveLinkClient->AddSource(Source);
 			return Source;
@@ -1027,393 +1098,200 @@ void FVirtualProductionSource::RemoveLiveLinkSource(TSharedPtr<FVirtualProductio
 	}
 }
 
-FName URokokoFaceMapData::GetRemappedCurveName_Implementation(FName CurveName) const
+void FVirtualProductionSource::StartRunnable()
 {
-	if (auto RemappedName = NameMapping.Find(CurveName))
-	{
-		return *RemappedName;
-	}
-	return "";
-}
-
-void URokokoFaceMapData::Initialize()
-{
-	InitializeTMap();
-}
-
-//VPStreamingNetwork::VPStreamingNetwork()
-//{
-//}
-//
-//
-//VPStreamingNetwork::~VPStreamingNetwork()
-//{
-//	// Stop the runnable
-//	Stop();
-//	auto livelink = FVirtualProductionSource::Get();
-//	if (livelink.IsValid())
-//	{
-//		livelink->ClearAllSubjects();
-//	}
-//	//livelink->HandleClearSubject(FLiveLinkClearSubject(FString("subjectNames")));
-//
-//	if (Socket)
-//	{
-//		Socket->Close();
-//	}
-//
-//	// And last but not least stop the main thread
-//	if (Thread != NULL)
-//	{
-//		Thread->Kill(true);
-//		delete Thread;
-//	}
-//}
-
-
-void FVirtualProductionSource::StartRunnable(int port)
-{
-	streaming_port = port;
 	FString ThreadName(FString::Printf(TEXT("VPStreamingNetwork%ld"), (long)(FDateTime::UtcNow().ToUnixTimestamp())));
-	if (streaming_port)
+	if (m_NetworkAddress.Port)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("VP port... %i"), streaming_port);
+		UE_LOG(LogTemp, Warning, TEXT("VP port... %i"), m_NetworkAddress.Port);
 	}
 	Thread = FRunnableThread::Create(this, *ThreadName, 512 * 1024, TPri_Normal);
 }
 
 
-bool FVirtualProductionSource::InitSocket(int port)
+bool FVirtualProductionSource::InitSocket()
 {
-	streaming_port = port;
-	if (Socket == NULL)
+	if (Socket == nullptr)
 	{
-		Socket = FUdpSocketBuilder(TEXT("VPStreamingNetwork")).BoundToAddress(FIPv4Address(0, 0, 0, 0)).BoundToPort(streaming_port).AsReusable().Build();
+		Running = false;
+		Socket = FUdpSocketBuilder(TEXT("VPStreamingNetwork")).BoundToAddress(m_NetworkAddress.Address).BoundToPort(m_NetworkAddress.Port).AsReusable().Build();
+		if (!Socket)
+		{
+			const FString addressStr = m_NetworkAddress.Address.ToString();
+			UE_LOG(LogTemp, Error, TEXT("Failed to bind to address %s and port %i"), *addressStr, m_NetworkAddress.Port);
+			return false;
+		}
+		
 		//allow the socket to listen to an already bounded address.
 		Socket->SetReuseAddr(true);
-		Stopping = false;
+		Running = true;
 	}
 	return true;
 }
 
 FString BytesToStringFixed(const uint8* In, int32 Count)
 {
-	FString Broken = BytesToString(In, Count);
-	FString Fixed;
-
-	for (int i = 0; i < Broken.Len(); i++)
+	FString Text = BytesToString(In, Count);
+	
+	for (int i = 0; i < Text.Len(); i++)
 	{
-		const TCHAR c = Broken[i] - 1;
-		Fixed.AppendChar(c);
+		const TCHAR c = Text[i] - 1;
+		Text[i] = c;
 	}
 
-	return Fixed;
+	return Text;
 }
 
-void FVirtualProductionSource::SendToLiveLink(TArray<FVirtualProductionSubject> Subjects)
-{
-	//auto livelink = FVirtualProductionSource::Get();
-	//if (livelink.IsValid())
-	//{
-	//	livelink->HandleSubjectFrame(Subjects);
-	//}
 
-	HandleSubjectFrame(Subjects);
-}
-
-void FVirtualProductionSource::SendFacesToLivelink(TArray<FFace> Subjects)
-{
-	//auto livelink = FVirtualProductionSource::Get();
-	//if (livelink.IsValid())
-	//{
-	//	livelink->HandleFace(Subjects);
-	//}
-
-	HandleFace(Subjects);
-}
-
-void FVirtualProductionSource::SendSuitsToLiveLink(TArray<FSuitData> Smartsuits)
-{
-	//auto livelink = FVirtualProductionSource::Get();
-	//if (livelink.IsValid())
-	//{
-	//	livelink->HandleSuits(Smartsuits);
-	//}
-
-	HandleSuits(Smartsuits);
-
-}
-
-PRAGMA_DISABLE_OPTIMIZATION
+//PRAGMA_DISABLE_OPTIMIZATION
 uint32 FVirtualProductionSource::Run()
 {
 	static LZ4F_decompressionContext_t g_dCtx;
 	LZ4F_createDecompressionContext(&g_dCtx, LZ4F_VERSION);
 	bool added = false;
-	while (!Stopping)
+
+	auto addr_in = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
+	int32 bytes_read = 0;
+	FString ret;
+
+	constexpr int32 PacketSize{ 32768 };
+	constexpr int32 UncompressedSize{ 2097152 };
+
+	TArray<uint8> PacketData;
+	PacketData.Empty(PacketSize);
+	PacketData.AddUninitialized(PacketSize);
+
+	TArray<uint8> UncompressedData;
+	UncompressedData.Empty(UncompressedSize);
+	UncompressedData.AddUninitialized(UncompressedSize);
+
+	while (Running)
 	{
-		auto addr_in = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
-		int32 bytes_read = 0;
-		FString ret;
-
-		uint8 data[32768];
-		memset(data, '\0', 32768);
-
 		FDateTime time = FDateTime::UtcNow();
 		int seconds = time.ToUnixTimestamp();
-		if (Socket)
+
+		if (!Socket)
+			break;
+
+		if (!Socket->RecvFrom(PacketData.GetData(), PacketData.Num() * sizeof(uint8), bytes_read, *addr_in)
+			|| bytes_read == 0)
 		{
-			if (Socket->RecvFrom(data, sizeof(data), bytes_read, *addr_in))
+			continue;
+		}
+
+		if (!Running) 
+			break;
+				
+		FVirtualProductionFrame VPFrame;
+		
+		size_t srcSize = static_cast<size_t>(bytes_read);
+		size_t dstSize = static_cast<size_t>(UncompressedData.Num());
+		size_t decompressResult;
+		verify(srcSize >= 0);
+		verify(dstSize >= 0);
+		decompressResult = LZ4F_decompress(g_dCtx, UncompressedData.GetData(), &dstSize, PacketData.GetData(), &srcSize, nullptr);
+		if (decompressResult != 0) 
+		{ 
+			UE_LOG(LogTemp, Error, TEXT("Error decompressing frame : unfinished frame \n")); 
+			continue;
+		}
+		if (srcSize != (size_t)bytes_read) 
+		{ 
+			UE_LOG(LogTemp, Error, TEXT("Error decompressing frame : read size incorrect \n")); 
+			continue;
+		}
+
+		FString result = BytesToStringFixed(UncompressedData.GetData(), static_cast<int32_t>(dstSize));
+				
+		TSharedPtr<FJsonObject> JsonObject;
+		TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(result);
+		if (FJsonSerializer::Deserialize(Reader, JsonObject))
+		{
+
+			VPFrame.Version = JsonObject->GetStringField("version");
+			
+			//SCENE
 			{
-				if (bytes_read == 0)
+				TSharedPtr<FJsonObject> SceneObj = JsonObject->GetObjectField("scene");
+				TArray<TSharedPtr<FJsonValue>> Livepropsarray = SceneObj->GetArrayField("props");
+
+				for (auto& currentprop : Livepropsarray)
 				{
-					continue;
+					auto NewProp = FProp(true, currentprop->AsObject());
+					VPFrame.Props.Emplace(MoveTemp(NewProp));
 				}
-				//FGraphEventRef Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]()
-				//{
-				if (Stopping) break;
-				mtx.lock();
-				FVirtualProductionFrame VPFrame;
 
-				int32 UncompressedSize = 2097152;
-
-				TArray<uint8> UncompressedData;
-				UncompressedData.Empty(UncompressedSize);
-				UncompressedData.AddUninitialized(UncompressedSize);
-
-				//FName FormatName = NAME_LZ4;
-				//if (!FCompression::UncompressMemory(FormatName, UncompressedData.GetData(), UncompressedSize, data, static_cast<int32_t>(bytes_read)))
-				//{
-				//	UE_LOG(LogTemp, Error, TEXT("FCompression::UncompressMemory - Failed to uncompress memory (%d/%d) from address %p using format %s, this may indicate the asset is corrupt!"), bytes_read, UncompressedSize, data, *FormatName.ToString());
-				//}
-
-
-				//IFileManager* FileManager = &IFileManager::Get();
-				uint32 WriteFlags = 0;
-
-				//FString path = "C:/GitHub/rokoko-studio-live-unreal-engine_JSONV3/test12345678.lz4";
-				//TUniquePtr<FArchive> Ar = TUniquePtr<FArchive>(FileManager->CreateFileWriter(*path, WriteFlags));
-				//if (!Ar)
-				//{
-				//	UE_LOG(LogTemp, Error, TEXT("Could not write file %s!"), bytes_read, UncompressedSize, data, *FormatName.ToString());
-				//}
-				//Ar->Serialize(const_cast<uint8*>(data), bytes_read);
-				//Ar->Close();
-
-
-				size_t srcSize = (size_t)bytes_read;
-				size_t dstSize = (size_t)UncompressedData.Num();
-				size_t decompressResult;
-				verify(srcSize >= 0);
-				verify(dstSize >= 0);
-				decompressResult = LZ4F_decompress(g_dCtx, UncompressedData.GetData(), &dstSize, data, &srcSize, NULL);
-				if (decompressResult != 0) { UE_LOG(LogTemp, Error, TEXT("Error decompressing frame : unfinished frame \n")); }
-				if (srcSize != (size_t)bytes_read) { UE_LOG(LogTemp, Error, TEXT("Error decompressing frame : read size incorrect \n")); }
-
-
-				//FString path2 = "C:/GitHub/rokoko-studio-live-unreal-engine_JSONV3/3actorstest.txt";
-				//TUniquePtr<FArchive> Ar2 = TUniquePtr<FArchive>(FileManager->CreateFileWriter(*path2, WriteFlags));
-				//if (!Ar2)
-				//{
-				//	UE_LOG(LogTemp, Error, TEXT("Could not write file %s!"), *path2);
-				//}
-				//Ar2->Serialize(UncompressedData.GetData(), dstSize);
-				//Ar2->Close();
-
-
-
-
-				FString result = BytesToStringFixed(UncompressedData.GetData(), static_cast<int32_t>(dstSize));
-				FString test = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
-				//FString result = BytesToString(UncompressedData.GetData(), static_cast<int32_t>(UncompressedData.Num()));
-				//FString result = BytesToStringFixed(UncompressedData.GetData(), UncompressedData.Num());
-				//FString result = BytesToStringFixed(data, static_cast<int32_t>(bytes_read));
-				//UE_LOG(LogTemp, Warning, TEXT("received: %s"), *result);
-				//FJsonObjectConverter::JsonObjectStringToUStruct(result, &VPFrame, 0, 0);
-
-				TSharedPtr<FJsonObject> JsonObject;
-				TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(result);
-				if (FJsonSerializer::Deserialize(Reader, JsonObject))
+				if (SceneObj->HasField("actors"))
 				{
-
-					VPFrame.version = JsonObject->GetIntegerField("version");
-					//VPFrame.timestamp = JsonObject->GetNumberField("timestamp");
-					//VPFrame.playbackTimestamp = JsonObject->GetNumberField("");
-
-					//SCENE
+					TArray<TSharedPtr<FJsonValue>> Livesuitsarray = SceneObj->GetArrayField("actors");
+					for (auto& currentsuit : Livesuitsarray)
 					{
-						TSharedPtr<FJsonObject> SceneObj = JsonObject->GetObjectField("scene");
-						TArray<TSharedPtr<FJsonValue>> Livepropsarray = SceneObj->GetArrayField("props");
-
-						for (auto& currentprop : Livepropsarray)
+						auto SuitData = FSuitData(true, currentsuit->AsObject());
+						if (SuitData.hasFace)
 						{
-							VPFrame.props.Add(FProp(true, currentprop->AsObject()));
+							auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
+							auto FaceData = FFace(JSONObjectface, SuitData.suitname);
+							SuitData.faceId = FaceData.faceId;
+							VPFrame.Faces.Emplace(MoveTemp(FaceData));
 						}
-
-						if (SceneObj->HasField("actors"))
-						{
-							TArray<TSharedPtr<FJsonValue>> Livesuitsarray = SceneObj->GetArrayField("actors");
-							for (auto& currentsuit : Livesuitsarray)
-							{
-								auto SuitData = FSuitData(true, currentsuit->AsObject());
-								if (SuitData.hasFace)
-								{
-									auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
-									auto FaceData = FFace(JSONObjectface, SuitData.suitname);
-									SuitData.faceId = FaceData.faceId;
-									VPFrame.faces.Add(FaceData);
-								}
-								VPFrame.suits.Add(SuitData);
-							}
-						}
+						VPFrame.Actors.Emplace(MoveTemp(SuitData));
 					}
-
-					////LIVE
-					//{
-					//	TSharedPtr<FJsonObject> LiveObj = JsonObject->GetObjectField("live");
-					//	TArray<TSharedPtr<FJsonValue>> Livepropsarray = LiveObj->GetArrayField("props");
-
-					//	for (auto& currentprop : Livepropsarray)
-					//	{
-					//		VPFrame.props.Add(FProp(true, currentprop->AsObject()));
-					//	}
-
-					//	if (LiveObj->HasField("actors"))
-					//	{
-					//		TArray<TSharedPtr<FJsonValue>> Livesuitsarray = LiveObj->GetArrayField("actors");
-					//		for (auto& currentsuit : Livesuitsarray)
-					//		{
-					//			auto SuitData = FSuitData(true, currentsuit->AsObject());
-					//			if (SuitData.hasFace)
-					//			{
-					//				auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
-					//				auto FaceData = FFace(JSONObjectface, SuitData.suitname);
-					//				SuitData.faceId = FaceData.faceId;
-					//				VPFrame.faces.Add(FaceData);
-					//			}
-					//			VPFrame.suits.Add(SuitData);
-					//		}
-					//	}
-					//}
-
-					////PLAYBACK
-					//{
-					//	TSharedPtr<FJsonObject> PlaybackObj = JsonObject->GetObjectField("playback");
-					//	TArray<TSharedPtr<FJsonValue>> Playbackpropsarray = PlaybackObj->GetArrayField("props");
-
-					//	for (auto& currentprop : Playbackpropsarray)
-					//	{
-					//		VPFrame.props.Add(FProp(false, currentprop->AsObject()));
-					//	}
-
-					//	if (PlaybackObj->HasField("actors"))
-					//	{
-					//		TArray<TSharedPtr<FJsonValue>> Playbacksuitsarray = PlaybackObj->GetArrayField("actors");
-					//		for (auto& currentsuit : Playbacksuitsarray)
-					//		{
-					//			auto SuitData = FSuitData(false, currentsuit->AsObject());
-					//			if (SuitData.hasFace)
-					//			{
-					//				auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
-					//				auto FaceData = FFace(JSONObjectface, SuitData.suitname);
-					//				SuitData.faceId = FaceData.faceId;
-					//				VPFrame.faces.Add(FaceData);
-					//			}
-					//			VPFrame.suits.Add(SuitData);
-					//		}
-					//	}
-					//}
-
-
-
-
-
 				}
 
-
-				//if (!GlobalVPFrame)
-				//{
-				//	GlobalVPFrame = new FVirtualProductionFrame();
-				//}
-				GlobalVPFrame.version = VPFrame.version;
-				GlobalVPFrame.props.Empty();
-				GlobalVPFrame.trackers.Empty();
-				GlobalVPFrame.faces.Empty();
-				GlobalVPFrame.suits.Empty();
-
-				//auto livelink = FVirtualProductionSource::Get();
-
-				//if (livelink.IsValid())
+				if (SceneObj->HasField("characters"))
 				{
-					subjects.Empty();
-					for (int i = 0; i < VPFrame.props.Num(); i++)
+					TArray<TSharedPtr<FJsonValue>> CharactersArray = SceneObj->GetArrayField("characters");
+					for (auto& currentcharacter : CharactersArray)
 					{
-						GlobalVPFrame.props.Add(VPFrame.props[i]);
-						FVirtualProductionSubject subject = GlobalVPFrame.props[i].GetSubject();
-						subjects.Add(subject);
+						auto CharacterData = FCharacterData(true, currentcharacter->AsObject());
+						VPFrame.Characters.Emplace(MoveTemp(CharacterData));
 					}
-					for (int i = 0; i < VPFrame.trackers.Num(); i++)
-					{
-						GlobalVPFrame.trackers.Add(VPFrame.trackers[i]);
-						FVirtualProductionSubject subject = GlobalVPFrame.trackers[i].GetSubject();
-						subjects.Add(subject);
-					}
-					for (int i = 0; i < VPFrame.faces.Num(); i++)
-					{
-						GlobalVPFrame.faces.Add(VPFrame.faces[i]);
-					}
-					for (int i = 0; i < VPFrame.suits.Num(); i++)
-					{
-						GlobalVPFrame.suits.Add(VPFrame.suits[i]);
-					}
-					SendToLiveLink(subjects);
-					SendFacesToLivelink(GlobalVPFrame.faces);
-					SendSuitsToLiveLink(GlobalVPFrame.suits);
 				}
-				//else
-				//{
-				//	for (int i = 0; i < VPFrame.props.Num(); i++)
-				//	{
-				//		GlobalVPFrame.props.Add(VPFrame.props[i]);
-				//	}
-				//	for (int i = 0; i < VPFrame.trackers.Num(); i++)
-				//	{
-				//		GlobalVPFrame.trackers.Add(VPFrame.trackers[i]);
-				//	}
-				//	for (int i = 0; i < VPFrame.faces.Num(); i++)
-				//	{
-				//		//UE_LOG(LogTemp, Warning, TEXT("face: %d - %s - %f"), VPFrame.faces[i].version, *VPFrame.faces[i].provider, VPFrame.faces[i].jawOpen);
-				//		GlobalVPFrame.faces.Add(VPFrame.faces[i]);
-				//	}
-				//	for (int i = 0; i < VPFrame.suits.Num(); i++)
-				//	{
-				//		GlobalVPFrame.suits.Add(VPFrame.suits[i]);
-				//	}
-				//}
-				//UE_LOG(LogTemp, Warning, TEXT("Faces... %i"), GlobalVPFrame.faces.Num());
-				mtx.unlock();
-				//}, TStatId(), NULL, ENamedThreads::GameThread);
-
-				// If you want to wait for the code above to complete do this:
-				//FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
-
 			}
 		}
+
+		mtx.lock();
+
+		GlobalVPFrame.Version = VPFrame.Version;
+		GlobalVPFrame.Props = MoveTemp(VPFrame.Props);
+		GlobalVPFrame.Trackers = MoveTemp(VPFrame.Trackers);
+		
+		Subjects.Empty();
+		for (int i = 0; i < VPFrame.Props.Num(); i++)
+		{
+			FVirtualProductionSubject subject = GlobalVPFrame.Props[i].GetSubject();
+			Subjects.Add(subject);
+		}
+		for (int i = 0; i < VPFrame.Trackers.Num(); i++)
+		{
+			FVirtualProductionSubject subject = GlobalVPFrame.Trackers[i].GetSubject();
+			Subjects.Add(subject);
+		}
+			
+		GlobalVPFrame.Faces = MoveTemp(VPFrame.Faces);
+		GlobalVPFrame.Actors = MoveTemp(VPFrame.Actors);
+		GlobalVPFrame.Characters = MoveTemp(VPFrame.Characters);
+		
+		mtx.unlock();
+
+		HandleSubjectFrame(Subjects);
+		HandleFace(GlobalVPFrame.Faces);
+		HandleSuits(GlobalVPFrame.Actors);
+		HandleCharacters(GlobalVPFrame.Characters);
 	}
 	return 0;
 }
-PRAGMA_ENABLE_OPTIMIZATION
+//PRAGMA_ENABLE_OPTIMIZATION
 FProp* FVirtualProductionSource::GetPropByName(FString name, bool isLive)
 {
 	FProp* result = nullptr;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
-		for (int i = 0; i < GlobalVPFrame.props.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Props.Num(); i++)
 		{
-			if (name == GlobalVPFrame.props[i].name && GlobalVPFrame.props[i].isLive == isLive)
+			if (name == GlobalVPFrame.Props[i].name && GlobalVPFrame.Props[i].isLive == isLive)
 			{
-				result = &GlobalVPFrame.props[i];
+				result = &GlobalVPFrame.Props[i];
 			}
 		}
 	}
@@ -1423,35 +1301,29 @@ FProp* FVirtualProductionSource::GetPropByName(FString name, bool isLive)
 
 TArray<FProp> FVirtualProductionSource::GetAllProps()
 {
-	//return nullptr;
 	TArray<FProp> result;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
-		for (int i = 0; i < GlobalVPFrame.props.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Props.Num(); i++)
 		{
-			result.Add(GlobalVPFrame.props[i]);
-			//result->Add
+			result.Add(GlobalVPFrame.Props[i]);
 		}
 	}
 	mtx.unlock();
 	//UE_LOG(LogTemp, Display, TEXT("Yeeee3"));
 	return result;
-
-	//return GlobalVPFrame.props;
 }
 
 FTracker* FVirtualProductionSource::GetTrackerByName(FString name, bool isLive)
 {
 	FTracker* result = nullptr;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
-		for (int i = 0; i < GlobalVPFrame.trackers.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Trackers.Num(); i++)
 		{
-			if (name == GlobalVPFrame.trackers[i].name && GlobalVPFrame.trackers[i].isLive == isLive)
+			if (name == GlobalVPFrame.Trackers[i].name && GlobalVPFrame.Trackers[i].isLive == isLive)
 			{
-				result = &GlobalVPFrame.trackers[i];
+				result = &GlobalVPFrame.Trackers[i];
 			}
 		}
 	}
@@ -1463,13 +1335,12 @@ FTracker* FVirtualProductionSource::GetTrackerByConnectionID(const FString& name
 {
 	FTracker* result = nullptr;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
-		for (int i = 0; i < GlobalVPFrame.trackers.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Trackers.Num(); i++)
 		{
-			if (name == GlobalVPFrame.trackers[i].connectionId /*&& GlobalVPFrame.trackers[i].isLive == isLive*/)
+			if (name == GlobalVPFrame.Trackers[i].connectionId /*&& GlobalVPFrame.trackers[i].isLive == isLive*/)
 			{
-				result = &GlobalVPFrame.trackers[i];
+				result = &GlobalVPFrame.Trackers[i];
 			}
 		}
 	}
@@ -1481,13 +1352,12 @@ TArray<FTracker> FVirtualProductionSource::GetTrackersWithMatchingId(FString Con
 {
 	TArray<FTracker> result;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
-		for (int i = 0; i < GlobalVPFrame.trackers.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Trackers.Num(); i++)
 		{
-			if (ConnectionId == GlobalVPFrame.trackers[i].connectionId /*&& GlobalVPFrame.trackers[i].isLive == isLive*/)
+			if (ConnectionId == GlobalVPFrame.Trackers[i].connectionId /*&& GlobalVPFrame.trackers[i].isLive == isLive*/)
 			{
-				result.Add(GlobalVPFrame.trackers[i]);
+				result.Add(GlobalVPFrame.Trackers[i]);
 			}
 		}
 	}
@@ -1497,22 +1367,22 @@ TArray<FTracker> FVirtualProductionSource::GetTrackersWithMatchingId(FString Con
 
 FSuitData* FVirtualProductionSource::GetSmartsuitByName(FString suitName)
 {
-	if (suitName.Len() == 0 || suitName.Compare(FString("")) == 0)
+	
+	if (suitName.IsEmpty() || suitName.Compare(FString("")) == 0)
 	{
 		return nullptr;
 	}
 
 	FSuitData* result = nullptr;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
 		//should probably set the limit to the size of the suit array here?
-		for (int i = 0; i < GlobalVPFrame.suits.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Actors.Num(); i++)
 		{
-			FString mySuitName(GlobalVPFrame.suits[i].suitname);
-			if (suitName.Compare(mySuitName) == 0 && mySuitName.Len() > 0)
+			FString mySuitName(GlobalVPFrame.Actors[i].suitname);
+			if (suitName.Compare(mySuitName) == 0 && !mySuitName.IsEmpty())
 			{
-				result = &(GlobalVPFrame.suits[i]);
+				result = &(GlobalVPFrame.Actors[i]);
 			}
 		}
 	}
@@ -1525,13 +1395,12 @@ TArray<FString> FVirtualProductionSource::GetAvailableSmartsuitNames()
 	TArray<FString> result;
 	//maybe we should set the limit to the size of the suits array
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
-		for (int i = 0; i < GlobalVPFrame.suits.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Actors.Num(); i++)
 		{
-			if ((GlobalVPFrame.suits[i].suitname != "\0\0\0\0") /*&& GlobalVPFrame.suits[i].fps > 0*/)
+			if ((GlobalVPFrame.Actors[i].suitname != "\0\0\0\0") /*&& GlobalVPFrame.suits[i].fps > 0*/)
 			{
-				result.Add(FString(GlobalVPFrame.suits[i].suitname));
+				result.Add(FString(GlobalVPFrame.Actors[i].suitname));
 			}
 		}
 	}
@@ -1544,13 +1413,12 @@ TArray<FSuitData> FVirtualProductionSource::GetAllSmartsuits()
 	TArray<FSuitData> suits;
 	//maybe we should set the limit to the size of the suits array
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
-		for (int i = 0; i < GlobalVPFrame.suits.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Actors.Num(); i++)
 		{
-			if ((GlobalVPFrame.suits[i].suitname != "\0\0\0\0") /*&& GlobalVPFrame.suits[i].fps > 0*/)
+			if ((GlobalVPFrame.Actors[i].suitname != "\0\0\0\0") /*&& GlobalVPFrame.suits[i].fps > 0*/)
 			{
-				suits.Add(GlobalVPFrame.suits[i]);
+				suits.Add(GlobalVPFrame.Actors[i]);
 			}
 		}
 	}
@@ -1560,35 +1428,31 @@ TArray<FSuitData> FVirtualProductionSource::GetAllSmartsuits()
 
 FFace FVirtualProductionSource::GetFaceByFaceID(FString faceID)
 {
-	FFace result;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
-		for (int i = 0; i < GlobalVPFrame.faces.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Faces.Num(); i++)
 		{
-			if (GlobalVPFrame.faces[i].faceId == faceID)
+			if (GlobalVPFrame.Faces[i].faceId == faceID)
 			{
-				result = GlobalVPFrame.faces[i];
-				break;
+				return FFace(GlobalVPFrame.Faces[i]);
 			}
 		}
 	}
 	mtx.unlock();
 
-	return result;
+	return FFace();
 }
 
 FFace* FVirtualProductionSource::GetFaceByProfileName(const FString& profileName)
 {
 	FFace* result = nullptr;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
-		for (int i = 0; i < GlobalVPFrame.faces.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Faces.Num(); i++)
 		{
-			if (GlobalVPFrame.faces[i].profileName == profileName)
+			if (GlobalVPFrame.Faces[i].profileName == profileName)
 			{
-				result = &GlobalVPFrame.faces[i];
+				result = &GlobalVPFrame.Faces[i];
 				break;
 			}
 		}
@@ -1602,17 +1466,13 @@ TArray<FFace> FVirtualProductionSource::GetAllFaces()
 {
 	TArray<FFace> result;
 	mtx.lock();
-	//if (GlobalVPFrame)
 	{
-		for (int i = 0; i < GlobalVPFrame.faces.Num(); i++)
+		for (int i = 0; i < GlobalVPFrame.Faces.Num(); i++)
 		{
-			result.Add(GlobalVPFrame.faces[i]);
-			//result->Add
+			result.Add(GlobalVPFrame.Faces[i]);
 		}
 	}
 	mtx.unlock();
 
 	return result;
-
-	//return GlobalVPFrame.faces;
 }

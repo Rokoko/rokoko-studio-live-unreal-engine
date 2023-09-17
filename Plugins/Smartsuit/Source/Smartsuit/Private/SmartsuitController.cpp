@@ -1,17 +1,14 @@
 // Copyright 2019 Rokoko Electronics. All Rights Reserved.
 
 #include "SmartsuitController.h"
-#include "Smartsuit.h"
-
+#include "VirtualProductionSource.h"
 
 // Sets default values
 ASmartsuitController::ASmartsuitController()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	hubInfoRequested = false;
 	bodyModelRequested = false;
-	hubInfo = nullptr;
 }
 
 // Called when the game starts or when spawned
@@ -25,35 +22,19 @@ void ASmartsuitController::BeginPlay()
 	}
 }
 
-ARokokoReceiver* ASmartsuitController::GetReceiver() 
-{
-	ARokokoReceiver* listener = nullptr;
-	// Find UObjects by type
-	for (TObjectIterator<ARokokoReceiver> It; It; ++It)
-	{
-		if (It->enabled) 
-		{
-			listener = *It;
-			break;
-		}
-		// ...
-	}
-	return listener;
-}
-
 // Called every frame
 void ASmartsuitController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	ARokokoReceiver* listener = GetReceiver();
-	if (!listener) 
+	auto livelink = FVirtualProductionSource::Get();
+	if (!livelink.IsValid())
 	{
 		return;
 	}
 
 	if (AutoConnect) 
 	{
-		TArray<FString> suitnames = listener->GetAvailableSmartsuitNames();
+		TArray<FString> suitnames = livelink->GetAvailableSmartsuitNames();
 		if (suitnames.Num() > 0)
 		{
 			suitname = suitnames[0];
@@ -65,77 +46,14 @@ void ASmartsuitController::Tick(float DeltaTime)
 		return;
 	}
 
-	FSuitData *data = listener->GetSmartsuit(suitname);
+	FSuitData *data = livelink->GetSmartsuitByName(suitname);
 	if (!data) 
 	{
 		return;
 	}
-	if (!hubInfoRequested) 
-	{
-		hubInfoRequested = true;
-		GetHubInfo();
-		return;
-	}
-	//hasProfile = data->hasProfile;
-	//isBroadcast = data->isBroadcasting;
-	//fps = data->fps;
-	//if (fps > 0 && profileToggleState != data->profileToggle) 
-	//{
-	//	profileToggleState = data->profileToggle;
-	//}
+	
 }
 
-//void ASmartsuitController::SendCommand(unsigned char cmd, uint8 *customData = nullptr, int customDataLength = 0) {
-//	if (!SupportsWiFi() && cmd != SMARTSUIT_COMMAND_READ_HUB_INFO) {
-//		UE_LOG(LogTemp, Warning, TEXT("Can't execute command, since this suit has an unsupported WiFi API version"));
-//		return;
-//	}
-//	
-//	uint32 myIp = GetLocalIP();
-//
-//	ARokokoReceiver * receiver = GetReceiver();
-//	if (receiver && myIp != 0) {
-//		if (customData != nullptr) {
-//			//receiver->SendCommand(suitname, customData, customDataLength);
-//		}
-//		else {
-//			unsigned char data[4] = { GetByte(myIp, 3), GetByte(myIp, 2), cmd, cmd };
-//			//receiver->SendCommand(suitname, data, sizeof(char) * 4);
-//		}
-//	}
-//}
-
-void ASmartsuitController::Restart() {
-	//SendCommand(SMARTSUIT_COMMAND_RESET_KALMAN_FILTER);
-}
-
-void ASmartsuitController::Calibrate() {
-	//SendCommand(SMARTSUIT_COMMAND_PERFORM_APOSE);
-}
-
-void ASmartsuitController::Broadcast() {
-	//SendCommand(SMARTSUIT_COMMAND_USE_BROADCAST_ADDR);
-}
-
-void ASmartsuitController::Unicast() {
-	//SendCommand(SMARTSUIT_COMMAND_USE_SPECIFIC_ADDR);
-}
-
-void ASmartsuitController::SetBodyModel(FBodyModel bodyToSet) {
-	//unsigned char b[sizeof(Body)];
-	//Body body = bodyToSet.GetBody();
-	//memcpy(b, &body, sizeof(Body));
-
-	//SendCommand(0, b, sizeof(Body));
-}
-
-void ASmartsuitController::GetBodyModel() {
-	//SendCommand(SMARTSUIT_COMMAND_GET_BODY_DIMENSIONS);
-}
-
-void ASmartsuitController::GetHubInfo() {
-	//SendCommand(SMARTSUIT_COMMAND_READ_HUB_INFO);
-}
 
 uint8 ASmartsuitController::GetByte(uint32 value, int i) 
 {
@@ -151,58 +69,6 @@ uint8 ASmartsuitController::GetByte(uint32 value, int i)
 	default:
 		return 0;
 	}
-}
-
-//uint32 ASmartsuitController::GetLocalIP() {
-//	
-//	ARokokoReceiver *receiver = GetReceiver();
-//	if (!receiver) {
-//		return 0;
-//	}
-//	SuitData* data = receiver->GetSmartsuit(suitname);
-//	if (!data) {
-//		return 0;
-//	}
-//    
-//    bool canBind = false;
-//    TArray<TSharedPtr<FInternetAddr>> addresses;
-//    if(!ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->GetLocalAdapterAddresses(addresses))
-//        UE_LOG(LogTemp, Warning, TEXT("Failed to get local adapter addresses"));
-//
-//    uint32 myIp;
-//	for (int i = 0; i < addresses.Num(); i++) {
-//		TSharedPtr<FInternetAddr> anIp = addresses[i];
-//		if (anIp->IsValid()) {
-//			anIp->GetIp(myIp);
-//			if (GetByte(myIp, 2) == GetByte(data->url, 2)) {
-//				return myIp;
-//			}
-//		}
-//	}
-//    
-//#if PLATFORM_MAC
-//    // On Mac, the GetLocalAdapterAddresses function only returns the single wildcard ip 0.0.0.0,
-//    // so we use the linux function getifaddrs() to obtain the local ip in that case (see GetLocalMacIP)
-//    myIp = GetLocalMacIP();
-//    if (GetByte(myIp, 2) == GetByte(data->url, 2)) {
-//        return myIp;
-//    }
-//#endif
-//    
-//	return 0;
-//}
-
-bool ASmartsuitController::SupportsWiFi() {
-	return hubInfo && ((hubInfo->wifiApiVersion >> 24) & 0xff) == SUPPORTED_MAJOR_WIFI_API;
-}
-
-void ASmartsuitController::UpdateWiFiApiString() {
-	if (hubInfo) {
-		uint32 version = hubInfo->wifiApiVersion;
-		wifiApiVersion = FString::Printf(TEXT("%d.%d.%d"), ((version >> 24) & 0xff), ((version >> 16) & 0xff), ((version >> 8) & 0xff));
-		if (!SupportsWiFi())
-			wifiApiVersion.Append(TEXT(" - Unsupported!"));
-	}	
 }
 
 #if PLATFORM_MAC

@@ -2,6 +2,139 @@
 
 #include "SmartsuitBlueprintLibrary.h"
 #include "VirtualProductionSource.h"
+#include "Engine/SkeletalMesh.h"
+
+
+FFace USmartsuitBlueprintLibrary::GetFaceByFaceID(FString faceId)
+{
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		return livelink->GetFaceByFaceID(faceId);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+	}
+	return FFace();
+}
+
+FFace USmartsuitBlueprintLibrary::GetFaceByProfileName(const FString& faceName, bool& found)
+{
+	found = false;
+	
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		FFace* temp = livelink->GetFaceByProfileName(faceName);
+		if (temp)
+		{
+			found = true;
+			return FFace(*temp);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+	}
+	return FFace();
+}
+
+TArray<FFace> USmartsuitBlueprintLibrary::GetAllFaces()
+{
+	TArray<FFace> Faces;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		Faces = livelink->GetAllFaces();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+	}
+	return Faces;
+}
+
+TArray<FFace> USmartsuitBlueprintLibrary::GetFacesNotAssociatedWithActor()
+{
+	TArray<FFace> FacesNotPairedWithSuit;
+	for (auto& CurrentFace : GetAllFaces())
+	{
+		bool FoundExistingProfileForFace = false;
+
+		for (auto& CurrentSuit : GetAllSmartsuits())
+		{
+			if (CurrentSuit.id == CurrentFace.profileName)
+			{
+				FoundExistingProfileForFace = true;
+			}
+		}
+
+		if (!FoundExistingProfileForFace)
+		{
+			FacesNotPairedWithSuit.Add(CurrentFace);
+		}
+	}
+	return FacesNotPairedWithSuit;
+}
+
+
+FSuitData* USmartsuitBlueprintLibrary::GetSmartsuit(FString suitName)
+{
+	FSuitData* ReturnValue = nullptr;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		ReturnValue = livelink->GetSmartsuitByName(suitName);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+	}
+
+	return ReturnValue;
+}
+
+bool USmartsuitBlueprintLibrary::GetSmartsuitByName(const FString& suitName, FSuitData& SuitData)
+{
+	if (FSuitData* smartsuit = GetSmartsuit(suitName))
+	{
+		SuitData = *smartsuit;
+		return true;
+	}
+	SuitData = FSuitData();
+	return false;
+}
+
+TArray<FSuitData> USmartsuitBlueprintLibrary::GetAllSmartsuits()
+{
+	TArray<FSuitData> Smartsuits;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		Smartsuits = livelink->GetAllSmartsuits();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+	}
+	return Smartsuits;
+}
+
+TArray<FString> USmartsuitBlueprintLibrary::GetAvailableActorNames()
+{
+	TArray<FString> SmartsuitNames;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		SmartsuitNames = livelink->GetAvailableSmartsuitNames();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+	}
+	return SmartsuitNames;
+}
 
 ASmartsuitController* USmartsuitBlueprintLibrary::GetSmartsuitControllerByName(FString name)
 {
@@ -42,6 +175,97 @@ ASmartsuitController* USmartsuitBlueprintLibrary::GetSmartsuitController(int id)
 	}
 	return actor;
 }
+
+
+FProp* USmartsuitBlueprintLibrary::GetPropByNameFromVP(FString name, bool isLive)
+{
+	FProp* ReturnValue = nullptr;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		ReturnValue = livelink->GetPropByName(name, isLive);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+	}
+	return ReturnValue;
+}
+
+TArray<FProp> USmartsuitBlueprintLibrary::GetAllProps()
+{
+	TArray<FProp> AllProps;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+	
+		AllProps = livelink->GetAllProps();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+	}
+	return AllProps;
+}
+
+bool USmartsuitBlueprintLibrary::GetProp(FString name, /*bool isLive, */FProp& OutProp)
+{
+	if (FProp* prop = GetPropByNameFromVP(name, true))
+	{
+		OutProp = *prop;
+		return true;
+	}
+	OutProp = FProp();
+	return false;
+}
+
+FTracker* USmartsuitBlueprintLibrary::GetTrackerByNameFromVP(FString name, bool isLive)
+{
+	FTracker* Tracker = nullptr;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		Tracker = livelink->GetTrackerByName(name, isLive);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+	}
+	return Tracker;
+}
+
+FTracker USmartsuitBlueprintLibrary::GetTracker(FString name, bool isLive)
+{
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		return *livelink->GetTrackerByName(name, isLive);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+	}
+	return FTracker();
+}
+
+FTracker USmartsuitBlueprintLibrary::GetTrackerByConnectionIDFromVP(const FString& name, bool isLive, bool& found)
+{
+	found = false;
+	FTracker returnval;
+	FTracker* temp = nullptr;
+	auto livelink = FVirtualProductionSource::Get();
+	if (livelink.IsValid())
+	{
+		temp = livelink->GetTrackerByConnectionID(name, isLive);
+	}
+	if (temp)
+	{
+		returnval = *temp;
+		found = true;
+	}
+	return returnval;
+}
+
 
 void USmartsuitBlueprintLibrary::JSONTest()
 {
@@ -137,7 +361,7 @@ FTransform USmartsuitBlueprintLibrary::GetRefPoseBoneTransform(USkeletalMeshComp
 	{
 		SkelMesh->ClearRefPoseOverride();
 		FReferenceSkeleton RefSkel;
-		RefSkel = SkelMesh->SkeletalMesh->RefSkeleton;
+		RefSkel = SkelMesh->GetSkeletalMeshAsset()->GetRefSkeleton();
 
 		BoneTransform = GetWorldSpaceTransform(RefSkel, RefSkel.FindBoneIndex(BoneName));
 	}
@@ -156,7 +380,7 @@ FTransform USmartsuitBlueprintLibrary::GetBoneTransform(USkeletalMeshComponent* 
 	if (SkelMesh && !BoneName.IsNone())
 	{
 		FReferenceSkeleton RefSkel;
-		RefSkel = SkelMesh->SkeletalMesh->RefSkeleton;
+		RefSkel = SkelMesh->GetSkeletalMeshAsset()->GetRefSkeleton();
 		BoneTransform = SkelMesh->GetBoneTransform(RefSkel.FindBoneIndex(BoneName));
 	}
 

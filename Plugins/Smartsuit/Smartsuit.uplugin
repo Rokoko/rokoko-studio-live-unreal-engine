@@ -1,13 +1,13 @@
 {
     "FileVersion": 3,
     "Version": 3,
-    "VersionName": "1.11.1",
+    "VersionName": "1.12.0",
     "FriendlyName": "Rokoko Studio Live",
     "Description": "Now you can use your Smartsuit Pro natively in Unreal! With Rokoko Studio Live you are able to stream and visualize Smartsuit Pro data inside Unreal Engine.",
     "Category": "Animation",
     "CreatedBy": "Rokoko Electronics ApS",
     "CreatedByURL": "https://www.rokoko.com",
-    "EngineVersion": "4.27.0",
+    "EngineVersion": ["5.0", "5.1", "5.2", 5.3],
     "DocsURL": "https://github.com/Rokoko/rokoko-studio-live-unreal-engine/wiki/Rokoko-Studio-Live-Plugin-for-Unreal-Engine",
     "MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/7e20fe7d4247410cb4f7d3e162d61c21",
     "SupportURL": "",
@@ -38,6 +38,10 @@
     "Plugins": [
         {
             "Name": "LiveLink",
+            "Enabled": true
+        },
+        {
+            "Name": "LiveLinkCamera",
             "Enabled": true
         }
     ]
