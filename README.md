@@ -7,12 +7,13 @@ This plugin let's you stream animation data from Rokoko Studio into Unreal Engin
 ---
 
 ## Requirements
-- Unreal Engine 5.1
-- Rokoko Studio 1.19.0b
+- Unreal Engine 5.x
+- Rokoko Studio or Rokoko Studio Legacy (starting from 1.19.0b)
 
 ## Features
 - Live stream data:
   * Up to five actors that can all include both body, face (52 blendshapes) and finger data at the same time.
+  * Character data
   * Camera data
   * Props data
 - Control Rokoko Studio from within Unreal Engine
