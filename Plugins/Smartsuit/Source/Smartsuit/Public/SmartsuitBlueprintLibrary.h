@@ -11,6 +11,7 @@
 #include "Dom/JsonObject.h"
 
 #include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
+#include "ReferenceSkeleton.h"
 
 #include "SmartsuitBlueprintLibrary.generated.h"
 

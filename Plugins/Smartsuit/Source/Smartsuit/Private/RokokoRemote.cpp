@@ -6,6 +6,7 @@
 #include "Interfaces/IHttpResponse.h"
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
+#include "UObject/UObjectIterator.h"
 
 ARokokoRemote::ARokokoRemote()
 {

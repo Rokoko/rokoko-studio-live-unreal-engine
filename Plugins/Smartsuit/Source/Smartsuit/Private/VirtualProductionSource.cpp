@@ -17,7 +17,8 @@
 #include "Runtime/JsonUtilities/Public/JsonObjectConverter.h"
 #include "Serialization/BufferArchive.h"
 #include "lz4frame.h"
-
+#include "SmartsuitBlueprintLibrary.h"
+#include "Dom/JsonObject.h"
 
 TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::instance = nullptr;
 
@@ -1142,6 +1143,132 @@ FString BytesToStringFixed(const uint8* In, int32 Count)
 	return Text;
 }
 
+void SuitParseBone(FSuitData* suitData, TSharedPtr<FJsonObject> jsonObject, const FString& BoneName)
+{
+	if (jsonObject->HasField(BoneName))
+	{
+		TSharedPtr<FJsonObject> BoneObject = jsonObject->GetObjectField(BoneName);
+		FVector SensorPosition = USmartsuitBlueprintLibrary::GetVectorField(BoneObject->GetObjectField("position"));
+		FQuat SensorRotation = USmartsuitBlueprintLibrary::GetQuaternionField(BoneObject->GetObjectField("rotation"));
+
+		suitData->bones.Add(FName(*BoneName), FSmartsuitBone(FName(*BoneName), SensorPosition, SensorRotation));
+	}
+}
+
+void UpdateSuitFromJson(FSuitData* suitData, const TSharedPtr<FJsonObject> jsonObject)
+{
+	suitData->suitname = jsonObject->GetStringField("name");
+
+	//temp
+	suitData->profileName = suitData->suitname;
+
+	//timestamp = jsonObject->GetNumberField("timestamp");
+	//id = jsonObject->GetStringField("id");
+	//isLive = jsonObject->GetBoolField("isLive");
+	//isLive = InIsLive;
+	//profileName = jsonObject->GetStringField("profileName");
+	//color = USmartsuitBlueprintLibrary::GetFLinearColorField(jsonObject->GetObjectField("color"));
+	//TArray<TSharedPtr<FJsonValue>> ColorArray = jsonObject->GetArrayField("color");
+	suitData->color = USmartsuitBlueprintLibrary::GetColorField(jsonObject);
+
+	TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField("meta");
+	suitData->hasGloves = Meta->GetBoolField("hasGloves");
+	suitData->hasLeftGlove = Meta->GetBoolField("hasLeftGlove");
+	suitData->hasRightGlove = Meta->GetBoolField("hasRightGlove");
+	suitData->hasBody = Meta->GetBoolField("hasBody");
+	suitData->hasFace = Meta->GetBoolField("hasFace");
+
+	TSharedPtr<FJsonObject> BodyObj = jsonObject->GetObjectField("body");
+
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::hip.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::spine.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::chest.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::neck.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::head.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftShoulder.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftUpperArm.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftLowerArm.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftHand.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightShoulder.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightUpperArm.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightLowerArm.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightHand.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftUpLeg.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftLeg.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftFoot.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftToe.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftToeEnd.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightUpLeg.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightLeg.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightFoot.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightToe.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightToeEnd.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftThumbProximal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftThumbMedial.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftThumbDistal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftThumbTip.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftIndexProximal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftIndexMedial.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftIndexDistal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftIndexTip.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftMiddleProximal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftMiddleMedial.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftMiddleDistal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftMiddleTip.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftRingProximal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftRingMedial.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftRingDistal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftRingTip.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftLittleProximal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftLittleMedial.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftLittleDistal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::leftLittleTip.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightThumbProximal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightThumbMedial.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightThumbDistal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightThumbTip.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightIndexProximal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightIndexMedial.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightIndexDistal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightIndexTip.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightMiddleProximal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightMiddleMedial.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightMiddleDistal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightMiddleTip.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightRingProximal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightRingMedial.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightRingDistal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightRingTip.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightLittleProximal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightLittleMedial.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightLittleDistal.ToString());
+	SuitParseBone(suitData, BodyObj, SmartsuitBones::rightLittleTip.ToString());
+}
+
+	
+
+
+void UpdateCharacterFromJson(FCharacterData* characterData, const TSharedPtr<FJsonObject> jsonObject)
+{
+	characterData->CharacterName = jsonObject->GetStringField("name");
+
+	TArray<TSharedPtr<FJsonValue>> JointsArray = jsonObject->GetArrayField("joints");
+
+	for (TArray< TSharedPtr< FJsonValue > >::TConstIterator JointsIter(JointsArray.CreateConstIterator()); JointsIter; ++JointsIter)
+	{
+		const TSharedPtr< FJsonValue >  JointEntry = *JointsIter;
+		const TSharedPtr< FJsonObject > JoinJSONObject = JointEntry->AsObject();
+
+		FString JointName = JoinJSONObject->GetStringField("name");
+		int32 JointParentIndex = JoinJSONObject->GetIntegerField("parent");
+		FVector JointPosition = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField("position"));
+		FQuat JointRotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField("rotation"));
+
+		FTransform JointTransform(JointRotation, JointPosition, FVector::OneVector);
+		characterData->joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, JointTransform));
+	}
+}
+
 
 //PRAGMA_DISABLE_OPTIMIZATION
 uint32 FVirtualProductionSource::Run()
@@ -1226,7 +1353,10 @@ uint32 FVirtualProductionSource::Run()
 					TArray<TSharedPtr<FJsonValue>> Livesuitsarray = SceneObj->GetArrayField("actors");
 					for (auto& currentsuit : Livesuitsarray)
 					{
-						auto SuitData = FSuitData(true, currentsuit->AsObject());
+						FSuitData SuitData; // = FSuitData(true, currentsuit->AsObject());
+						SuitData.isLive = true;
+						UpdateSuitFromJson(&SuitData, currentsuit->AsObject());
+
 						if (SuitData.hasFace)
 						{
 							auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
@@ -1243,7 +1373,10 @@ uint32 FVirtualProductionSource::Run()
 					TArray<TSharedPtr<FJsonValue>> CharactersArray = SceneObj->GetArrayField("characters");
 					for (auto& currentcharacter : CharactersArray)
 					{
-						auto CharacterData = FCharacterData(true, currentcharacter->AsObject());
+						FCharacterData CharacterData;
+						CharacterData.IsLive = true;
+						UpdateCharacterFromJson(&CharacterData, currentcharacter->AsObject());
+						
 						VPFrame.Characters.Emplace(MoveTemp(CharacterData));
 					}
 				}

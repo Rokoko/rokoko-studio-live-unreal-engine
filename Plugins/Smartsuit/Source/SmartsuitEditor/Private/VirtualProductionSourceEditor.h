@@ -20,7 +20,7 @@ public:
 #include "Widgets/DeclarativeSyntaxSupport.h"
 #include "VirtualProductionFrame.h"
 #include "Misc/Guid.h"
-#include "LiveLink/Public/LiveLinkMessageBusFinder.h"
+#include "LiveLinkMessageBusFinder.h"
 #include "Interfaces/IPv4/IPv4Endpoint.h"
 
 struct FMessageAddress;

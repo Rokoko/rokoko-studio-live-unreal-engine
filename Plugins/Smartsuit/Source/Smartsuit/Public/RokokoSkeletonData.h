@@ -256,10 +256,7 @@ struct FSuitData
 	GENERATED_BODY()
 
 	FSuitData() {}
-	FSuitData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject);
-
-	void ParseBone(TSharedPtr<FJsonObject> jsonObject, const FString& BoneName);
-
+	
 	/** The name of the Smartsuit. */
 	UPROPERTY(BlueprintReadOnly, Category=Default)
 	FString suitname;
@@ -326,7 +323,6 @@ struct FCharacterData
 	GENERATED_BODY()
 
 	FCharacterData(){}
-	FCharacterData(bool InIsLive, TSharedPtr<FJsonObject> jsonObject);
 
 	/** The name of the Smartsuit. */
 	UPROPERTY(BlueprintReadOnly, Category=Default)
