@@ -15,4 +15,8 @@ public:
 	/** keep a base name for received bone names, strip out all namespace **/
 	UPROPERTY(EditAnywhere, Category = "Source")
 	bool bTrimNamespace = false;
+
+	/** do a position and rotation a mixamo compatible, ZYX rotation order **/
+	UPROPERTY(EditAnywhere, Category = "Source")
+	bool bMixamoCompatible = false;
 };

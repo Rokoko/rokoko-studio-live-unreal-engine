@@ -723,20 +723,40 @@ void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& ch
 			const FVector JointPosition = tm.GetLocation();
 			const FQuat JointRotation = tm.GetRotation();
 
-			//convert meters to centimeters since values coming from unity are in meters
-			constexpr double WORLD_SCALE = 100.0;
-			FVector AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
+			if (SavedSourceSettings != nullptr && SavedSourceSettings->bMixamoCompatible)
+			{
+				//convert meters to centimeters since values coming from unity are in meters
+				constexpr double WORLD_SCALE = 100.0;
+				FVector AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, -JointPosition.Y * WORLD_SCALE, JointPosition.Z * WORLD_SCALE);
 
-			// Quaternions - Convert Rotations from Studio to UE
-			const FVector jointRotationEuler = JointRotation.Euler();
-			const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
-			const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Z));
-			const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
+				// Quaternions - Convert Rotations from Studio to UE
+				const FVector jointRotationEuler = JointRotation.Euler();
+				const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
+				const FQuat qz(FVector::UnitZ(), FMath::DegreesToRadians(jointRotationEuler.Z));
+				const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Y));
 
-			// Change Rotation Order
-			const FQuat qu = qy * qz * qx;
+				// Change Rotation Order - ZYX
+				const FQuat qu = qz * qy * qx;
 
-			transforms[transformIndex].SetComponents(qu, AdjustedJointPosition, FVector::One());
+				transforms[transformIndex].SetComponents(qu, AdjustedJointPosition, FVector::One());
+			}
+			else
+			{
+				//convert meters to centimeters since values coming from unity are in meters
+				constexpr double WORLD_SCALE = 100.0;
+				FVector AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
+
+				// Quaternions - Convert Rotations from Studio to UE
+				const FVector jointRotationEuler = JointRotation.Euler();
+				const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
+				const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Z));
+				const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
+
+				// Change Rotation Order - YZX
+				const FQuat qu = qy * qz * qx;
+
+				transforms[transformIndex].SetComponents(qu, AdjustedJointPosition, FVector::One());
+			}
 		}
 		
 		AnimFrameData.Transforms.Append(transforms);
