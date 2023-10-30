@@ -14,9 +14,13 @@ class SMARTSUIT_API UVirtualProductionSourceSettings : public ULiveLinkSourceSet
 public:
 	/** keep a base name for received bone names, strip out all namespace **/
 	UPROPERTY(EditAnywhere, Category = "Source")
-	bool bTrimNamespace = false;
+	bool bTrimNamespaces = false;
 
 	/** do a position and rotation a mixamo compatible, ZYX rotation order **/
 	UPROPERTY(EditAnywhere, Category = "Source")
-	bool bMixamoCompatible = false;
+	bool bUseRotationOrderZYX = false;
+
+	/** pre rotation for a hips **/
+	UPROPERTY(EditAnywhere, Category = "Source")
+	FRotator HipPreRotation;
 };
