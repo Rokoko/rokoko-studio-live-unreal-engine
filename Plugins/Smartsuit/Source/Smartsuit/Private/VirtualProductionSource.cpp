@@ -65,6 +65,12 @@ void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid In
 	SourceGuid = InSourceGuid;
 }
 
+void FVirtualProductionSource::InitializeSettings(ULiveLinkSourceSettings* Settings)
+{
+	// Save our source settings pointer so we can use it directly
+	SavedSourceSettings = Cast<UVirtualProductionSourceSettings>(Settings);
+}
+
 bool FVirtualProductionSource::IsSourceStillValid() const
 {
 	return Client != nullptr;
@@ -753,7 +759,24 @@ void FVirtualProductionSource::HandleCharacterData(const FCharacterData& charact
 	
 	for(int x = 0; x < character.joints.Num(); x++)
 	{
-		boneNames.Add(character.joints[x].name);
+		if (SavedSourceSettings != nullptr && SavedSourceSettings->bTrimNamespace)
+		{
+			const FString name = character.joints[x].name.ToString();
+			int32 index = 0;
+			if (name.FindLastChar(':', index))
+			{
+				boneNames.Add(FName(name.Right(name.Len() - index - 1)));
+			}
+			else
+			{
+				boneNames.Add(character.joints[x].name);
+			}
+		}
+		else
+		{
+			boneNames.Add(character.joints[x].name);
+		}
+		
 		boneParents.Add(character.joints[x].parentIndex );
 	}
 	
@@ -1608,4 +1631,25 @@ TArray<FFace> FVirtualProductionSource::GetAllFaces()
 	mtx.unlock();
 
 	return result;
+}
+
+
+void FVirtualProductionSource::OnSettingsChanged(ULiveLinkSourceSettings* Settings, const FPropertyChangedEvent& PropertyChangedEvent)
+{
+	ILiveLinkSource::OnSettingsChanged(Settings, PropertyChangedEvent);
+
+	FProperty* MemberProperty = PropertyChangedEvent.MemberProperty;
+	FProperty* Property = PropertyChangedEvent.Property;
+	if (Property && MemberProperty && (PropertyChangedEvent.ChangeType != EPropertyChangeType::Interactive))
+	{
+		UVirtualProductionSourceSettings* SourceSettings = Cast<UVirtualProductionSourceSettings>(Settings);
+		if (SavedSourceSettings != SourceSettings)
+		{
+			UE_LOG(LogTemp, Error, TEXT("FVirtualProductionSource: OnSettingsChanged pointers don't match - this should never happen!"));
+			return;
+		}
+
+		existingCharacters.Empty();
+		characterNames.Empty();
+	}
 }
