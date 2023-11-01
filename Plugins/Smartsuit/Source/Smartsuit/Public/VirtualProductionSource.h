@@ -19,6 +19,7 @@
 #include "Runtime/Core/Public/HAL/RunnableThread.h"
 #include <mutex>
 #include "VirtualProductionFrame.h"
+#include "VirtualProductionSourceSettings.h"
 
 //#include "VirtualProductionSource.generated.h"
 
@@ -47,6 +48,8 @@ public:
 	virtual ~FVirtualProductionSource();
 
 	virtual void ReceiveClient(ILiveLinkClient* InClient, FGuid InSourceGuid);
+	virtual void InitializeSettings(ULiveLinkSourceSettings* Settings) override;
+
 	virtual bool IsSourceStillValid() const override;
 	virtual bool RequestSourceShutdown();
 
@@ -65,6 +68,9 @@ public:
 	static TSharedPtr<FVirtualProductionSource> Get();
 	static TSharedPtr<FVirtualProductionSource> CreateLiveLinkSource();
 	static void RemoveLiveLinkSource(TSharedPtr<FVirtualProductionSource> InSource);
+
+	virtual TSubclassOf<ULiveLinkSourceSettings> GetSettingsClass() const override { return UVirtualProductionSourceSettings::StaticClass(); }
+	virtual void OnSettingsChanged(ULiveLinkSourceSettings* Settings, const FPropertyChangedEvent& PropertyChangedEvent) override;
 private:
 	void HandleClearSubject(const FName subjectName);
 	void HandleSubjectData(const FVirtualProductionSubject& virtualProductionObject);
@@ -96,6 +102,9 @@ private:
 
 	//singleton instance
 	static TSharedPtr<FVirtualProductionSource> instance;
+
+	// Pointer to the settings for this source so we don't have to duplicate data
+	UVirtualProductionSourceSettings* SavedSourceSettings = nullptr;
 
 public:
 	/// @private

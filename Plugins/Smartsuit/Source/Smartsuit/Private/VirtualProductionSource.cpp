@@ -65,6 +65,12 @@ void FVirtualProductionSource::ReceiveClient(ILiveLinkClient* InClient, FGuid In
 	SourceGuid = InSourceGuid;
 }
 
+void FVirtualProductionSource::InitializeSettings(ULiveLinkSourceSettings* Settings)
+{
+	// Save our source settings pointer so we can use it directly
+	SavedSourceSettings = Cast<UVirtualProductionSourceSettings>(Settings);
+}
+
 bool FVirtualProductionSource::IsSourceStillValid() const
 {
 	return Client != nullptr;
@@ -717,18 +723,47 @@ void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& ch
 			const FVector JointPosition = tm.GetLocation();
 			const FQuat JointRotation = tm.GetRotation();
 
-			//convert meters to centimeters since values coming from unity are in meters
-			constexpr double WORLD_SCALE = 100.0;
-			FVector AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
+			FQuat preRotation = FQuat::MakeFromRotator(SavedSourceSettings->HipPreRotation);
+			
+			FVector AdjustedJointPosition;
+			FQuat qu;
 
-			// Quaternions - Convert Rotations from Studio to UE
-			const FVector jointRotationEuler = JointRotation.Euler();
-			const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
-			const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Z));
-			const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
+			if (SavedSourceSettings != nullptr && SavedSourceSettings->bUseRotationOrderZYX)
+			{
+				//convert meters to centimeters since values coming from unity are in meters
+				constexpr double WORLD_SCALE = 100.0;
+				AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, -JointPosition.Y * WORLD_SCALE, JointPosition.Z * WORLD_SCALE);
 
-			// Change Rotation Order
-			const FQuat qu = qy * qz * qx;
+				// Quaternions - Convert Rotations from Studio to UE
+				const FVector jointRotationEuler = JointRotation.Euler();
+				const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
+				const FQuat qz(FVector::UnitZ(), FMath::DegreesToRadians(jointRotationEuler.Z));
+				const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Y));
+
+				// Change Rotation Order - ZYX
+				qu = qz * qy * qx;
+			}
+			else
+			{
+				//convert meters to centimeters since values coming from unity are in meters
+				constexpr double WORLD_SCALE = 100.0;
+				AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
+
+				// Quaternions - Convert Rotations from Studio to UE
+				const FVector jointRotationEuler = JointRotation.Euler();
+				const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
+				const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Z));
+				const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
+
+				// Change Rotation Order - YZX
+				qu = qy * qz * qx;
+			}
+			
+			if (parentIndex < 0 && !preRotation.IsIdentity())
+			{
+				AdjustedJointPosition = preRotation * AdjustedJointPosition;
+				qu = preRotation * qu;
+			}
 
 			transforms[transformIndex].SetComponents(qu, AdjustedJointPosition, FVector::One());
 		}
@@ -753,7 +788,24 @@ void FVirtualProductionSource::HandleCharacterData(const FCharacterData& charact
 	
 	for(int x = 0; x < character.joints.Num(); x++)
 	{
-		boneNames.Add(character.joints[x].name);
+		if (SavedSourceSettings != nullptr && SavedSourceSettings->bTrimNamespaces)
+		{
+			const FString name = character.joints[x].name.ToString();
+			int32 index = 0;
+			if (name.FindLastChar(':', index))
+			{
+				boneNames.Add(FName(name.Right(name.Len() - index - 1)));
+			}
+			else
+			{
+				boneNames.Add(character.joints[x].name);
+			}
+		}
+		else
+		{
+			boneNames.Add(character.joints[x].name);
+		}
+		
 		boneParents.Add(character.joints[x].parentIndex );
 	}
 	
@@ -1608,4 +1660,25 @@ TArray<FFace> FVirtualProductionSource::GetAllFaces()
 	mtx.unlock();
 
 	return result;
+}
+
+
+void FVirtualProductionSource::OnSettingsChanged(ULiveLinkSourceSettings* Settings, const FPropertyChangedEvent& PropertyChangedEvent)
+{
+	ILiveLinkSource::OnSettingsChanged(Settings, PropertyChangedEvent);
+
+	FProperty* MemberProperty = PropertyChangedEvent.MemberProperty;
+	FProperty* Property = PropertyChangedEvent.Property;
+	if (Property && MemberProperty && (PropertyChangedEvent.ChangeType != EPropertyChangeType::Interactive))
+	{
+		UVirtualProductionSourceSettings* SourceSettings = Cast<UVirtualProductionSourceSettings>(Settings);
+		if (SavedSourceSettings != SourceSettings)
+		{
+			UE_LOG(LogTemp, Error, TEXT("FVirtualProductionSource: OnSettingsChanged pointers don't match - this should never happen!"));
+			return;
+		}
+
+		existingCharacters.Empty();
+		characterNames.Empty();
+	}
 }
