@@ -193,7 +193,7 @@ FFace::FFace(FFace&& otherFace)
 
 FFace::FFace(TSharedPtr<FJsonObject> jsonObject, const FString& InActorName)
 {
-	faceId = jsonObject->GetStringField("faceId");
+	faceId = InActorName;
 	actorName = InActorName;
 	if (!jsonObject->TryGetStringField("profileName", profileName))
 	{
