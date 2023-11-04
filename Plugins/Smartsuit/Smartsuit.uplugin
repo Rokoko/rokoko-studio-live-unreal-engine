@@ -23,7 +23,7 @@
             "WhitelistPlatforms": [
                 "Win64",
                 "Mac",
-				"Linux"
+                "Linux"
             ]
         },
         {
@@ -33,7 +33,7 @@
             "WhitelistPlatforms": [
                 "Win64",
                 "Mac",
-				"Linux"
+                "Linux"
             ]
         }
     ],
