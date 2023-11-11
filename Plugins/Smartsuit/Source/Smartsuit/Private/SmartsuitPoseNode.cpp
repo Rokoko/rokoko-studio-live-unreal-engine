@@ -80,11 +80,10 @@ struct TPose {
 /**
  * Helper function that stores the T Pose for a Smartsuit character.
  */
-class SmartsuitTPose
+class SMARTSUIT_API SmartsuitTPose
 {
 public:
-	SmartsuitTPose();
-	~SmartsuitTPose();
+	
 	/**The T-pose transforms.*/
 	TPose Pose;
 	/**The start position of the character, used to offset the character if it is set.*/
@@ -100,6 +99,7 @@ public:
 FSmartsuitPoseNode::FSmartsuitPoseNode()
 {
 	SSPTPose = new SmartsuitTPose();
+	SSPTPose->StoredTPose = false;
 }
 
 FSmartsuitPoseNode::~FSmartsuitPoseNode()
