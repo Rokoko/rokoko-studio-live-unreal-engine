@@ -9,11 +9,10 @@
 #include "LiveLinkTypes.h"
 
 #include "SmartsuitController.h"
-#include "SmartsuitTPose.h"
 #include "SmartsuitPoseNode.generated.h"
 
 class ILiveLinkClient;
-
+class SmartsuitTPose;
 
 /*! \brief Bone reference mapping that is used to map bones between Smartsuit sensors and skeleton.*/
 USTRUCT()
@@ -247,7 +246,7 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 	float ArmSpace{ 0.0f };
 
 	/// @private
-	SmartsuitTPose TPose;
+	SmartsuitTPose* SSPTPose;
 	/// @private
 	FVector initialPos;
 
