@@ -719,7 +719,7 @@ void FSmartsuitPoseNode::CreateRetargetAsset(const UAnimInstance* InAnimInstance
 
 void FSmartsuitPoseNode::InitializeBoneReferences(const FBoneContainer& RequiredBones)
 {
-	if (CurrentRetargetAsset->IsValidLowLevel())
+	if (CurrentRetargetAsset != nullptr && CurrentRetargetAsset->IsValidLowLevel())
 	{
 		BoneMap.hip = CurrentRetargetAsset->GetRemappedBoneName("hip");
 		BoneMap.stomach = CurrentRetargetAsset->GetRemappedBoneName("stomach");

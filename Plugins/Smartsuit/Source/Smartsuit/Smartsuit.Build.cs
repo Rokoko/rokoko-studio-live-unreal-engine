@@ -138,6 +138,21 @@ public class Smartsuit : ModuleRules
 
             PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, "SmartsuitLib." + PlatformString + ".a"));
         
+        }  else if (Target.Platform == UnrealTargetPlatform.Linux){
+
+            isLibrarySupported = true;
+
+            string PlatformString = "x64";
+            string LibrariesPath = Path.Combine(SmartsuitLibPath, "V8", "Libraries");
+
+            /*
+            test your path with:
+            using System; // Console.WriteLine("");
+            Console.WriteLine("... LibrariesPath -> " + LibrariesPath);
+            */
+
+            PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, "SmartsuitLib." + PlatformString + ".so"));
+        
         }
 
         if (isLibrarySupported)
@@ -173,6 +188,14 @@ public class Smartsuit : ModuleRules
             string LibrariesPath = Path.Combine(SmartsuitLibPath, "lz4", "static");
 
             PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, "liblz4.a"));
+        }
+        else if (Target.Platform == UnrealTargetPlatform.Linux)
+        {
+            isLibrarySupported = true;
+
+            string LibrariesPath = Path.Combine(SmartsuitLibPath, "lz4", "static");
+
+            PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, "liblz4.so"));
         }
 
         if (isLibrarySupported)

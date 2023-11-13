@@ -110,7 +110,8 @@ void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, F
 	//	Node.BoneMap.rightLittleTip =		Node.Bone_Map_Override_OLD->rightLittleTip;
 
 	UClass* RetargetAssetPtr = Node.RetargetAsset.Get();
-	
+	bool assetIsRetargetted = false;
+
 	if(IsValid(RetargetAssetPtr))
 	{
 		FString Msg = "retarget asset: " + Node.RetargetAsset->GetName();
@@ -120,16 +121,17 @@ void USmartsuitPose::ValidateAnimNodeDuringCompilation(USkeleton* ForSkeleton, F
 		//ForSkeleton
 		Node.CurrentRetargetAsset = NewObject<ULiveLinkRemapAsset>(GetTransientPackage(), RetargetAssetPtr);
 		Node.CurrentRetargetAsset->Initialize();
+		assetIsRetargetted = true;
 	}
 	else
 	{
-		// FString Msg = "could not get retarget asset!";
-		// MessageLog.Warning(*Msg, this);
+		FString Msg = "could not get retarget asset!";
+		MessageLog.Warning(*Msg, this);
 	}
 
 	bool CheckBoneOverrides = true;
 	
-	if (Node.CurrentRetargetAsset->IsValidLowLevel())
+	if (assetIsRetargetted && Node.CurrentRetargetAsset->IsValidLowLevel())
 	{ 
 		Node.BoneMap.hip = Node.CurrentRetargetAsset->GetRemappedBoneName("hip");
 		Node.BoneMap.stomach = Node.CurrentRetargetAsset->GetRemappedBoneName("stomach");

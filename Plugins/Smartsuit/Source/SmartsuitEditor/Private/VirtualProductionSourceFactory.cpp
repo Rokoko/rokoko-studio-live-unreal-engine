@@ -32,7 +32,7 @@ UVirtualProductionSourceFactory::EMenuType UVirtualProductionSourceFactory::GetM
 		ILiveLinkClient& LiveLinkClient = IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
 		auto livelink = FVirtualProductionSource::Get();
 		
-		if (livelink && !livelink.IsValid() || !LiveLinkClient.HasSourceBeenAdded(livelink))
+		if ((livelink && !livelink.IsValid()) || !LiveLinkClient.HasSourceBeenAdded(livelink))
 		{
 			return EMenuType::SubPanel;
 		}
