@@ -4,20 +4,9 @@
 #include "SmartsuitEditor.h"
 #include "LiveLinkRemapAsset.h"
 #include "SmartsuitEditorPrivatePCH.h"
-//#include "CompilerResultsLog.h"
-
-
-
-
 
 #define LOCTEXT_NAMESPACE "SmartsuitEditor"
 
-
-//USmartsuitPose::USmartsuitPose(const FObjectInitializer& ObjectInitializer)
-//	: Super(ObjectInitializer)
-//{
-//	//CurWidgetMode = (int32)FWidget::WM_Rotate;
-//}
 
 void USmartsuitPose::CheckForWarnings(FString name, FBoneReference bone, USkeleton* ForSkeleton, FCompilerResultsLog& MessageLog) {
 	if (ForSkeleton->GetReferenceSkeleton().FindBoneIndex(bone.BoneName) == INDEX_NONE)
@@ -287,95 +276,23 @@ FText USmartsuitPose::GetTooltipText() const
 
 FText USmartsuitPose::GetNodeTitle(ENodeTitleType::Type TitleType) const
 {
-	//if ((TitleType == ENodeTitleType::ListView || TitleType == ENodeTitleType::MenuTitle) && (Node.BoneToModify.BoneName == NAME_None))
-	//{
 	return GetControllerDescription();
-	//}
-	// @TODO: the bone can be altered in the property editor, so we have to 
-	//        choose to mark this dirty when that happens for this to properly work
-	//else //if (!CachedNodeTitles.IsTitleCached(TitleType, this))
-	//{
-	//	FFormatNamedArguments Args;
-	//	Args.Add(TEXT("ControllerDescription"), GetControllerDescription());
-	//	Args.Add(TEXT("BoneName"), FText::FromName(Node.BoneToModify.BoneName));
-
-	//	// FText::Format() is slow, so we cache this to save on performance
-	//	if (TitleType == ENodeTitleType::ListView || TitleType == ENodeTitleType::MenuTitle)
-	//	{
-	//		CachedNodeTitles.SetCachedTitle(TitleType, FText::Format(LOCTEXT("AnimGraphNode_ModifyBone_ListTitle", "{ControllerDescription} - Bone: {BoneName}"), Args), this);
-	//	}
-	//	else
-	//	{
-	//		CachedNodeTitles.SetCachedTitle(TitleType, FText::Format(LOCTEXT("AnimGraphNode_ModifyBone_Title", "{ControllerDescription}\nBone: {BoneName}"), Args), this);
-	//	}
-	//}
-	//return CachedNodeTitles[TitleType];
 }
 
 void USmartsuitPose::CopyNodeDataToPreviewNode(FAnimNode_Base* InPreviewNode)
 {
 	FSmartsuitPoseNode* ModifyBone = static_cast<FSmartsuitPoseNode*>(InPreviewNode);
-
-	//// copies Pin values from the internal node to get data which are not compiled yet
-	//ModifyBone->Translation = Node.Translation;
-	//ModifyBone->Rotation = Node.Rotation;
-	//ModifyBone->Scale = Node.Scale;
-
-	//// copies Modes
-	////ModifyBone->TranslationMode = Node.TranslationMode;
-	////ModifyBone->RotationMode = Node.RotationMode;
-	////ModifyBone->ScaleMode = Node.ScaleMode;
-
-	//// copies Spaces
-	//ModifyBone->TranslationSpace = Node.TranslationSpace;
-	//ModifyBone->RotationSpace = Node.RotationSpace;
-	//ModifyBone->ScaleSpace = Node.ScaleSpace;
-
-	//ModifyBone->Bone_Map_Override_OLD = Node.Bone_Map_Override_OLD;
-	//ModifyBone->CurrentRetargetAsset = Node.CurrentRetargetAsset;
-
 	Node.RetargetAsset = ModifyBone->RetargetAsset;
-
-	//Node.CurrentRetargetAsset = ModifyBone->CurrentRetargetAsset;
 }
-
-//FEditorModeID USmartsuitPose::GetEditorMode() const
-//{
-//	return FEditorModeID("AnimGraph.SkeletalControl.ModifyBone");
-//	//return  AnimNodeEditModes::ModifyBone;
-//}
 
 void USmartsuitPose::CopyPinDefaultsToNodeData(UEdGraphPin* InPin)
 {
-	//if (InPin->GetName() == GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Translation))
-	//{
-	//	GetDefaultValue(GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Translation), Node.Translation);
-	//}
-	//else if (InPin->GetName() == GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Rotation))
-	//{
-	//	GetDefaultValue(GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Rotation), Node.Rotation);
-	//}
-	//else if (InPin->GetName() == GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Scale))
-	//{
-	//	GetDefaultValue(GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Scale), Node.Scale);
-	//}
-
-	//if (InPin->GetName() == GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Bone_Map_Override_OLD))
-	//{
-	//	//GetDefaultValue(GET_MEMBER_NAME_STRING_CHECKED(FSmartsuitPoseNode, Bone_Map_Override_OLD), Node.Bone_Map_Override_OLD);
-	//}
-
-
 }
 
 void USmartsuitPose::PreloadRequiredAssets()
 {
 	Super::PreloadRequiredAssets();
-
-	
 	PreloadObject(Node.RetargetAsset);
-
-
 }
 
 //PRAGMA_ENABLE_OPTIMIZATION
