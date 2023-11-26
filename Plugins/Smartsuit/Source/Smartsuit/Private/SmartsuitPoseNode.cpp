@@ -97,18 +97,9 @@ public:
 // SmartsuitPoseNode
 
 FSmartsuitPoseNode::FSmartsuitPoseNode()
+	: SSPTPose(new SmartsuitTPose())
 {
-	SSPTPose = new SmartsuitTPose();
 	SSPTPose->StoredTPose = false;
-}
-
-FSmartsuitPoseNode::~FSmartsuitPoseNode()
-{
-	if (SSPTPose)
-	{
-		delete SSPTPose;
-		SSPTPose = nullptr;
-	}
 }
 
 void FSmartsuitPoseNode::GatherDebugData(FNodeDebugData& DebugData)

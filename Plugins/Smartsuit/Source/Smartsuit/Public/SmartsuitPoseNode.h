@@ -247,13 +247,12 @@ struct SMARTSUIT_API FSmartsuitPoseNode : public FAnimNode_SkeletalControlBase
 	float ArmSpace{ 0.0f };
 
 	/// @private
-	SmartsuitTPose* SSPTPose;
+	TSharedPtr<SmartsuitTPose> SSPTPose;
 	/// @private
 	FVector initialPos;
 
 	FSmartsuitPoseNode();
-	~FSmartsuitPoseNode();
-
+	
 	/// @private
 	virtual void GatherDebugData(FNodeDebugData& DebugData) override;
 	
