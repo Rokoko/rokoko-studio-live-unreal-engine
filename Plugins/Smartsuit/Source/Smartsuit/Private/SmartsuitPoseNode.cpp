@@ -330,26 +330,26 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	TSubclassOf<ULiveLinkRole> SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole_AnyThread(LiveLinkSubjectName);
 	if (SubjectRole)
 	{
-#ifdef USE_SMARTSUIT_ANIMATION_ROLE
-		if (SubjectRole->IsChildOf(ULiveLinkSmartsuitRole::StaticClass()))
-		{
-			//Process animation data if the subject is from that type
-			if (LiveLinkClient_AnyThread->EvaluateFrame_AnyThread(LiveLinkSubjectName, ULiveLinkSmartsuitRole::StaticClass(), SubjectFrameData))
-			{
-
-			}
-			else
-			{
-				return;
-			}
-
-
-		}
-		else
-		{
-			return;
-		}
-#else
+//#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+//		if (SubjectRole->IsChildOf(ULiveLinkSmartsuitRole::StaticClass()))
+//		{
+//			//Process animation data if the subject is from that type
+//			if (LiveLinkClient_AnyThread->EvaluateFrame_AnyThread(LiveLinkSubjectName, ULiveLinkSmartsuitRole::StaticClass(), SubjectFrameData))
+//			{
+//
+//			}
+//			else
+//			{
+//				return;
+//			}
+//
+//
+//		}
+//		else
+//		{
+//			return;
+//		}
+//#else
 		if (SubjectRole->IsChildOf(ULiveLinkAnimationRole::StaticClass()))
 		{
 			//Process animation data if the subject is from that type
@@ -368,20 +368,20 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 		{
 			return;
 		}
-#endif
+//#endif
 	}
 	else
 	{
 		return;
 	}
 
-#ifdef USE_SMARTSUIT_ANIMATION_ROLE
-	FLiveLinkSmartsuitStaticData* SkeletonData = SubjectFrameData.StaticData.Cast<FLiveLinkSmartsuitStaticData>();
-	FLiveLinkSmartsuitFrameData* FrameData = SubjectFrameData.FrameData.Cast<FLiveLinkSmartsuitFrameData>();
-#else
+//#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+//	FLiveLinkSmartsuitStaticData* SkeletonData = SubjectFrameData.StaticData.Cast<FLiveLinkSmartsuitStaticData>();
+//	FLiveLinkSmartsuitFrameData* FrameData = SubjectFrameData.FrameData.Cast<FLiveLinkSmartsuitFrameData>();
+//#else
 	FLiveLinkSkeletonStaticData* SkeletonData = SubjectFrameData.StaticData.Cast<FLiveLinkSkeletonStaticData>();
 	FLiveLinkAnimationFrameData* FrameData = SubjectFrameData.FrameData.Cast<FLiveLinkAnimationFrameData>();
-#endif
+//#endif
 
 	check(SkeletonData);
 	check(FrameData);
@@ -704,10 +704,10 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	bool HasLeftGlove = true;
 	bool HasRightGlove = true;
 
-	#ifdef USE_SMARTSUIT_ANIMATION_ROLE
-	HasLeftGlove = FrameData->HasLeftGlove;
-	HasRightGlove = FrameData->HasRightGlove;
-	#endif
+	//#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+	//HasLeftGlove = FrameData->HasLeftGlove;
+	//HasRightGlove = FrameData->HasRightGlove;
+	//#endif
 
 	if(HasLeftGlove)
 	{
