@@ -432,13 +432,13 @@ void FVirtualProductionSource::HandleSuitData(const FSuitData& suit)
 	};
 	
 
-	#ifdef USE_SMARTSUIT_ANIMATION_ROLE
-	FLiveLinkStaticDataStruct StaticData(FLiveLinkSmartsuitStaticData::StaticStruct());
-	FLiveLinkSmartsuitStaticData* SkeletonData = StaticData.Cast<FLiveLinkSmartsuitStaticData>();
-	#else
+	//#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+	//FLiveLinkStaticDataStruct StaticData(FLiveLinkSmartsuitStaticData::StaticStruct());
+	//FLiveLinkSmartsuitStaticData* SkeletonData = StaticData.Cast<FLiveLinkSmartsuitStaticData>();
+	//#else
 	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
 	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
-	#endif
+	//#endif
 
 
 	SkeletonData->SetBoneNames(boneNames);
@@ -446,11 +446,11 @@ void FVirtualProductionSource::HandleSuitData(const FSuitData& suit)
 
 	if(Client)
 	{
-		#ifdef USE_SMARTSUIT_ANIMATION_ROLE
-			Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkSmartsuitRole::StaticClass(), MoveTemp(StaticData));
-		#else
+		//#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+		//	Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkSmartsuitRole::StaticClass(), MoveTemp(StaticData));
+		//#else
 			Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
-		#endif
+		//#endif
 	}
 }
 
@@ -529,13 +529,13 @@ void FVirtualProductionSource::HandleSuits(const TArray<FSuitData>& suits)
 			}
 		}
 
-		#ifdef USE_SMARTSUIT_ANIMATION_ROLE
-		FLiveLinkFrameDataStruct FrameData1(FLiveLinkSmartsuitFrameData::StaticStruct());
-		FLiveLinkSmartsuitFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkSmartsuitFrameData>();
-		#else
+		//#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+		//FLiveLinkFrameDataStruct FrameData1(FLiveLinkSmartsuitFrameData::StaticStruct());
+		//FLiveLinkSmartsuitFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkSmartsuitFrameData>();
+		//#else
 		FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
 		FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
-		#endif
+		//#endif
 		
 		AnimFrameData.WorldTime = FLiveLinkWorldTime(/*(double)(timer.GetCurrentTime())*/);
 
@@ -627,10 +627,10 @@ void FVirtualProductionSource::HandleSuits(const TArray<FSuitData>& suits)
 
 		AnimFrameData.Transforms.Append(transforms);
 
-		#ifdef USE_SMARTSUIT_ANIMATION_ROLE
-		AnimFrameData.HasLeftGlove = subject.hasLeftGlove;
-		AnimFrameData.HasRightGlove = subject.hasRightGlove;
-		#endif
+		//#ifdef USE_SMARTSUIT_ANIMATION_ROLE
+		//AnimFrameData.HasLeftGlove = subject.hasLeftGlove;
+		//AnimFrameData.HasRightGlove = subject.hasRightGlove;
+		//#endif
 
 		if(Client)
 			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData1));
