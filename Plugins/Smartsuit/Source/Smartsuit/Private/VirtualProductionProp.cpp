@@ -28,7 +28,7 @@ void UVirtualProductionProp::TickComponent(float DeltaTime, ELevelTick TickType,
 	auto livelink = FVirtualProductionSource::Get();
 	if (!livelink.IsValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+		UE_LOG(LogTemp, Warning, TEXT("[UVirtualProductionProp::TickComponent] can not get virtual production source!!!"));
 		return;
 	}
 
