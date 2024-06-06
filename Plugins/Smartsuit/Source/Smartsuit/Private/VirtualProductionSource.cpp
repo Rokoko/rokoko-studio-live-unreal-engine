@@ -775,6 +775,11 @@ void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& ch
 	}
 }
 
+void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
+{
+	// TODO
+}
+
 void FVirtualProductionSource::HandleCharacterData(const FCharacterData& character) 
 {
 	characterNames.Add(character.GetSubjectName());
@@ -1319,6 +1324,27 @@ void UpdateCharacterFromJson(FCharacterData* characterData, const TSharedPtr<FJs
 	}
 }
 
+void UpdateNewtonsFromJson(FNewtonData* newtonData, const TSharedPtr<FJsonObject> jsonObject)
+{
+	newtonData->NewtonName = jsonObject->GetStringField("name");
+
+	TArray<TSharedPtr<FJsonValue>> JointsArray = jsonObject->GetArrayField("joints");
+
+	for (TArray< TSharedPtr< FJsonValue > >::TConstIterator JointsIter(JointsArray.CreateConstIterator()); JointsIter; ++JointsIter)
+	{
+		const TSharedPtr< FJsonValue >  JointEntry = *JointsIter;
+		const TSharedPtr< FJsonObject > JoinJSONObject = JointEntry->AsObject();
+
+		FString JointName = JoinJSONObject->GetStringField("name");
+		int32 JointParentIndex = JoinJSONObject->GetIntegerField("parent");
+		FVector JointPosition = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField("position"));
+		FQuat JointRotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField("rotation"));
+
+		FTransform JointTransform(JointRotation, JointPosition, FVector::OneVector);
+		newtonData->joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, JointTransform));
+	}
+}
+
 
 //PRAGMA_DISABLE_OPTIMIZATION
 uint32 FVirtualProductionSource::Run()
@@ -1400,8 +1426,8 @@ uint32 FVirtualProductionSource::Run()
 
 				if (SceneObj->HasField("actors"))
 				{
-					TArray<TSharedPtr<FJsonValue>> Livesuitsarray = SceneObj->GetArrayField("actors");
-					for (auto& currentsuit : Livesuitsarray)
+					TArray<TSharedPtr<FJsonValue>> LivesuitsArray = SceneObj->GetArrayField("actors");
+					for (auto& currentsuit : LivesuitsArray)
 					{
 						FSuitData SuitData; // = FSuitData(true, currentsuit->AsObject());
 						SuitData.isLive = true;
@@ -1415,6 +1441,26 @@ uint32 FVirtualProductionSource::Run()
 							VPFrame.Faces.Emplace(MoveTemp(FaceData));
 						}
 						VPFrame.Actors.Emplace(MoveTemp(SuitData));
+					}
+				}
+
+				if (SceneObj->HasField("newtons"))
+				{
+					TArray<TSharedPtr<FJsonValue>> NewtonsArray = SceneObj->GetArrayField("newtons");
+					for (auto& currentNewton : NewtonsArray)
+					{
+						FNewtonData NewtonData; // = FNewtonData(true, currentNewton->AsObject());
+						NewtonData.IsLive = true;
+						UpdateNewtonsFromJson(&NewtonData, currentNewton->AsObject());
+
+						//if (NewtonData.hasFace)
+						//{
+						//	auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
+						//	auto FaceData = FFace(JSONObjectface, NewtonData.suitname);
+						//	NewtonData.faceId = FaceData.faceId;
+						//	VPFrame.Faces.Emplace(MoveTemp(FaceData));
+						//}
+						VPFrame.Newtons.Emplace(MoveTemp(NewtonData));
 					}
 				}
 
@@ -1454,6 +1500,7 @@ uint32 FVirtualProductionSource::Run()
 		GlobalVPFrame.Faces = MoveTemp(VPFrame.Faces);
 		GlobalVPFrame.Actors = MoveTemp(VPFrame.Actors);
 		GlobalVPFrame.Characters = MoveTemp(VPFrame.Characters);
+		GlobalVPFrame.Newtons = MoveTemp(VPFrame.Newtons);
 		
 		mtx.unlock();
 
@@ -1461,6 +1508,7 @@ uint32 FVirtualProductionSource::Run()
 		HandleFace(GlobalVPFrame.Faces);
 		HandleSuits(GlobalVPFrame.Actors);
 		HandleCharacters(GlobalVPFrame.Characters);
+		HandleNewtons(GlobalVPFrame.Newtons);
 	}
 	return 0;
 }

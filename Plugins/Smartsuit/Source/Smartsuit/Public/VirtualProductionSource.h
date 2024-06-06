@@ -62,6 +62,7 @@ public:
 	void HandleFace(const TArray<FFace>& faces);
 	void HandleSuits(const TArray<FSuitData>& suits);
 	void HandleCharacters(const TArray<FCharacterData>& characters);
+	void HandleNewtons(const TArray<FNewtonData>& newtons);
 	void ClearAllSubjects();
 
 	static void SetInstance(TSharedPtr<FVirtualProductionSource> NewInstance) { instance = NewInstance; }
@@ -83,6 +84,7 @@ private:
 	TArray<FName> faceNames;
 	TArray<FName> actorNames;
 	TArray<FName> characterNames;
+	TArray<FName> newtonNames;
 
 	TArray<FVirtualProductionSubject> existingSubjects;
 	TArray<FFace> existingFaces;

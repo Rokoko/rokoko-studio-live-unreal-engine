@@ -407,4 +407,7 @@ struct FVirtualProductionFrame {
 	UPROPERTY()
 	TArray<FCharacterData> Characters;
 
+	UPROPERTY()
+	TArray<FNewtonData> Newtons;
+
 };
