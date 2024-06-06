@@ -1235,6 +1235,11 @@ void UpdateSuitFromJson(FSuitData* suitData, const TSharedPtr<FJsonObject> jsonO
 
 	TSharedPtr<FJsonObject> BodyObj = jsonObject->GetObjectField("body");
 
+	if (BodyObj->HasField("SkeletonType") && BodyObj->GetStringField("SkeletonType") == "LivestreamSkeleton")
+	{
+
+	}
+
 	SuitParseBone(suitData, BodyObj, SmartsuitBones::hip.ToString());
 	SuitParseBone(suitData, BodyObj, SmartsuitBones::spine.ToString());
 	SuitParseBone(suitData, BodyObj, SmartsuitBones::chest.ToString());
