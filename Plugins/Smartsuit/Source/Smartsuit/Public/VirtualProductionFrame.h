@@ -381,7 +381,7 @@ struct FFace
 };
 
 /*! \brief Information about a specific tracker, including its status, rotation, position.*/
-USTRUCT(BlueprintType, meta = (ToolTip = "The Virtual Producion frame contains all props' and trackers' information."))
+USTRUCT(BlueprintType, meta = (ToolTip = "The Virtual Production frame contains all props' and trackers' information."))
 struct FVirtualProductionFrame {
 
 	GENERATED_USTRUCT_BODY()
