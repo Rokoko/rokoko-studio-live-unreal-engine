@@ -8,8 +8,6 @@
 #include "Animation/AnimInstanceProxy.h"
 #include "Roles/LiveLinkAnimationRole.h"
 #include "SmartsuitBlueprintLibrary.h"
-#include "Roles/LiveLinkSmartsuitRole.h"
-#include "Roles/LiveLinkSmartsuitTypes.h"
 
 
 /**Holds information a Smartsuit character pose.*/

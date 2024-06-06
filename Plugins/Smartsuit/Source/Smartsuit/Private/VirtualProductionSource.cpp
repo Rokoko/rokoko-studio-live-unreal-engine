@@ -8,8 +8,6 @@
 #include "Roles/LiveLinkLightRole.h"
 #include "Roles/LiveLinkLightTypes.h"
 #include "Features/IModularFeatures.h"
-#include "Roles/LiveLinkSmartsuitRole.h"
-#include "Roles/LiveLinkSmartsuitTypes.h"
 
 #include "VirtualProductionFrame.h"
 #include "Runtime/Core/Public/Containers/UnrealString.h"
