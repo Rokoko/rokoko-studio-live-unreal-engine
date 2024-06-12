@@ -12,14 +12,9 @@ This plugin let's you stream animation data from Rokoko Studio into Unreal Engin
 
 ## Features
 - Live stream data:
-  * Up to five actors that can all include both body, face (52 blendshapes) and finger data at the same time.
+  * Up to 3 actors that can all include both body, face (52 blendshapes) and finger data at the same time.
   * Character data
-  * Camera data
-  * Props data
 - Control Rokoko Studio from within Unreal Engine
- 
-Unreal Engine Demo project including a character already set up for live streaming from Rokoko Studio:
-https://github.com/Rokoko/Unreal-Demo-Project
  
 ---
 
