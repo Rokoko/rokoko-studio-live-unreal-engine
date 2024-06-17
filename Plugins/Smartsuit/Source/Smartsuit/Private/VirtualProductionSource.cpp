@@ -670,7 +670,7 @@ void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& ch
 		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
 		if (subjectIndex == characters.Num() - 1) 
 		{
-			for (int i = 0; i < actorNames.Num(); i++) 
+			for (int i = 0; i < characterNames.Num(); i++)
 			{
 				bool subjectExists = false;
 				for (int j = 0; j < existingCharacters.Num(); j++) 
@@ -690,7 +690,7 @@ void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& ch
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("Removing face"));
 				Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, notExistingSubjects[i]));
-				actorNames.RemoveSingle(notExistingSubjects[i]);
+				characterNames.RemoveSingle(notExistingSubjects[i]);
 				notExistingSubjects.RemoveAt(i);
 			}
 		}
