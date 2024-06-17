@@ -777,7 +777,143 @@ void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& ch
 
 void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
 {
-	// TODO
+	if (Client == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client was null!!!!!!"));
+		return;
+	}
+
+	existingNewtons.Empty();
+	notExistingSubjects.Empty();
+
+	for (int subjectIndex = 0; subjectIndex < newtons.Num(); subjectIndex++)
+	{
+		const FNewtonData& subject = newtons[subjectIndex];
+
+		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
+		bool nameExists = false;
+		for (int idx = 0; idx < newtonNames.Num(); idx++)
+		{
+			if (subject.GetSubjectName() == characterNames[idx])
+			{
+				nameExists = true;
+				existingNewtons.Add(subject);
+				break;
+			}
+		}
+
+		if (!nameExists)
+		{
+			existingNewtons.Add(subject);
+			HandleNewtonData(subject); // TODO
+		}
+		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
+		if (subjectIndex == newtons.Num() - 1)
+		{
+			for (int i = 0; i < newtonNames.Num(); i++)
+			{
+				bool subjectExists = false;
+				for (int j = 0; j < existingNewtons.Num(); j++)
+				{
+					if (newtonNames[i] == existingNewtons[j].GetSubjectName())
+					{
+						subjectExists = true;
+					}
+				}
+				if (!subjectExists)
+				{
+					notExistingSubjects.Add(newtonNames[i]);
+				}
+			}
+
+			for (int i = 0; i < notExistingSubjects.Num(); i++)
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("Removing face"));
+				Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, notExistingSubjects[i]));
+				newtonNames.RemoveSingle(notExistingSubjects[i]);
+				notExistingSubjects.RemoveAt(i);
+			}
+		}
+
+		FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
+		FLiveLinkAnimationFrameData& AnimFrameData = *FrameData1.Cast<FLiveLinkAnimationFrameData>();
+
+		AnimFrameData.WorldTime = FLiveLinkWorldTime();
+
+		TArray<FTransform> transforms;
+		transforms.Reset(subject.joints.Num());
+		FTransform tm;
+
+		for (int x = 0; x < subject.joints.Num(); x++)
+		{
+			const int32 transformIndex = transforms.AddUninitialized(1);
+			const int parentIndex = subject.joints[x].parentIndex;
+
+			if (parentIndex >= 0)
+			{
+				tm = subject.joints[x].transform.GetRelativeTransform(subject.joints[parentIndex].transform);
+			}
+			else
+			{
+				tm = subject.joints[x].transform;
+			}
+
+			const FVector JointPosition = tm.GetLocation();
+			const FQuat JointRotation = tm.GetRotation();
+
+			// TODO: what is this?? Is it needed for newtons?
+			FQuat preRotation = FQuat::MakeFromRotator(SavedSourceSettings->HipPreRotation);
+
+			FVector AdjustedJointPosition;
+			FQuat qu;
+
+			if (SavedSourceSettings != nullptr && SavedSourceSettings->bUseRotationOrderZYX)
+			{
+				//convert meters to centimeters since values coming from unity are in meters
+				constexpr double WORLD_SCALE = 100.0;
+				AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, -JointPosition.Y * WORLD_SCALE, JointPosition.Z * WORLD_SCALE);
+
+				// Quaternions - Convert Rotations from Studio to UE
+				const FVector jointRotationEuler = JointRotation.Euler();
+				const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
+				const FQuat qz(FVector::UnitZ(), FMath::DegreesToRadians(jointRotationEuler.Z));
+				const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Y));
+
+				// Change Rotation Order - ZYX
+				qu = qz * qy * qx;
+			}
+			else
+			{
+				//convert meters to centimeters since values coming from unity are in meters
+				constexpr double WORLD_SCALE = 100.0;
+				AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
+
+				// Quaternions - Convert Rotations from Studio to UE
+				const FVector jointRotationEuler = JointRotation.Euler();
+				const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
+				const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Z));
+				const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
+
+				// Change Rotation Order - YZX
+				qu = qy * qz * qx;
+			}
+
+			if (parentIndex < 0 && !preRotation.IsIdentity())
+			{
+				AdjustedJointPosition = preRotation * AdjustedJointPosition;
+				qu = preRotation * qu;
+			}
+
+			transforms[transformIndex].SetComponents(qu, AdjustedJointPosition, FVector::One());
+		}
+
+		AnimFrameData.Transforms.Append(transforms);
+
+		if (Client)
+		{
+			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData1));
+		}
+	}
 }
 
 void FVirtualProductionSource::HandleCharacterData(const FCharacterData& character) 
@@ -819,6 +955,50 @@ void FVirtualProductionSource::HandleCharacterData(const FCharacterData& charact
 	SkeletonData->SetBoneParents(boneParents);
 
 	if(Client)
+	{
+		Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
+	}
+}
+
+void FVirtualProductionSource::HandleNewtonData(const FNewtonData& newton)
+{
+	newtonNames.Add(character.GetSubjectName());
+
+	FLiveLinkSubjectKey Key = FLiveLinkSubjectKey(SourceGuid, newton.GetSubjectName());
+
+	TArray<FName> boneNames;
+	TArray<int32> boneParents;
+
+	for (int x = 0; x < newton.joints.Num(); x++)
+	{
+		//if (SavedSourceSettings != nullptr && SavedSourceSettings->bTrimNamespaces)
+		//{
+		//	const FString name = character.joints[x].name.ToString();
+		//	int32 index = 0;
+		//	if (name.FindLastChar(':', index))
+		//	{
+		//		boneNames.Add(FName(name.Right(name.Len() - index - 1)));
+		//	}
+		//	else
+		//	{
+		//		boneNames.Add(character.joints[x].name);
+		//	}
+		//}
+		//else
+		//{
+			boneNames.Add(newton.joints[x].name);
+		//}
+
+		boneParents.Add(newton.joints[x].parentIndex);
+	}
+
+	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
+	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
+
+	SkeletonData->SetBoneNames(boneNames);
+	SkeletonData->SetBoneParents(boneParents);
+
+	if (Client)
 	{
 		Client->PushSubjectStaticData_AnyThread(Key, ULiveLinkAnimationRole::StaticClass(), MoveTemp(StaticData));
 	}
@@ -1332,6 +1512,26 @@ void UpdateCharacterFromJson(FCharacterData* characterData, const TSharedPtr<FJs
 void UpdateNewtonsFromJson(FNewtonData* newtonData, const TSharedPtr<FJsonObject> jsonObject)
 {
 	newtonData->NewtonName = jsonObject->GetStringField("name");
+
+	// TODO dimensions, color, bools, etc?
+	//suitData->profileName = suitData->suitname;
+
+	////timestamp = jsonObject->GetNumberField("timestamp");
+	////id = jsonObject->GetStringField("id");
+	////isLive = jsonObject->GetBoolField("isLive");
+	////isLive = InIsLive;
+	////profileName = jsonObject->GetStringField("profileName");
+	////color = USmartsuitBlueprintLibrary::GetFLinearColorField(jsonObject->GetObjectField("color"));
+	////TArray<TSharedPtr<FJsonValue>> ColorArray = jsonObject->GetArrayField("color");
+	//suitData->color = USmartsuitBlueprintLibrary::GetColorField(jsonObject);
+
+	//TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField("meta");
+	//suitData->hasGloves = Meta->GetBoolField("hasGloves");
+	//suitData->hasLeftGlove = Meta->GetBoolField("hasLeftGlove");
+	//suitData->hasRightGlove = Meta->GetBoolField("hasRightGlove");
+	//suitData->hasBody = Meta->GetBoolField("hasBody");
+	//suitData->hasFace = Meta->GetBoolField("hasFace");
+	// -
 
 	TArray<TSharedPtr<FJsonValue>> JointsArray = jsonObject->GetArrayField("joints");
 
