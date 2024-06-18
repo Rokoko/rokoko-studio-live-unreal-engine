@@ -1074,22 +1074,30 @@ TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::Get()
 
 		if (ModularFeatures.IsModularFeatureAvailable(ILiveLinkClient::ModularFeatureName))
 		{
-			bool bDoesAlreadyExist = false;
+			ILiveLinkClient& LiveLinkClient = IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
+			TArray<FGuid> Sources = LiveLinkClient.GetSources();
+			for (FGuid SourceGuid : Sources)
 			{
-				ILiveLinkClient& LiveLinkClient = IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
-				TArray<FGuid> Sources = LiveLinkClient.GetSources();
-				for (FGuid SourceGuid : Sources)
+				if (LiveLinkClient.GetSourceType(SourceGuid).ToString() == "Studio")
 				{
-					if (LiveLinkClient.GetSourceType(SourceGuid).ToString() == "Studio")
-					{
-						//UE_LOG(LogTemp, Warning, TEXT("you can't add more than one instance of FVirtualProductionSource!!"));
-						bDoesAlreadyExist = true;
-
-						//SetInstance(LiveLinkClient.getsour)
-						break;
-					}
+					UE_LOG(LogTemp, Warning, TEXT("Remove already existed LiveLink Source and replace with new one"));
+					LiveLinkClient.RemoveSource(SourceGuid);
 				}
 			}
+
+			FIPv4Address address(FIPv4Address::Any);
+
+			FIPv4Endpoint Endpoint;
+			Endpoint.Address = address;
+			Endpoint.Port = 14043;
+
+			TSharedPtr<FVirtualProductionSource> Source = MakeShared<FVirtualProductionSource>(Endpoint, FText::FromString("Studio"), FText::FromString(""), FMessageAddress::NewAddress());
+			SetInstance(Source);
+			LiveLinkClient.AddSource(Source);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[Rokoko] modular feature {0} is not available"), ILiveLinkClient::ModularFeatureName);
 		}
 	}
 
