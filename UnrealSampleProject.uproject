@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.3",
+	"EngineAssociation": "5.4",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -16,30 +16,13 @@
 	],
 	"Plugins": [
 		{
-			"Name": "VirtualCamera",
-			"Enabled": true,
-			"SupportedTargetPlatforms": [
-				"Win64",
-				"Linux"
-			]
-		},
-		{
 			"Name": "LiveLink",
 			"Enabled": true
 		},
 		{
-			"Name": "Smartsuit",
+			"Name": "Rokoko Studio Live",
 			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/7e20fe7d4247410cb4f7d3e162d61c21"
-		},
-		{
-			"Name": "SteamVR",
-			"Enabled": false,
-			"SupportedTargetPlatforms": [
-				"Win64",
-				"Linux",
-				"Mac"
-			]
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/e604c994ee4942148903275df92dfc73"
 		}
 	]
 }
