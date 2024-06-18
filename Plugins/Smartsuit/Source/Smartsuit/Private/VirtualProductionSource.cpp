@@ -962,7 +962,7 @@ void FVirtualProductionSource::HandleCharacterData(const FCharacterData& charact
 
 void FVirtualProductionSource::HandleNewtonData(const FNewtonData& newton)
 {
-	newtonNames.Add(character.GetSubjectName());
+	newtonNames.Add(newton.GetSubjectName());
 
 	FLiveLinkSubjectKey Key = FLiveLinkSubjectKey(SourceGuid, newton.GetSubjectName());
 

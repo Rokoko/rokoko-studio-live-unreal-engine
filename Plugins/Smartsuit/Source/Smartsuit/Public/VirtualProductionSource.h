@@ -78,6 +78,7 @@ private:
 	void HandleFaceData(const FFace& face);
 	void HandleSuitData(const FSuitData& suit);
 	void HandleCharacterData(const FCharacterData& character);
+	void HandleNewtonData(const FNewtonData& newton);
 	void CreateJoint(TArray<FTransform>& transforms, int32 index, const FSmartsuitBone* parent, const FSmartsuitBone* sensor);
 
 	TArray<FName> subjectNames;
@@ -90,6 +91,7 @@ private:
 	TArray<FFace> existingFaces;
 	TArray<FSuitData> existingActors;
 	TArray<FCharacterData> existingCharacters;
+	TArray<FNewtonData> existingNewtons;
 
 	TArray<FName> notExistingSubjects;
 
