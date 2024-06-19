@@ -660,7 +660,7 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 		FVector NewRootPosition = hipPosition;
 		NewRootPosition.Z = 0.0f;
 
-		// Make sure to initialize root motion position, otherwise we will get erronous results
+		// Make sure to initialize root motion position, otherwise we will get erroneous results
 		if (!bInitializedRootPosition)
 		{
 			OldRootPosition = NewRootPosition;

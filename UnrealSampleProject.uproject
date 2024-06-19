@@ -17,11 +17,7 @@
 	"Plugins": [
 		{
 			"Name": "VirtualCamera",
-			"Enabled": true,
-			"SupportedTargetPlatforms": [
-				"Win64",
-				"Linux"
-			]
+			"Enabled": true
 		},
 		{
 			"Name": "LiveLink",
@@ -40,6 +36,10 @@
 				"Linux",
 				"Mac"
 			]
+		},
+		{
+			"Name": "MocopiLiveLink",
+			"Enabled": true
 		}
 	]
 }

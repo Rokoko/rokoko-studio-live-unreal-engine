@@ -190,6 +190,13 @@ struct FRokokoCharacterJoint
 		, parentIndex(ParentIndex)
 		, transform(Transform)
 	{}
+	FRokokoCharacterJoint(FName Name, int32 ParentIndex, const FTransform& Transform, FVector Position, FQuat Rotation)
+		: name(Name)
+		, parentIndex(ParentIndex)
+		, transform(Transform)
+		, position(Position)
+		, rotation(Rotation)
+	{}
 
 	FName name;
 	int32 parentIndex;

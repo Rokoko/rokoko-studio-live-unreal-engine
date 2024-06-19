@@ -786,6 +786,8 @@ void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
 	existingNewtons.Empty();
 	notExistingSubjects.Empty();
 
+	if (newtons.Num() == 0) return;
+
 	for (int subjectIndex = 0; subjectIndex < newtons.Num(); subjectIndex++)
 	{
 		const FNewtonData& subject = newtons[subjectIndex];
@@ -794,7 +796,7 @@ void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
 		bool nameExists = false;
 		for (int idx = 0; idx < newtonNames.Num(); idx++)
 		{
-			if (subject.GetSubjectName() == characterNames[idx])
+			if (subject.GetSubjectName() == newtonNames[idx])
 			{
 				nameExists = true;
 				existingNewtons.Add(subject);
@@ -847,64 +849,94 @@ void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
 		for (int x = 0; x < subject.joints.Num(); x++)
 		{
 			const int32 transformIndex = transforms.AddUninitialized(1);
-			const int parentIndex = subject.joints[x].parentIndex;
+			float worldScale = 1;
 
-			if (parentIndex >= 0)
-			{
-				tm = subject.joints[x].transform.GetRelativeTransform(subject.joints[parentIndex].transform);
-			}
-			else
-			{
-				tm = subject.joints[x].transform;
-			}
+			//const int parentIndex = subject.joints[x].parentIndex;
 
-			const FVector JointPosition = tm.GetLocation();
-			const FQuat JointRotation = tm.GetRotation();
+			//if (parentIndex >= 0)
+			//{
+			//	tm = subject.joints[x].transform.GetRelativeTransform(subject.joints[parentIndex].transform);
+			//}
+			//else
+			//{
+			tm = subject.joints[x].transform;
+			//}
 
-			// TODO: what is this?? Is it needed for newtons?
-			FQuat preRotation = FQuat::MakeFromRotator(SavedSourceSettings->HipPreRotation);
 
-			FVector AdjustedJointPosition;
-			FQuat qu;
+			const FVector JointPosition = subject.joints[x].position;// tm.GetLocation();
+			const FQuat JointRotation = subject.joints[x].rotation;// tm.GetRotation();
 
-			if (SavedSourceSettings != nullptr && SavedSourceSettings->bUseRotationOrderZYX)
-			{
-				//convert meters to centimeters since values coming from unity are in meters
-				constexpr double WORLD_SCALE = 100.0;
-				AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, -JointPosition.Y * WORLD_SCALE, JointPosition.Z * WORLD_SCALE);
+			FQuat result(JointRotation.Z, JointRotation.X, JointRotation.Y, JointRotation.W);
 
-				// Quaternions - Convert Rotations from Studio to UE
-				const FVector jointRotationEuler = JointRotation.Euler();
-				const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
-				const FQuat qz(FVector::UnitZ(), FMath::DegreesToRadians(jointRotationEuler.Z));
-				const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Y));
+			static FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, -90));
+			result *= modifier;
 
-				// Change Rotation Order - ZYX
-				qu = qz * qy * qx;
-			}
-			else
-			{
-				//convert meters to centimeters since values coming from unity are in meters
-				constexpr double WORLD_SCALE = 100.0;
-				AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
+			transforms[transformIndex].SetLocation(FVector(worldScale * JointPosition.Z, worldScale * JointPosition.X, worldScale * JointPosition.Y));
+			transforms[transformIndex].SetRotation(FQuat::Identity);
+			//transforms[transformIndex].SetRotation(result);
+			//transforms[transformIndex].SetLocation(JointPosition * 100.0f);
+			//transforms[transformIndex].SetRotation(JointRotation);
+			transforms[transformIndex].SetScale3D(FVector::OneVector);
 
-				// Quaternions - Convert Rotations from Studio to UE
-				const FVector jointRotationEuler = JointRotation.Euler();
-				const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
-				const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Z));
-				const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
 
-				// Change Rotation Order - YZX
-				qu = qy * qz * qx;
-			}
+			//const int parentIndex = subject.joints[x].parentIndex;
 
-			if (parentIndex < 0 && !preRotation.IsIdentity())
-			{
-				AdjustedJointPosition = preRotation * AdjustedJointPosition;
-				qu = preRotation * qu;
-			}
+			//if (parentIndex >= 0)
+			//{
+			//	tm = subject.joints[x].transform.GetRelativeTransform(subject.joints[parentIndex].transform);
+			//}
+			//else
+			//{
+			//	tm = subject.joints[x].transform;
+			//}
 
-			transforms[transformIndex].SetComponents(qu, AdjustedJointPosition, FVector::One());
+			//const FVector JointPosition = tm.GetLocation();
+			//const FQuat JointRotation = tm.GetRotation();
+
+			//// TODO: what is this?? Is it needed for newtons?
+			//FQuat preRotation = FQuat::MakeFromRotator(SavedSourceSettings->HipPreRotation);
+
+			//FVector AdjustedJointPosition;
+			//FQuat qu;
+
+			//if (SavedSourceSettings != nullptr && SavedSourceSettings->bUseRotationOrderZYX)
+			//{
+			//	//convert meters to centimeters since values coming from unity are in meters
+			//	constexpr double WORLD_SCALE = 100.0;
+			//	AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, -JointPosition.Y * WORLD_SCALE, JointPosition.Z * WORLD_SCALE);
+
+			//	// Quaternions - Convert Rotations from Studio to UE
+			//	const FVector jointRotationEuler = JointRotation.Euler();
+			//	const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
+			//	const FQuat qz(FVector::UnitZ(), FMath::DegreesToRadians(jointRotationEuler.Z));
+			//	const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Y));
+
+			//	// Change Rotation Order - ZYX
+			//	qu = qz * qy * qx;
+			//}
+			//else
+			//{
+			//	//convert meters to centimeters since values coming from unity are in meters
+			//	constexpr double WORLD_SCALE = 100.0;
+			//	AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
+
+			//	// Quaternions - Convert Rotations from Studio to UE
+			//	const FVector jointRotationEuler = JointRotation.Euler();
+			//	const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
+			//	const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Z));
+			//	const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
+
+			//	// Change Rotation Order - YZX
+			//	qu = qy * qz * qx;
+			//}
+
+			//if (parentIndex < 0 && !preRotation.IsIdentity())
+			//{
+			//	AdjustedJointPosition = preRotation * AdjustedJointPosition;
+			//	qu = preRotation * qu;
+			//}
+
+			//transforms[transformIndex].SetComponents(qu, AdjustedJointPosition, FVector::One());
 		}
 
 		AnimFrameData.Transforms.Append(transforms);
@@ -1511,7 +1543,14 @@ void UpdateCharacterFromJson(FCharacterData* characterData, const TSharedPtr<FJs
 
 void UpdateNewtonsFromJson(FNewtonData* newtonData, const TSharedPtr<FJsonObject> jsonObject)
 {
-	newtonData->NewtonName = jsonObject->GetStringField("name");
+	if (jsonObject->HasField("name"))
+	{
+		newtonData->NewtonName = jsonObject->GetStringField("name");
+	}
+	else
+	{
+		newtonData->NewtonName = "UnknownName";
+	}
 
 	// TODO dimensions, color, bools, etc?
 	//suitData->profileName = suitData->suitname;
@@ -1533,20 +1572,27 @@ void UpdateNewtonsFromJson(FNewtonData* newtonData, const TSharedPtr<FJsonObject
 	//suitData->hasFace = Meta->GetBoolField("hasFace");
 	// -
 
-	TArray<TSharedPtr<FJsonValue>> JointsArray = jsonObject->GetArrayField("joints");
-
-	for (TArray< TSharedPtr< FJsonValue > >::TConstIterator JointsIter(JointsArray.CreateConstIterator()); JointsIter; ++JointsIter)
+	if (jsonObject->HasField("joints"))
 	{
-		const TSharedPtr< FJsonValue >  JointEntry = *JointsIter;
-		const TSharedPtr< FJsonObject > JoinJSONObject = JointEntry->AsObject();
+		TArray<TSharedPtr<FJsonValue>> JointsArray = jsonObject->GetArrayField("joints");
 
-		FString JointName = JoinJSONObject->GetStringField("name");
-		int32 JointParentIndex = JoinJSONObject->GetIntegerField("parent");
-		FVector JointPosition = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField("position"));
-		FQuat JointRotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField("rotation"));
+		for (TArray< TSharedPtr< FJsonValue > >::TConstIterator JointsIter(JointsArray.CreateConstIterator()); JointsIter; ++JointsIter)
+		{
+			const TSharedPtr< FJsonValue >  JointEntry = *JointsIter;
+			const TSharedPtr< FJsonObject > JoinJSONObject = JointEntry->AsObject();
 
-		FTransform JointTransform(JointRotation, JointPosition, FVector::OneVector);
-		newtonData->joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, JointTransform));
+			FString JointName = JoinJSONObject->GetStringField("name");
+			int32 JointParentIndex = JoinJSONObject->GetIntegerField("parent");
+			FVector JointPosition = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField("position"));
+			FQuat JointRotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField("rotation"));
+
+			FTransform JointTransform(JointRotation, JointPosition, FVector::OneVector);
+			newtonData->joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, JointTransform, JointPosition, JointRotation));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Newton skeleton contains no joints"));
 	}
 }
 
@@ -1609,6 +1655,8 @@ uint32 FVirtualProductionSource::Run()
 			continue;
 		}
 
+		UE_LOG(LogTemp, Error, TEXT("Got message \n"));
+
 		FString result = BytesToStringFixed(UncompressedData.GetData(), static_cast<int32_t>(dstSize));
 				
 		TSharedPtr<FJsonObject> JsonObject;
@@ -1631,9 +1679,11 @@ uint32 FVirtualProductionSource::Run()
 
 				if (SceneObj->HasField("actors"))
 				{
+
 					TArray<TSharedPtr<FJsonValue>> LivesuitsArray = SceneObj->GetArrayField("actors");
 					for (auto& currentsuit : LivesuitsArray)
 					{
+						UE_LOG(LogTemp, Error, TEXT("Found 'actor' \n"));
 						FSuitData SuitData; // = FSuitData(true, currentsuit->AsObject());
 						SuitData.isLive = true;
 						UpdateSuitFromJson(&SuitData, currentsuit->AsObject());
@@ -1654,6 +1704,7 @@ uint32 FVirtualProductionSource::Run()
 					TArray<TSharedPtr<FJsonValue>> NewtonsArray = SceneObj->GetArrayField("newtons");
 					for (auto& currentNewton : NewtonsArray)
 					{
+						UE_LOG(LogTemp, Error, TEXT("Found 'newton' \n"));
 						FNewtonData NewtonData; // = FNewtonData(true, currentNewton->AsObject());
 						NewtonData.IsLive = true;
 						UpdateNewtonsFromJson(&NewtonData, currentNewton->AsObject());

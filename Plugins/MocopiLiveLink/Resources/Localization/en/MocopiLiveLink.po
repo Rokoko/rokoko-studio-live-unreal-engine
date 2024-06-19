@@ -1,0 +1,162 @@
+﻿# MocopiLiveLink English translation.
+# Copyright Epic Games, Inc. All Rights Reserved.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: MocopiLiveLink\n"
+"POT-Creation-Date: 2023-03-15 16:50\n"
+"PO-Revision-Date: 2023-03-15 16:50\n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Key:	CreateSourceButtonLabel
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:88
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:88
+msgctxt "MocopiLiveLinkModule,CreateSourceButtonLabel"
+msgid "Create Mocopi Source"
+msgstr "Create Mocopi Source"
+
+#. Key:	errorInvalidPort
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:115
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:115
+msgctxt "MocopiLiveLinkModule,errorInvalidPort"
+msgid "Invalid port.\nPlease enter a port number between 0 and 65535"
+msgstr "Invalid port.\nPlease enter a port number between 0 and 65535"
+
+#. Key:	errorInvalidSMF
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:101
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:101
+msgctxt "MocopiLiveLinkModule,errorInvalidSMF"
+msgid "Error loading the SonyMotionFormat Library. Please reinstall the plugin to repair the files."
+msgstr "Error loading the SonyMotionFormat Library. Please reinstall the plugin to repair the files."
+
+#. Key:	errorInvalidSocket
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSource.cpp:70
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSource.cpp:70
+msgctxt "MocopiLiveLinkModule,errorInvalidSocket"
+msgid "Trying to start UDP thread with an invalid / uninitialized socket"
+msgstr "Trying to start UDP thread with an invalid / uninitialized socket"
+
+#. Key:	errorNoSubjectName
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:138
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:138
+msgctxt "MocopiLiveLinkModule,errorNoSubjectName"
+msgid "Enter a subject name to create a Mocopi LiveLink Source"
+msgstr "Enter a subject name to create a Mocopi LiveLink Source"
+
+#. Key:	errorTitleInvalidPort
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:110
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:110
+msgctxt "MocopiLiveLinkModule,errorTitleInvalidPort"
+msgid "Error: Invalid Port"
+msgstr "Error: Invalid Port"
+
+#. Key:	errorTitleInvalidSMF
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:100
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:100
+msgctxt "MocopiLiveLinkModule,errorTitleInvalidSMF"
+msgid "Error: SonyMotionFormat Library"
+msgstr "Error: SonyMotionFormat Library"
+
+#. Key:	errorTitleNoSubjectName
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:137
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:137
+msgctxt "MocopiLiveLinkModule,errorTitleNoSubjectName"
+msgid "Error: Empty Subject Name"
+msgstr "Error: Empty Subject Name"
+
+#. Key:	errorTitleUsedPort
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:129
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:129
+msgctxt "MocopiLiveLinkModule,errorTitleUsedPort"
+msgid "Error: Port in Use"
+msgstr "Error: Port in Use"
+
+#. Key:	errorUsedPort
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:130
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:130
+msgctxt "MocopiLiveLinkModule,errorUsedPort"
+msgid "This port is already being used by another Mocopi LiveLink Source"
+msgstr "This port is already being used by another Mocopi LiveLink Source"
+
+#. Key:	InputPort
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:38
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:38
+msgctxt "MocopiLiveLinkModule,InputPort"
+msgid "Port Number"
+msgstr "Port Number"
+
+#. Key:	receivedUnrecognizedData
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSource.cpp:222
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSource.cpp:222
+msgctxt "MocopiLiveLinkModule,receivedUnrecognizedData"
+msgid "MocopiLiveLink plugin received unrecognized data"
+msgstr "MocopiLiveLink plugin received unrecognized data"
+
+#. Key:	smfImportError
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SonyMotionFormat.cpp:18
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SonyMotionFormat.cpp:18
+msgctxt "MocopiLiveLinkModule,smfImportError"
+msgid "Failed to import SonyMotionFormat function"
+msgstr "Failed to import SonyMotionFormat function"
+
+#. Key:	smfLoadError
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SonyMotionFormat.cpp:80
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SonyMotionFormat.cpp:80
+msgctxt "MocopiLiveLinkModule,smfLoadError"
+msgid "Failed to load the required SonyMotionFormat library. Plugin will not be functional. File Path: "
+msgstr "Failed to load the required SonyMotionFormat library. Plugin will not be functional. File Path: "
+
+#. Key:	socketInitFailed
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSource.cpp:54
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSource.cpp:54
+msgctxt "MocopiLiveLinkModule,socketInitFailed"
+msgid "Socket Initialization Failed"
+msgstr "Socket Initialization Failed"
+
+#. Key:	SourceDisplayName
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSourceFactory.cpp:11
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSourceFactory.cpp:11
+msgctxt "MocopiLiveLinkModule,SourceDisplayName"
+msgid "Mocopi LiveLink"
+msgstr "Mocopi LiveLink"
+
+#. Key:	sourceMachineName
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSource.cpp:301
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSource.cpp:301
+msgctxt "MocopiLiveLinkModule,sourceMachineName"
+msgid "Mocopi LiveLink"
+msgstr "Mocopi LiveLink"
+
+#. Key:	SourceStatusReceiving
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSource.cpp:307
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSource.cpp:307
+msgctxt "MocopiLiveLinkModule,SourceStatusReceiving"
+msgid "Listening to port {0}"
+msgstr "Listening to port {0}"
+
+#. Key:	SourceTooltip
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSourceFactory.cpp:16
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSourceFactory.cpp:16
+msgctxt "MocopiLiveLinkModule,SourceTooltip"
+msgid "Creates a connection to Mocopi Sensors"
+msgstr "Creates a connection to Mocopi Sensors"
+
+#. Key:	sourceType
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSource.cpp:296
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/MocopiLiveLinkSource.cpp:296
+msgctxt "MocopiLiveLinkModule,sourceType"
+msgid "Mocopi LiveLink"
+msgstr "Mocopi LiveLink"
+
+#. Key:	SubjectName
+#. SourceLocation:	Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:61
+#: Plugins/MocopiLiveLink/Source/MocopiLiveLink/Private/SMocopiLiveLinkSourceFactory.cpp:61
+msgctxt "MocopiLiveLinkModule,SubjectName"
+msgid "Subject Name"
+msgstr "Subject Name"
+
