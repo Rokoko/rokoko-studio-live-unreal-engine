@@ -848,72 +848,72 @@ void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
 
 		for (int x = 0; x < subject.joints.Num(); x++)
 		{
-			const int32 transformIndex = transforms.AddUninitialized(1);
-			float worldScale = 1;
+			//const int32 transformIndex = transforms.AddUninitialized(1);
+			//float worldScale = 100.0f;
 
-			//const int parentIndex = subject.joints[x].parentIndex;
+			////const int parentIndex = subject.joints[x].parentIndex;
 
-			//if (parentIndex >= 0)
-			//{
-			//	tm = subject.joints[x].transform.GetRelativeTransform(subject.joints[parentIndex].transform);
-			//}
-			//else
-			//{
-			tm = subject.joints[x].transform;
-			//}
+			////if (parentIndex >= 0)
+			////{
+			////	tm = subject.joints[x].transform.GetRelativeTransform(subject.joints[parentIndex].transform);
+			////}
+			////else
+			////{
+			//tm = subject.joints[x].transform;
+			////}
 
 
-			const FVector JointPosition = subject.joints[x].position;// tm.GetLocation();
-			const FQuat JointRotation = subject.joints[x].rotation;// tm.GetRotation();
+			//const FVector JointPosition = subject.joints[x].position;// tm.GetLocation();
+			//const FQuat JointRotation = subject.joints[x].rotation;// tm.GetRotation();
 
-			FQuat result(JointRotation.Z, JointRotation.X, JointRotation.Y, JointRotation.W);
+			//FQuat result(JointRotation.Z, JointRotation.X, JointRotation.Y, JointRotation.W);
 
-			static FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, -90));
-			result *= modifier;
+			//static FQuat modifier = FQuat::MakeFromEuler(FVector(90, 0, -90));
+			//result *= modifier;
 
-			transforms[transformIndex].SetLocation(FVector(worldScale * JointPosition.Z, worldScale * JointPosition.X, worldScale * JointPosition.Y));
-			transforms[transformIndex].SetRotation(FQuat::Identity);
+			//transforms[transformIndex].SetLocation(FVector(worldScale * JointPosition.Z, worldScale * JointPosition.X, worldScale * JointPosition.Y));
+			//////transforms[transformIndex].SetRotation(FQuat::Identity);
+			////transforms[transformIndex].SetRotation(result);
+			////transforms[transformIndex].SetLocation(JointPosition * 100.0f);
 			//transforms[transformIndex].SetRotation(result);
-			//transforms[transformIndex].SetLocation(JointPosition * 100.0f);
-			//transforms[transformIndex].SetRotation(JointRotation);
-			transforms[transformIndex].SetScale3D(FVector::OneVector);
+			//transforms[transformIndex].SetScale3D(FVector::OneVector);
 
 
-			//const int parentIndex = subject.joints[x].parentIndex;
+			const int32 transformIndex = transforms.AddUninitialized(1);
+			const int parentIndex = subject.joints[x].parentIndex;
 
-			//if (parentIndex >= 0)
-			//{
-			//	tm = subject.joints[x].transform.GetRelativeTransform(subject.joints[parentIndex].transform);
-			//}
-			//else
-			//{
-			//	tm = subject.joints[x].transform;
-			//}
+			if (parentIndex >= 0)
+			{
+				tm = subject.joints[x].transform.GetRelativeTransform(subject.joints[parentIndex].transform);
+			}
+			else
+			{
+				tm = subject.joints[x].transform;
+			}
 
-			//const FVector JointPosition = tm.GetLocation();
-			//const FQuat JointRotation = tm.GetRotation();
+			const FVector JointPosition = tm.GetLocation();
+			const FQuat JointRotation = tm.GetRotation();
 
-			//// TODO: what is this?? Is it needed for newtons?
-			//FQuat preRotation = FQuat::MakeFromRotator(SavedSourceSettings->HipPreRotation);
+			FQuat preRotation = FQuat::MakeFromRotator(SavedSourceSettings->HipPreRotation);
 
-			//FVector AdjustedJointPosition;
-			//FQuat qu;
+			FVector AdjustedJointPosition;
+			FQuat qu;
 
 			//if (SavedSourceSettings != nullptr && SavedSourceSettings->bUseRotationOrderZYX)
-			//{
-			//	//convert meters to centimeters since values coming from unity are in meters
-			//	constexpr double WORLD_SCALE = 100.0;
-			//	AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, -JointPosition.Y * WORLD_SCALE, JointPosition.Z * WORLD_SCALE);
+			{
+				//convert meters to centimeters since values coming from unity are in meters
+				constexpr double WORLD_SCALE = 100.0;
+				AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, -JointPosition.Y * WORLD_SCALE, JointPosition.Z * WORLD_SCALE);
 
-			//	// Quaternions - Convert Rotations from Studio to UE
-			//	const FVector jointRotationEuler = JointRotation.Euler();
-			//	const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
-			//	const FQuat qz(FVector::UnitZ(), FMath::DegreesToRadians(jointRotationEuler.Z));
-			//	const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Y));
+				// Quaternions - Convert Rotations from Studio to UE
+				const FVector jointRotationEuler = JointRotation.Euler();
+				const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
+				const FQuat qz(FVector::UnitZ(), FMath::DegreesToRadians(jointRotationEuler.Z));
+				const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Y));
 
-			//	// Change Rotation Order - ZYX
-			//	qu = qz * qy * qx;
-			//}
+				// Change Rotation Order - ZYX
+				qu = qz * qy * qx;
+			}
 			//else
 			//{
 			//	//convert meters to centimeters since values coming from unity are in meters
@@ -930,13 +930,13 @@ void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
 			//	qu = qy * qz * qx;
 			//}
 
-			//if (parentIndex < 0 && !preRotation.IsIdentity())
-			//{
-			//	AdjustedJointPosition = preRotation * AdjustedJointPosition;
-			//	qu = preRotation * qu;
-			//}
+			if (parentIndex < 0 && !preRotation.IsIdentity())
+			{
+				AdjustedJointPosition = preRotation * AdjustedJointPosition;
+				qu = preRotation * qu;
+			}
 
-			//transforms[transformIndex].SetComponents(qu, AdjustedJointPosition, FVector::One());
+			transforms[transformIndex].SetComponents(qu, AdjustedJointPosition, FVector::One());
 		}
 
 		AnimFrameData.Transforms.Append(transforms);
