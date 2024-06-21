@@ -894,7 +894,7 @@ void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
 			const FVector JointPosition = tm.GetLocation();
 			const FQuat JointRotation = tm.GetRotation();
 
-			FQuat preRotation = FQuat::MakeFromRotator(SavedSourceSettings->HipPreRotation);
+			//FQuat preRotation = FQuat::MakeFromRotator(SavedSourceSettings->HipPreRotation);
 
 			FVector AdjustedJointPosition;
 			FQuat qu;
@@ -913,28 +913,35 @@ void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
 
 				// Change Rotation Order - ZYX
 				qu = qz * qy * qx;
+
+				if (parentIndex < 0)
+				{
+					static FQuat preRotation = FQuat::MakeFromEuler(FVector(90, 0, -90));
+					AdjustedJointPosition = preRotation * AdjustedJointPosition;
+					qu = preRotation * qu;
+				}
 			}
 			//else
 			//{
 			//	//convert meters to centimeters since values coming from unity are in meters
 			//	constexpr double WORLD_SCALE = 100.0;
-			//	AdjustedJointPosition = FVector(-JointPosition.X * WORLD_SCALE, JointPosition.Z * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
+			//	AdjustedJointPosition = FVector(JointPosition.Z * WORLD_SCALE, JointPosition.X * WORLD_SCALE, JointPosition.Y * WORLD_SCALE);
 
 			//	// Quaternions - Convert Rotations from Studio to UE
 			//	const FVector jointRotationEuler = JointRotation.Euler();
 			//	const FQuat qx(FVector::UnitX(), FMath::DegreesToRadians(jointRotationEuler.X));
-			//	const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Z));
-			//	const FQuat qz(FVector::UnitZ(), -FMath::DegreesToRadians(jointRotationEuler.Y));
+			//	const FQuat qy(FVector::UnitY(), FMath::DegreesToRadians(jointRotationEuler.Y));
+			//	const FQuat qz(FVector::UnitZ(), FMath::DegreesToRadians(jointRotationEuler.Z));
 
 			//	// Change Rotation Order - YZX
-			//	qu = qy * qz * qx;
+			//	qu = qy * qx * qz;
 			//}
 
-			if (parentIndex < 0 && !preRotation.IsIdentity())
-			{
-				AdjustedJointPosition = preRotation * AdjustedJointPosition;
-				qu = preRotation * qu;
-			}
+			//if (parentIndex < 0 && !preRotation.IsIdentity())
+			//{
+			//	AdjustedJointPosition = preRotation * AdjustedJointPosition;
+			//	qu = preRotation * qu;
+			//}
 
 			transforms[transformIndex].SetComponents(qu, AdjustedJointPosition, FVector::One());
 		}
@@ -1709,13 +1716,13 @@ uint32 FVirtualProductionSource::Run()
 						NewtonData.IsLive = true;
 						UpdateNewtonsFromJson(&NewtonData, currentNewton->AsObject());
 
-						//if (NewtonData.hasFace)
-						//{
-						//	auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
-						//	auto FaceData = FFace(JSONObjectface, NewtonData.suitname);
-						//	NewtonData.faceId = FaceData.faceId;
-						//	VPFrame.Faces.Emplace(MoveTemp(FaceData));
-						//}
+						if (NewtonData.hasFace)
+						{
+							auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
+							auto FaceData = FFace(JSONObjectface, NewtonData.NewtonName);
+							//NewtonData.faceId = FaceData.faceId;
+							VPFrame.Faces.Emplace(MoveTemp(FaceData));
+						}
 						VPFrame.Newtons.Emplace(MoveTemp(NewtonData));
 					}
 				}
