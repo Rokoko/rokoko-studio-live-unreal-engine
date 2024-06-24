@@ -377,6 +377,8 @@ struct FNewtonData
 	UPROPERTY(BlueprintReadOnly, Category = Default)
 	bool IsLive{ false };
 
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	bool hasFace{ false };
 
 	TArray<FRokokoCharacterJoint> joints;
 

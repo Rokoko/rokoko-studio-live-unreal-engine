@@ -1571,12 +1571,12 @@ void UpdateNewtonsFromJson(FNewtonData* newtonData, const TSharedPtr<FJsonObject
 	////TArray<TSharedPtr<FJsonValue>> ColorArray = jsonObject->GetArrayField("color");
 	//suitData->color = USmartsuitBlueprintLibrary::GetColorField(jsonObject);
 
-	//TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField("meta");
+	TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField("meta");
 	//suitData->hasGloves = Meta->GetBoolField("hasGloves");
 	//suitData->hasLeftGlove = Meta->GetBoolField("hasLeftGlove");
 	//suitData->hasRightGlove = Meta->GetBoolField("hasRightGlove");
 	//suitData->hasBody = Meta->GetBoolField("hasBody");
-	//suitData->hasFace = Meta->GetBoolField("hasFace");
+	newtonData->hasFace = Meta->GetBoolField("hasFace");
 	// -
 
 	if (jsonObject->HasField("joints"))
@@ -1718,7 +1718,7 @@ uint32 FVirtualProductionSource::Run()
 
 						if (NewtonData.hasFace)
 						{
-							auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
+							auto JSONObjectface = currentNewton->AsObject()->GetObjectField("face");
 							auto FaceData = FFace(JSONObjectface, NewtonData.NewtonName);
 							//NewtonData.faceId = FaceData.faceId;
 							VPFrame.Faces.Emplace(MoveTemp(FaceData));
