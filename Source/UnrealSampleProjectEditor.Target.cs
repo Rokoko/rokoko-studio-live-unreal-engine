@@ -7,7 +7,8 @@ public class UnrealSampleProjectEditorTarget : TargetRules
 {
 	public UnrealSampleProjectEditorTarget(TargetInfo Target) : base(Target)
 	{
-		Type = TargetType.Editor;
+        bOverrideBuildEnvironment = true;
+        Type = TargetType.Editor;
 
 		ExtraModuleNames.AddRange( new string[] { "UnrealSampleProject" } );
 	}
