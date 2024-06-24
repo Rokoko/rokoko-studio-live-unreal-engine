@@ -14,7 +14,7 @@ FFace USmartsuitBlueprintLibrary::GetFaceByFaceID(FString faceId)
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source for FaceID!!!"));
 	}
 	return FFace();
 }
@@ -50,7 +50,7 @@ TArray<FFace> USmartsuitBlueprintLibrary::GetAllFaces()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+		UE_LOG(LogTemp, Warning, TEXT("[USmartsuitBlueprintLibrary::GetAllFaces] can not get virtual production source!!!"));
 	}
 	return Faces;
 }
@@ -89,7 +89,7 @@ FSuitData* USmartsuitBlueprintLibrary::GetSmartsuit(FString suitName)
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+		UE_LOG(LogTemp, Warning, TEXT("[USmartsuitBlueprintLibrary::GetSmartsuit] can not get virtual production source!!!"));
 	}
 
 	return ReturnValue;
@@ -116,7 +116,7 @@ TArray<FSuitData> USmartsuitBlueprintLibrary::GetAllSmartsuits()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+		UE_LOG(LogTemp, Warning, TEXT("[USmartsuitBlueprintLibrary::GetAllSmartsuits] can not get virtual production source!!!"));
 	}
 	return Smartsuits;
 }
@@ -131,7 +131,7 @@ TArray<FString> USmartsuitBlueprintLibrary::GetAvailableActorNames()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+		UE_LOG(LogTemp, Warning, TEXT("[USmartsuitBlueprintLibrary::GetAvailableActorNames] can not get virtual production source!!!"));
 	}
 	return SmartsuitNames;
 }
@@ -187,7 +187,7 @@ FProp* USmartsuitBlueprintLibrary::GetPropByNameFromVP(FString name, bool isLive
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+		UE_LOG(LogTemp, Warning, TEXT("[USmartsuitBlueprintLibrary::GetPropByNameFromVP] can not get virtual production source!!!"));
 	}
 	return ReturnValue;
 }
@@ -203,7 +203,7 @@ TArray<FProp> USmartsuitBlueprintLibrary::GetAllProps()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+		UE_LOG(LogTemp, Warning, TEXT("[USmartsuitBlueprintLibrary::GetAllProps] can not get virtual production source!!!"));
 	}
 	return AllProps;
 }
@@ -229,7 +229,7 @@ FTracker* USmartsuitBlueprintLibrary::GetTrackerByNameFromVP(FString name, bool 
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+		UE_LOG(LogTemp, Warning, TEXT("[USmartsuitBlueprintLibrary::GetTrackerByNameFromVP] can not get virtual production source!!!"));
 	}
 	return Tracker;
 }
@@ -243,7 +243,7 @@ FTracker USmartsuitBlueprintLibrary::GetTracker(FString name, bool isLive)
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("can not get virtual production source!!!"));
+		UE_LOG(LogTemp, Warning, TEXT("[USmartsuitBlueprintLibrary::GetTracker] can not get virtual production source!!!"));
 	}
 	return FTracker();
 }
