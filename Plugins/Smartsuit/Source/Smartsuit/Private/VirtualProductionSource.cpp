@@ -1585,12 +1585,15 @@ uint32 FVirtualProductionSource::Run()
 			//SCENE
 			{
 				TSharedPtr<FJsonObject> SceneObj = JsonObject->GetObjectField("scene");
-				TArray<TSharedPtr<FJsonValue>> Livepropsarray = SceneObj->GetArrayField("props");
-
-				for (auto& currentprop : Livepropsarray)
+				if (SceneObj->HasField("props"))
 				{
-					auto NewProp = FProp(true, currentprop->AsObject());
-					VPFrame.Props.Emplace(MoveTemp(NewProp));
+					TArray<TSharedPtr<FJsonValue>> Livepropsarray = SceneObj->GetArrayField("props");
+
+					for (auto& currentprop : Livepropsarray)
+					{
+						auto NewProp = FProp(true, currentprop->AsObject());
+						VPFrame.Props.Emplace(MoveTemp(NewProp));
+					}
 				}
 
 				if (SceneObj->HasField("actors"))
