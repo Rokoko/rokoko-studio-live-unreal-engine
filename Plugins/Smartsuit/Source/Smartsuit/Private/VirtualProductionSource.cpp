@@ -1487,8 +1487,11 @@ void UpdateNewtonsFromJson(FNewtonData* newtonData, const TSharedPtr<FJsonObject
 		newtonData->NewtonName = "UnknownName";
 	}
 
-	TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField("meta");
-	newtonData->hasFace = Meta->GetBoolField("hasFace");
+	if (jsonObject->HasField("meta"))
+	{
+		TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField("meta");
+		newtonData->hasFace = Meta->GetBoolField("hasFace");
+	}
 
 	if (jsonObject->HasField("joints"))
 	{
