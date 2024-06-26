@@ -842,21 +842,21 @@ void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
 		AnimFrameData.WorldTime = FLiveLinkWorldTime();
 
 		TArray<FTransform> transforms;
-		transforms.Reset(subject.joints.Num());
+		transforms.Reset(subject.Joints.Num());
 		FTransform tm;
 
-		for (int x = 0; x < subject.joints.Num(); x++)
+		for (int x = 0; x < subject.Joints.Num(); x++)
 		{
 			const int32 transformIndex = transforms.AddUninitialized(1);
-			const int parentIndex = subject.joints[x].parentIndex;
+			const int parentIndex = subject.Joints[x].parentIndex;
 
 			if (parentIndex >= 0)
 			{
-				tm = subject.joints[x].transform.GetRelativeTransform(subject.joints[parentIndex].transform);
+				tm = subject.Joints[x].transform.GetRelativeTransform(subject.Joints[parentIndex].transform);
 			}
 			else
 			{
-				tm = subject.joints[x].transform;
+				tm = subject.Joints[x].transform;
 			}
 
 			const FVector JointPosition = tm.GetLocation();
@@ -950,10 +950,14 @@ void FVirtualProductionSource::HandleNewtonData(const FNewtonData& newton)
 	TArray<FName> boneNames;
 	TArray<int32> boneParents;
 
-	for (int x = 0; x < newton.joints.Num(); x++)
+	int32 JointsLength = newton.Joints.Num();
+	boneNames.SetNum(JointsLength);
+	boneParents.SetNum(JointsLength);
+
+	for (int x = 0; x < JointsLength; ++x)
 	{
-		boneNames.Add(newton.joints[x].name);
-		boneParents.Add(newton.joints[x].parentIndex);
+		boneNames.Add(newton.Joints[x].name);
+		boneParents.Add(newton.Joints[x].parentIndex);
 	}
 
 	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
@@ -1490,17 +1494,16 @@ void UpdateNewtonsFromJson(FNewtonData* newtonData, const TSharedPtr<FJsonObject
 	if (jsonObject->HasField("meta"))
 	{
 		TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField("meta");
-		newtonData->hasFace = Meta->GetBoolField("hasFace");
+		newtonData->HasFace = Meta->GetBoolField("hasFace");
 	}
 
 	if (jsonObject->HasField("joints"))
 	{
 		TArray<TSharedPtr<FJsonValue>> JointsArray = jsonObject->GetArrayField("joints");
 
-		for (TArray< TSharedPtr< FJsonValue > >::TConstIterator JointsIter(JointsArray.CreateConstIterator()); JointsIter; ++JointsIter)
+		for (const auto& JointElem : JointsArray)
 		{
-			const TSharedPtr< FJsonValue >  JointEntry = *JointsIter;
-			const TSharedPtr< FJsonObject > JoinJSONObject = JointEntry->AsObject();
+			const TSharedPtr< FJsonObject > JoinJSONObject = JointElem->AsObject();
 
 			FString JointName = JoinJSONObject->GetStringField("name");
 			int32 JointParentIndex = JoinJSONObject->GetIntegerField("parent");
@@ -1508,7 +1511,7 @@ void UpdateNewtonsFromJson(FNewtonData* newtonData, const TSharedPtr<FJsonObject
 			FQuat JointRotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField("rotation"));
 
 			FTransform JointTransform(JointRotation, JointPosition, FVector::OneVector);
-			newtonData->joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, JointTransform, JointPosition, JointRotation));
+			newtonData->Joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, JointTransform, JointPosition, JointRotation));
 		}
 	}
 	else
@@ -1629,7 +1632,7 @@ uint32 FVirtualProductionSource::Run()
 						NewtonData.IsLive = true;
 						UpdateNewtonsFromJson(&NewtonData, currentNewton->AsObject());
 
-						if (NewtonData.hasFace)
+						if (NewtonData.HasFace)
 						{
 							auto JSONObjectface = currentNewton->AsObject()->GetObjectField("face");
 							auto FaceData = FFace(JSONObjectface, NewtonData.NewtonName);

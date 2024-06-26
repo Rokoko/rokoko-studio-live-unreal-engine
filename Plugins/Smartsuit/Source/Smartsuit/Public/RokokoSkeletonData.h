@@ -190,7 +190,7 @@ struct FRokokoCharacterJoint
 		, parentIndex(ParentIndex)
 		, transform(Transform)
 	{}
-	FRokokoCharacterJoint(FName Name, int32 ParentIndex, const FTransform& Transform, FVector Position, FQuat Rotation)
+	FRokokoCharacterJoint(FName Name, int32 ParentIndex, const FTransform& Transform, FVector& Position, FQuat& Rotation)
 		: name(Name)
 		, parentIndex(ParentIndex)
 		, transform(Transform)
@@ -378,9 +378,9 @@ struct FNewtonData
 	bool IsLive{ false };
 
 	UPROPERTY(BlueprintReadOnly, Category = Default)
-	bool hasFace{ false };
+	bool HasFace{ false };
 
-	TArray<FRokokoCharacterJoint> joints;
+	TArray<FRokokoCharacterJoint> Joints;
 
 
 	FName GetSubjectName() const
