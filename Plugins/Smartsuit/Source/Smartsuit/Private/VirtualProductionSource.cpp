@@ -1505,13 +1505,14 @@ void UpdateNewtonsFromJson(FNewtonData* newtonData, const TSharedPtr<FJsonObject
 		{
 			const TSharedPtr< FJsonObject > JoinJSONObject = JointElem->AsObject();
 
-			FString JointName = JoinJSONObject->GetStringField("name");
-			int32 JointParentIndex = JoinJSONObject->GetIntegerField("parent");
-			FVector JointPosition = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField("position"));
-			FQuat JointRotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField("rotation"));
-
-			FTransform JointTransform(JointRotation, JointPosition, FVector::OneVector);
-			newtonData->Joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, JointTransform, JointPosition, JointRotation));
+			FRokokoCharacterJoint CharacterJoint;
+			CharacterJoint.name = *JoinJSONObject->GetStringField("name");
+			CharacterJoint.parentIndex = JoinJSONObject->GetIntegerField("parent");
+			CharacterJoint.position = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField("position"));
+			CharacterJoint.rotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField("rotation"));
+			FTransform JointTransform(CharacterJoint.rotation, CharacterJoint.position, FVector::OneVector);
+			CharacterJoint.transform = JointTransform;
+			newtonData->Joints.Add(MoveTemp(CharacterJoint));
 		}
 	}
 	else
