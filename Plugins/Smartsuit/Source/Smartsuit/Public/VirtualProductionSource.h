@@ -62,6 +62,7 @@ public:
 	void HandleFace(const TArray<FFace>& faces);
 	void HandleSuits(const TArray<FSuitData>& suits);
 	void HandleCharacters(const TArray<FCharacterData>& characters);
+	void HandleNewtons(const TArray<FNewtonData>& newtons);
 	void ClearAllSubjects();
 
 	static void SetInstance(TSharedPtr<FVirtualProductionSource> NewInstance) { instance = NewInstance; }
@@ -77,17 +78,20 @@ private:
 	void HandleFaceData(const FFace& face);
 	void HandleSuitData(const FSuitData& suit);
 	void HandleCharacterData(const FCharacterData& character);
+	void HandleNewtonData(const FNewtonData& newton);
 	void CreateJoint(TArray<FTransform>& transforms, int32 index, const FSmartsuitBone* parent, const FSmartsuitBone* sensor);
 
 	TArray<FName> subjectNames;
 	TArray<FName> faceNames;
 	TArray<FName> actorNames;
 	TArray<FName> characterNames;
+	TArray<FName> newtonNames;
 
 	TArray<FVirtualProductionSubject> existingSubjects;
 	TArray<FFace> existingFaces;
 	TArray<FSuitData> existingActors;
 	TArray<FCharacterData> existingCharacters;
+	TArray<FNewtonData> existingNewtons;
 
 	TArray<FName> notExistingSubjects;
 
