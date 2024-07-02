@@ -190,6 +190,13 @@ struct FRokokoCharacterJoint
 		, parentIndex(ParentIndex)
 		, transform(Transform)
 	{}
+	FRokokoCharacterJoint(FName Name, int32 ParentIndex, const FTransform& Transform, FVector& Position, FQuat& Rotation)
+		: name(Name)
+		, parentIndex(ParentIndex)
+		, transform(Transform)
+		, position(Position)
+		, rotation(Rotation)
+	{}
 
 	FName name;
 	int32 parentIndex;
@@ -343,6 +350,42 @@ struct FCharacterData
 	FName GetSubjectName() const
 	{
 		FString TempSubjectName = "character:" + CharacterName + ":body";
+#if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
+		return FName(TempSubjectName);
+#else
+		return FName(*TempSubjectName);
+#endif
+	}
+};
+
+USTRUCT(BlueprintType)
+struct FNewtonData
+{
+	GENERATED_BODY()
+
+	FNewtonData() {}
+
+	/** The name of the Actor. */
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	FString NewtonName;
+
+	uint32_t Timestamp{ 0 };
+
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	FString Id;
+
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	bool IsLive{ false };
+
+	UPROPERTY(BlueprintReadOnly, Category = Default)
+	bool HasFace{ false };
+
+	TArray<FRokokoCharacterJoint> Joints;
+
+
+	FName GetSubjectName() const
+	{
+		FString TempSubjectName = "newton:" + NewtonName + ":body";
 #if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
 		return FName(TempSubjectName);
 #else
