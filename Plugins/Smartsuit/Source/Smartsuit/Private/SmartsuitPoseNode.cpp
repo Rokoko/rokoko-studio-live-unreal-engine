@@ -8,8 +8,6 @@
 #include "Animation/AnimInstanceProxy.h"
 #include "Roles/LiveLinkAnimationRole.h"
 #include "SmartsuitBlueprintLibrary.h"
-#include "Roles/LiveLinkSmartsuitRole.h"
-#include "Roles/LiveLinkSmartsuitTypes.h"
 
 
 /**Holds information a Smartsuit character pose.*/
@@ -662,7 +660,7 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 		FVector NewRootPosition = hipPosition;
 		NewRootPosition.Z = 0.0f;
 
-		// Make sure to initialize root motion position, otherwise we will get erronous results
+		// Make sure to initialize root motion position, otherwise we will get erroneous results
 		if (!bInitializedRootPosition)
 		{
 			OldRootPosition = NewRootPosition;
