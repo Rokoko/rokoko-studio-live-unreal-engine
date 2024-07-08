@@ -950,11 +950,7 @@ void FVirtualProductionSource::HandleNewtonData(const FNewtonData& newton)
 	TArray<FName> boneNames;
 	TArray<int32> boneParents;
 
-	int32 JointsLength = newton.Joints.Num();
-	boneNames.SetNum(JointsLength);
-	boneParents.SetNum(JointsLength);
-
-	for (int x = 0; x < JointsLength; ++x)
+	for (int x = 0; x < newton.Joints.Num(); x++)
 	{
 		boneNames.Add(newton.Joints[x].name);
 		boneParents.Add(newton.Joints[x].parentIndex);
