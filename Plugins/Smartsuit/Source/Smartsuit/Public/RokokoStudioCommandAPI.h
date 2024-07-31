@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Interfaces/IHttpRequest.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
 #include "RokokoStudioCommandAPI.generated.h"
 
 USTRUCT(BlueprintType)

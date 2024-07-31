@@ -7,6 +7,8 @@
 #include "Dom/JsonObject.h"
 #include "Serialization/JsonSerializer.h"
 #include "RokokoRemote.h"
+#include "Runtime/Launch/Resources/Version.h"
+#include "Runtime/Core/Public/Misc/Timecode.h"
 
 
 void URokokoStudioCommandAPI::Info(const FRokokoCommandAPI_IPInfo& IPInfo, bool ShouldIncludeDevices, bool ShouldIncludeClips, bool ShouldIncludeActors, bool ShouldIncludeCharacters)
