@@ -1,50 +1,50 @@
 {
-    "FileVersion": 3,
-    "Version": 3,
-    "VersionName": "1.12.2",
-    "FriendlyName": "Rokoko Studio Live",
-    "Description": "Now you can use your Smartsuit Pro natively in Unreal! With Rokoko Studio Live you are able to stream and visualize Studio's Actor and Character data inside Unreal Engine.",
-    "Category": "Animation",
-    "CreatedBy": "Rokoko Electronics ApS",
-    "CreatedByURL": "https://www.rokoko.com",
-    "EngineVersion": ["5.0", "5.1", "5.2", "5.3", "5.4"],
-    "DocsURL": "https://github.com/Rokoko/rokoko-studio-live-unreal-engine/wiki/Rokoko-Studio-Live-Plugin-for-Unreal-Engine",
-    "MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/7e20fe7d4247410cb4f7d3e162d61c21",
-    "SupportURL": "",
-    "CanContainContent": true,
-    "IsBetaVersion": true,
-    "Installed": true,
-    "EnabledByDefault": true,
-    "Modules": [
-        {
-            "Name": "Smartsuit",
-            "Type": "Runtime",
-            "LoadingPhase": "PreDefault",
-            "WhitelistPlatforms": [
-                "Win64",
-                "Mac",
-                "Linux"
-            ]
-        },
-        {
-            "Name": "SmartsuitEditor",
-            "Type": "UncookedOnly",
-            "LoadingPhase": "PreDefault",
-            "WhitelistPlatforms": [
-                "Win64",
-                "Mac",
-                "Linux"
-            ]
-        }
-    ],
-    "Plugins": [
-        {
-            "Name": "LiveLink",
-            "Enabled": true
-        },
-        {
-            "Name": "LiveLinkCamera",
-            "Enabled": true
-        }
-    ]
+	"FileVersion": 3,
+	"Version": 3,
+	"VersionName": "1.12.2",
+	"FriendlyName": "Rokoko Studio Live",
+	"Description": "Now you can use your Smartsuit Pro natively in Unreal! With Rokoko Studio Live you are able to stream and visualize Studio's Actor and Character data inside Unreal Engine.",
+	"Category": "Animation",
+	"CreatedBy": "Rokoko Electronics ApS",
+	"CreatedByURL": "https://www.rokoko.com",
+	"IsExperimentalVersion": false,
+	"DocsURL": "https://github.com/Rokoko/rokoko-studio-live-unreal-engine/wiki/Rokoko-Studio-Live-Plugin-for-Unreal-Engine",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/7e20fe7d4247410cb4f7d3e162d61c21",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": true,
+	"EnabledByDefault": true,
+	"Modules": [
+		{
+			"Name": "Smartsuit",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault",
+			"PlatformAllowList": [
+				"Win64",
+				"Mac",
+				"Linux"
+			]
+		},
+		{
+			"Name": "SmartsuitEditor",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "PreDefault",
+			"PlatformAllowList": [
+				"Win64",
+				"Mac",
+				"Linux"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "LiveLink",
+			"Enabled": true
+		},
+		{
+			"Name": "LiveLinkCamera",
+			"Enabled": true
+		}
+	]
 }
