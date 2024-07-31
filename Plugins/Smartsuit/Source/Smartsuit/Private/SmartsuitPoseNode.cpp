@@ -8,6 +8,7 @@
 #include "Animation/AnimInstanceProxy.h"
 #include "Roles/LiveLinkAnimationRole.h"
 #include "SmartsuitBlueprintLibrary.h"
+#include "Runtime/Core/Public/Features/IModularFeatures.h"
 
 
 /**Holds information a Smartsuit character pose.*/

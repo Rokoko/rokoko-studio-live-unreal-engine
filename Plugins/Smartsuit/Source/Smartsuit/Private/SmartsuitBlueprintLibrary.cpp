@@ -3,6 +3,8 @@
 #include "SmartsuitBlueprintLibrary.h"
 #include "VirtualProductionSource.h"
 #include "Engine/SkeletalMesh.h"
+#include "Runtime/Engine/Classes/Components/SkeletalMeshComponent.h"
+#include "Runtime/CoreUObject/Public/UObject/UObjectIterator.h"
 
 
 FFace USmartsuitBlueprintLibrary::GetFaceByFaceID(FString faceId)
