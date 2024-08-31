@@ -201,7 +201,7 @@ FFace::FFace(TSharedPtr<FJsonObject> jsonObject, const FString& InActorName)
 	}
 
 	constexpr float scale{ 0.01f };
-
+	
 	eyeBlinkLeft = jsonObject->GetNumberField(TEXT("eyeBlinkLeft")) * scale;
 	eyeLookDownLeft = jsonObject->GetNumberField(TEXT("eyeLookDownLeft")) * scale;
 	eyeLookInLeft = jsonObject->GetNumberField(TEXT("eyeLookInLeft")) * scale;
