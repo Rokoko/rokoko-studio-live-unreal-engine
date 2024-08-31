@@ -1631,7 +1631,7 @@ uint32 FVirtualProductionSource::Run()
 
 						if (NewtonData.HasFace)
 						{
-							auto JSONObjectface = currentNewton->AsObject()->GetObjectField("face");
+							auto JSONObjectface = currentNewton->AsObject()->GetObjectField(TEXT("face"));
 							auto FaceData = FFace(JSONObjectface, NewtonData.NewtonName);
 							VPFrame.Faces.Emplace(MoveTemp(FaceData));
 						}

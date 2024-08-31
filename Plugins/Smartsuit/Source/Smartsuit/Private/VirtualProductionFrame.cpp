@@ -13,59 +13,59 @@ VirtualProductionFrame::~VirtualProductionFrame()
 
 FProp::FProp(bool InIsLive, TSharedPtr<FJsonObject> jsonObject)
 {
-	name = jsonObject->GetStringField("name");
+	name = jsonObject->GetStringField(TEXT("name"));
 	color = USmartsuitBlueprintLibrary::GetColorField(jsonObject);
-	position = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField("position"));
-	rotation = USmartsuitBlueprintLibrary::GetQuaternionField(jsonObject->GetObjectField("rotation"));
+	position = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField(TEXT("position")));
+	rotation = USmartsuitBlueprintLibrary::GetQuaternionField(jsonObject->GetObjectField(TEXT("rotation")));
 	
 	isLive = InIsLive;
 }
 
 FProfile::FProfile(TSharedPtr<FJsonObject> jsonObject)
 {
-	name = jsonObject->GetStringField("name");
-	uuid = jsonObject->GetStringField("uuid");
-	dimensions = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField("dimensions"));
-	color = USmartsuitBlueprintLibrary::GetFLinearColorField(jsonObject->GetObjectField("color"));
-	trackerOffset = FReferencePoint(jsonObject->GetObjectField("trackeroffset"));
-	pivot = FReferencePoint(jsonObject->GetObjectField("pivot"));
+	name = jsonObject->GetStringField(TEXT("name"));
+	uuid = jsonObject->GetStringField(TEXT("uuid"));
+	dimensions = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField(TEXT("dimensions")));
+	color = USmartsuitBlueprintLibrary::GetFLinearColorField(jsonObject->GetObjectField(TEXT("color")));
+	trackerOffset = FReferencePoint(jsonObject->GetObjectField(TEXT("trackeroffset")));
+	pivot = FReferencePoint(jsonObject->GetObjectField(TEXT("pivot")));
 
-	TArray<TSharedPtr<FJsonValue>> gripsarray = jsonObject->GetArrayField("grips");
+	TArray<TSharedPtr<FJsonValue>> gripsarray = jsonObject->GetArrayField(TEXT("grips"));
 
 	for (auto currentgrip : gripsarray)
 	{
 		grips.Add(FRadiusReferencePoint(currentgrip->AsObject()));
 	}
 
-	propType = jsonObject->GetIntegerField("propType");
+	propType = jsonObject->GetIntegerField(TEXT("propType"));
 }
 
 FReferencePoint::FReferencePoint(TSharedPtr<FJsonObject> jsonObject)
 {
-	position = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField("position"));
+	position = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField(TEXT("position")));
 
-	FVector TempVector = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField("rotation"));
+	FVector TempVector = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField(TEXT("rotation")));
 	rotation = TempVector.Rotation().Quaternion();
 }
 
 FRadiusReferencePoint::FRadiusReferencePoint(TSharedPtr<FJsonObject> jsonObject)
 {
-	radius = jsonObject->GetNumberField("radius");
-	position = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField("position"));
-	rotation = USmartsuitBlueprintLibrary::GetQuaternionField(jsonObject->GetObjectField("rotation"));
+	radius = jsonObject->GetNumberField(TEXT("radius"));
+	position = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField(TEXT("position")));
+	rotation = USmartsuitBlueprintLibrary::GetQuaternionField(jsonObject->GetObjectField(TEXT("rotation")));
 }
 
 FTracker::FTracker(TSharedPtr<FJsonObject> jsonObject)
 {
-	name = jsonObject->GetStringField("name");
-	connectionId = jsonObject->GetStringField("connectionId");
-	position = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField("position"));
-	rotation = USmartsuitBlueprintLibrary::GetQuaternionField(jsonObject->GetObjectField("rotation"));
-	isLive = jsonObject->GetBoolField("isLive");
-	trackingResult = jsonObject->GetIntegerField("trackingResult");
-	trackerType = jsonObject->GetIntegerField("trackerType");
-	RenderModelName = jsonObject->GetStringField("RenderModelName");
-	battery = jsonObject->GetNumberField("battery");
+	name = jsonObject->GetStringField(TEXT("name"));
+	connectionId = jsonObject->GetStringField(TEXT("connectionId"));
+	position = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField(TEXT("position")));
+	rotation = USmartsuitBlueprintLibrary::GetQuaternionField(jsonObject->GetObjectField(TEXT("rotation")));
+	isLive = jsonObject->GetBoolField(TEXT("isLive"));
+	trackingResult = jsonObject->GetIntegerField(TEXT("trackingResult"));
+	trackerType = jsonObject->GetIntegerField(TEXT("trackerType"));
+	RenderModelName = jsonObject->GetStringField(TEXT("RenderModelName"));
+	battery = jsonObject->GetNumberField(TEXT("battery"));
 }
 
 
@@ -195,63 +195,63 @@ FFace::FFace(TSharedPtr<FJsonObject> jsonObject, const FString& InActorName)
 {
 	faceId = InActorName;
 	actorName = InActorName;
-	if (!jsonObject->TryGetStringField("profileName", profileName))
+	if (!jsonObject->TryGetStringField(TEXT("profileName"), profileName))
 	{
 		profileName = "NOPROFILENAME for " + faceId;
 	}
 
 	constexpr float scale{ 0.01f };
-
-	eyeBlinkLeft = jsonObject->GetNumberField("eyeBlinkLeft") * scale;
-	eyeLookDownLeft = jsonObject->GetNumberField("eyeLookDownLeft") * scale;
-	eyeLookInLeft = jsonObject->GetNumberField("eyeLookInLeft") * scale;
-	eyeLookOutLeft = jsonObject->GetNumberField("eyeLookOutLeft") * scale;
-	eyeLookUpLeft = jsonObject->GetNumberField("eyeLookUpLeft") * scale;
-	eyeSquintLeft = jsonObject->GetNumberField("eyeSquintLeft") * scale;
-	eyeWideLeft = jsonObject->GetNumberField("eyeWideLeft") * scale;
-	eyeBlinkRight = jsonObject->GetNumberField("eyeBlinkRight") * scale;
-	eyeLookDownRight = jsonObject->GetNumberField("eyeLookDownRight") * scale;
-	eyeLookInRight = jsonObject->GetNumberField("eyeLookInRight") * scale;
-	eyeLookOutRight = jsonObject->GetNumberField("eyeLookOutRight") * scale;
-	eyeLookUpRight = jsonObject->GetNumberField("eyeLookUpRight") * scale;
-	eyeSquintRight = jsonObject->GetNumberField("eyeSquintRight") * scale;
-	eyeWideRight = jsonObject->GetNumberField("eyeWideRight") * scale;
-	jawForward = jsonObject->GetNumberField("jawForward") * scale;
-	jawLeft = jsonObject->GetNumberField("jawLeft") * scale;
-	jawRight = jsonObject->GetNumberField("jawRight") * scale;
-	jawOpen = jsonObject->GetNumberField("jawOpen") * scale;
-	mouthClose = jsonObject->GetNumberField("mouthClose") * scale;
-	mouthFunnel = jsonObject->GetNumberField("mouthFunnel") * scale;
-	mouthPucker = jsonObject->GetNumberField("mouthPucker") * scale;
-	mouthLeft = jsonObject->GetNumberField("mouthLeft") * scale;
-	mouthRight = jsonObject->GetNumberField("mouthRight") * scale;
-	mouthSmileLeft = jsonObject->GetNumberField("mouthSmileLeft") * scale;
-	mouthSmileRight = jsonObject->GetNumberField("mouthSmileRight") * scale;
-	mouthFrownLeft = jsonObject->GetNumberField("mouthFrownLeft") * scale;
-	mouthFrownRight = jsonObject->GetNumberField("mouthFrownRight") * scale;
-	mouthDimpleLeft = jsonObject->GetNumberField("mouthDimpleLeft") * scale;
-	mouthDimpleRight = jsonObject->GetNumberField("mouthDimpleRight") * scale;
-	mouthStretchLeft = jsonObject->GetNumberField("mouthStretchLeft") * scale;
-	mouthStretchRight = jsonObject->GetNumberField("mouthStretchRight") * scale;
-	mouthRollLower = jsonObject->GetNumberField("mouthRollLower") * scale;
-	mouthRollUpper = jsonObject->GetNumberField("mouthRollUpper") * scale;
-	mouthShrugLower = jsonObject->GetNumberField("mouthShrugLower") * scale;
-	mouthShrugUpper = jsonObject->GetNumberField("mouthShrugUpper") * scale;
-	mouthPressLeft = jsonObject->GetNumberField("mouthPressLeft") * scale;
-	mouthPressRight = jsonObject->GetNumberField("mouthPressRight") * scale;
-	mouthLowerDownLeft = jsonObject->GetNumberField("mouthLowerDownLeft") * scale;
-	mouthLowerDownRight = jsonObject->GetNumberField("mouthLowerDownRight") * scale;
-	mouthUpperUpLeft = jsonObject->GetNumberField("mouthUpperUpLeft") * scale;
-	mouthUpperUpRight = jsonObject->GetNumberField("mouthUpperUpRight") * scale;
-	browDownLeft = jsonObject->GetNumberField("browDownLeft") * scale;
-	browDownRight = jsonObject->GetNumberField("browDownRight") * scale;
-	browInnerUp = jsonObject->GetNumberField("browInnerUp") * scale;
-	browOuterUpLeft = jsonObject->GetNumberField("browOuterUpLeft") * scale;
-	browOuterUpRight = jsonObject->GetNumberField("browOuterUpRight") * scale;
-	cheekPuff = jsonObject->GetNumberField("cheekPuff") * scale;
-	cheekSquintLeft = jsonObject->GetNumberField("cheekSquintLeft") * scale;
-	cheekSquintRight = jsonObject->GetNumberField("cheekSquintRight") * scale;
-	noseSneerLeft = jsonObject->GetNumberField("noseSneerLeft") * scale;
-	noseSneerRight = jsonObject->GetNumberField("noseSneerRight") * scale;
-	tongueOut = jsonObject->GetNumberField("tongueOut") * scale;
+	//fix all number fields with the depracated Passing an ANSI string to GetNumberField 
+	eyeBlinkLeft = jsonObject->GetNumberField(TEXT("eyeBlinkLeft")) * scale;
+	eyeLookDownLeft = jsonObject->GetNumberField(TEXT("eyeLookDownLeft")) * scale;
+	eyeLookInLeft = jsonObject->GetNumberField(TEXT("eyeLookInLeft")) * scale;
+	eyeLookOutLeft = jsonObject->GetNumberField(TEXT("eyeLookOutLeft")) * scale;
+	eyeLookUpLeft = jsonObject->GetNumberField(TEXT("eyeLookUpLeft")) * scale;
+	eyeSquintLeft = jsonObject->GetNumberField(TEXT("eyeSquintLeft")) * scale;
+	eyeWideLeft = jsonObject->GetNumberField(TEXT("eyeWideLeft")) * scale;
+	eyeBlinkRight = jsonObject->GetNumberField(TEXT("eyeBlinkRight")) * scale;
+	eyeLookDownRight = jsonObject->GetNumberField(TEXT("eyeLookDownRight")) * scale;
+	eyeLookInRight = jsonObject->GetNumberField(TEXT("eyeLookInRight")) * scale;
+	eyeLookOutRight = jsonObject->GetNumberField(TEXT("eyeLookOutRight")) * scale;
+	eyeLookUpRight = jsonObject->GetNumberField(TEXT("eyeLookUpRight")) * scale;
+	eyeSquintRight = jsonObject->GetNumberField(TEXT("eyeSquintRight")) * scale;
+	eyeWideRight = jsonObject->GetNumberField(TEXT("eyeWideRight")) * scale;
+	jawForward = jsonObject->GetNumberField(TEXT("jawForward")) * scale;
+	jawLeft = jsonObject->GetNumberField(TEXT("jawLeft")) * scale;
+	jawRight = jsonObject->GetNumberField(TEXT("jawRight")) * scale;
+	jawOpen = jsonObject->GetNumberField(TEXT("jawOpen")) * scale;
+	mouthClose = jsonObject->GetNumberField(TEXT("mouthClose")) * scale;
+	mouthFunnel = jsonObject->GetNumberField(TEXT("mouthFunnel")) * scale;
+	mouthPucker = jsonObject->GetNumberField(TEXT("mouthPucker")) * scale;
+	mouthLeft = jsonObject->GetNumberField(TEXT("mouthLeft")) * scale;
+	mouthRight = jsonObject->GetNumberField(TEXT("mouthRight")) * scale;
+	mouthSmileLeft = jsonObject->GetNumberField(TEXT("mouthSmileLeft")) * scale;
+	mouthSmileRight = jsonObject->GetNumberField(TEXT("mouthSmileRight")) * scale;
+	mouthFrownLeft = jsonObject->GetNumberField(TEXT("mouthFrownLeft")) * scale;
+	mouthFrownRight = jsonObject->GetNumberField(TEXT("mouthFrownRight")) * scale;
+	mouthDimpleLeft = jsonObject->GetNumberField(TEXT("mouthDimpleLeft")) * scale;
+	mouthDimpleRight = jsonObject->GetNumberField(TEXT("mouthDimpleRight")) * scale;
+	mouthStretchLeft = jsonObject->GetNumberField(TEXT("mouthStretchLeft")) * scale;
+	mouthStretchRight = jsonObject->GetNumberField(TEXT("mouthStretchRight")) * scale;
+	mouthRollLower = jsonObject->GetNumberField(TEXT("mouthRollLower")) * scale;
+	mouthRollUpper = jsonObject->GetNumberField(TEXT("mouthRollUpper")) * scale;
+	mouthShrugLower = jsonObject->GetNumberField(TEXT("mouthShrugLower")) * scale;
+	mouthShrugUpper = jsonObject->GetNumberField(TEXT("mouthShrugUpper")) * scale;
+	mouthPressLeft = jsonObject->GetNumberField(TEXT("mouthPressLeft")) * scale;
+	mouthPressRight = jsonObject->GetNumberField(TEXT("mouthPressRight")) * scale;
+	mouthLowerDownLeft = jsonObject->GetNumberField(TEXT("mouthLowerDownLeft")) * scale;
+	mouthLowerDownRight = jsonObject->GetNumberField(TEXT("mouthLowerDownRight")) * scale;
+	mouthUpperUpLeft = jsonObject->GetNumberField(TEXT("mouthUpperUpLeft")) * scale;
+	mouthUpperUpRight = jsonObject->GetNumberField(TEXT("mouthUpperUpRight")) * scale;
+	browDownLeft = jsonObject->GetNumberField(TEXT("browDownLeft")) * scale;
+	browDownRight = jsonObject->GetNumberField(TEXT("browDownRight")) * scale;
+	browInnerUp = jsonObject->GetNumberField(TEXT("browInnerUp")) * scale;
+	browOuterUpLeft = jsonObject->GetNumberField(TEXT("browOuterUpLeft")) * scale;
+	browOuterUpRight = jsonObject->GetNumberField(TEXT("browOuterUpRight")) * scale;
+	cheekPuff = jsonObject->GetNumberField(TEXT("cheekPuff")) * scale;
+	cheekSquintLeft = jsonObject->GetNumberField(TEXT("cheekSquintLeft")) * scale;
+	cheekSquintRight = jsonObject->GetNumberField(TEXT("cheekSquintRight")) * scale;
+	noseSneerLeft = jsonObject->GetNumberField(TEXT("noseSneerLeft")) * scale;
+	noseSneerRight = jsonObject->GetNumberField(TEXT("noseSneerRight")) * scale;
+	tongueOut = jsonObject->GetNumberField(TEXT("tongueOut")) * scale;
 }
