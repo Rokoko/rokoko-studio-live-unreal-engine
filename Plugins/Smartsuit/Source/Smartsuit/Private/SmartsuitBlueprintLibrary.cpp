@@ -280,9 +280,9 @@ void USmartsuitBlueprintLibrary::JSONTest()
 FVector USmartsuitBlueprintLibrary::GetVectorField(TSharedPtr<FJsonObject> jsonObject)
 {
 	FVector ReturnVal;
-	ReturnVal.X = jsonObject->GetNumberField("x");
-	ReturnVal.Y = jsonObject->GetNumberField("y");
-	ReturnVal.Z = jsonObject->GetNumberField("z");
+	ReturnVal.X = jsonObject->GetNumberField(TEXT("x"));
+	ReturnVal.Y = jsonObject->GetNumberField(TEXT("y"));
+	ReturnVal.Z = jsonObject->GetNumberField(TEXT("z"));
 	return ReturnVal;
 }
 
