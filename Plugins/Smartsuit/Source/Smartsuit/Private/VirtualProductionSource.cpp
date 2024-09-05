@@ -1355,8 +1355,8 @@ void SuitParseBone(FSuitData* suitData, TSharedPtr<FJsonObject> jsonObject, cons
 	if (jsonObject->HasField(BoneName))
 	{
 		TSharedPtr<FJsonObject> BoneObject = jsonObject->GetObjectField(BoneName);
-		FVector SensorPosition = USmartsuitBlueprintLibrary::GetVectorField(BoneObject->GetObjectField("position"));
-		FQuat SensorRotation = USmartsuitBlueprintLibrary::GetQuaternionField(BoneObject->GetObjectField("rotation"));
+		FVector SensorPosition = USmartsuitBlueprintLibrary::GetVectorField(BoneObject->GetObjectField(TEXT("position")));
+		FQuat SensorRotation = USmartsuitBlueprintLibrary::GetQuaternionField(BoneObject->GetObjectField(TEXT("rotation")));
 
 		suitData->bones.Add(FName(*BoneName), FSmartsuitBone(FName(*BoneName), SensorPosition, SensorRotation));
 	}
@@ -1364,7 +1364,7 @@ void SuitParseBone(FSuitData* suitData, TSharedPtr<FJsonObject> jsonObject, cons
 
 void UpdateSuitFromJson(FSuitData* suitData, const TSharedPtr<FJsonObject> jsonObject)
 {
-	suitData->suitname = jsonObject->GetStringField("name");
+	suitData->suitname = jsonObject->GetStringField(TEXT("name"));
 
 	//temp
 	suitData->profileName = suitData->suitname;
@@ -1378,14 +1378,14 @@ void UpdateSuitFromJson(FSuitData* suitData, const TSharedPtr<FJsonObject> jsonO
 	//TArray<TSharedPtr<FJsonValue>> ColorArray = jsonObject->GetArrayField("color");
 	suitData->color = USmartsuitBlueprintLibrary::GetColorField(jsonObject);
 
-	TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField("meta");
-	suitData->hasGloves = Meta->GetBoolField("hasGloves");
-	suitData->hasLeftGlove = Meta->GetBoolField("hasLeftGlove");
-	suitData->hasRightGlove = Meta->GetBoolField("hasRightGlove");
-	suitData->hasBody = Meta->GetBoolField("hasBody");
-	suitData->hasFace = Meta->GetBoolField("hasFace");
+	TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField(TEXT("meta"));
+	suitData->hasGloves = Meta->GetBoolField(TEXT("hasGloves"));
+	suitData->hasLeftGlove = Meta->GetBoolField(TEXT("hasLeftGlove"));
+	suitData->hasRightGlove = Meta->GetBoolField(TEXT("hasRightGlove"));
+	suitData->hasBody = Meta->GetBoolField(TEXT("hasBody"));
+	suitData->hasFace = Meta->GetBoolField(TEXT("hasFace"));
 
-	TSharedPtr<FJsonObject> BodyObj = jsonObject->GetObjectField("body");
+	TSharedPtr<FJsonObject> BodyObj = jsonObject->GetObjectField(TEXT("body"));
 
 	SuitParseBone(suitData, BodyObj, SmartsuitBones::hip.ToString());
 	SuitParseBone(suitData, BodyObj, SmartsuitBones::spine.ToString());
@@ -1457,19 +1457,19 @@ void UpdateSuitFromJson(FSuitData* suitData, const TSharedPtr<FJsonObject> jsonO
 
 void UpdateCharacterFromJson(FCharacterData* characterData, const TSharedPtr<FJsonObject> jsonObject)
 {
-	characterData->CharacterName = jsonObject->GetStringField("name");
+	characterData->CharacterName = jsonObject->GetStringField(TEXT("name"));
 
-	TArray<TSharedPtr<FJsonValue>> JointsArray = jsonObject->GetArrayField("joints");
+	TArray<TSharedPtr<FJsonValue>> JointsArray = jsonObject->GetArrayField(TEXT("joints"));
 
 	for (TArray< TSharedPtr< FJsonValue > >::TConstIterator JointsIter(JointsArray.CreateConstIterator()); JointsIter; ++JointsIter)
 	{
 		const TSharedPtr< FJsonValue >  JointEntry = *JointsIter;
 		const TSharedPtr< FJsonObject > JoinJSONObject = JointEntry->AsObject();
 
-		FString JointName = JoinJSONObject->GetStringField("name");
-		int32 JointParentIndex = JoinJSONObject->GetIntegerField("parent");
-		FVector JointPosition = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField("position"));
-		FQuat JointRotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField("rotation"));
+		FString JointName = JoinJSONObject->GetStringField(TEXT("name"));
+		int32 JointParentIndex = JoinJSONObject->GetIntegerField(TEXT("parent"));
+		FVector JointPosition = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField(TEXT("position")));
+		FQuat JointRotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField(TEXT("rotation")));
 
 		FTransform JointTransform(JointRotation, JointPosition, FVector::OneVector);
 		characterData->joints.Add(FRokokoCharacterJoint(*JointName, JointParentIndex, JointTransform));
@@ -1478,34 +1478,34 @@ void UpdateCharacterFromJson(FCharacterData* characterData, const TSharedPtr<FJs
 
 void UpdateNewtonsFromJson(FNewtonData* newtonData, const TSharedPtr<FJsonObject> jsonObject)
 {
-	if (jsonObject->HasField("name"))
+	if (jsonObject->HasField(TEXT("name")))
 	{
-		newtonData->NewtonName = jsonObject->GetStringField("name");
+		newtonData->NewtonName = jsonObject->GetStringField(TEXT("name"));
 	}
 	else
 	{
 		newtonData->NewtonName = "UnknownName";
 	}
 
-	if (jsonObject->HasField("meta"))
+	if (jsonObject->HasField(TEXT("meta")))
 	{
-		TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField("meta");
-		newtonData->HasFace = Meta->GetBoolField("hasFace");
+		TSharedPtr<FJsonObject> Meta = jsonObject->GetObjectField(TEXT("meta"));
+		newtonData->HasFace = Meta->GetBoolField(TEXT("hasFace"));
 	}
 
-	if (jsonObject->HasField("joints"))
+	if (jsonObject->HasField(TEXT("joints")))
 	{
-		TArray<TSharedPtr<FJsonValue>> JointsArray = jsonObject->GetArrayField("joints");
+		TArray<TSharedPtr<FJsonValue>> JointsArray = jsonObject->GetArrayField(TEXT("joints"));
 
 		for (const auto& JointElem : JointsArray)
 		{
 			const TSharedPtr< FJsonObject > JoinJSONObject = JointElem->AsObject();
 
 			FRokokoCharacterJoint CharacterJoint;
-			CharacterJoint.name = *JoinJSONObject->GetStringField("name");
-			CharacterJoint.parentIndex = JoinJSONObject->GetIntegerField("parent");
-			CharacterJoint.position = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField("position"));
-			CharacterJoint.rotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField("rotation"));
+            CharacterJoint.name = *JoinJSONObject->GetStringField(TEXT("name"));
+			CharacterJoint.parentIndex = JoinJSONObject->GetIntegerField(TEXT("parent"));
+			CharacterJoint.position = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField(TEXT("position")));
+			CharacterJoint.rotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField(TEXT("rotation")));
 			FTransform JointTransform(CharacterJoint.rotation, CharacterJoint.position, FVector::OneVector);
 			CharacterJoint.transform = JointTransform;
 			newtonData->Joints.Add(MoveTemp(CharacterJoint));
@@ -1583,14 +1583,14 @@ uint32 FVirtualProductionSource::Run()
 		if (FJsonSerializer::Deserialize(Reader, JsonObject))
 		{
 
-			VPFrame.Version = JsonObject->GetStringField("version");
+			VPFrame.Version = JsonObject->GetStringField(TEXT("version"));
 			
 			//SCENE
 			{
-				TSharedPtr<FJsonObject> SceneObj = JsonObject->GetObjectField("scene");
-				if (SceneObj->HasField("props"))
+				TSharedPtr<FJsonObject> SceneObj = JsonObject->GetObjectField(TEXT("scene"));
+				if (SceneObj->HasField(TEXT("props")))
 				{
-					TArray<TSharedPtr<FJsonValue>> Livepropsarray = SceneObj->GetArrayField("props");
+					TArray<TSharedPtr<FJsonValue>> Livepropsarray = SceneObj->GetArrayField(TEXT("props"));
 
 					for (auto& currentprop : Livepropsarray)
 					{
@@ -1599,10 +1599,10 @@ uint32 FVirtualProductionSource::Run()
 					}
 				}
 
-				if (SceneObj->HasField("actors"))
+				if (SceneObj->HasField(TEXT("actors")))
 				{
 
-					TArray<TSharedPtr<FJsonValue>> LivesuitsArray = SceneObj->GetArrayField("actors");
+					TArray<TSharedPtr<FJsonValue>> LivesuitsArray = SceneObj->GetArrayField(TEXT("actors"));
 					for (auto& currentsuit : LivesuitsArray)
 					{
 						FSuitData SuitData; // = FSuitData(true, currentsuit->AsObject());
@@ -1611,7 +1611,7 @@ uint32 FVirtualProductionSource::Run()
 
 						if (SuitData.hasFace)
 						{
-							auto JSONObjectface = currentsuit->AsObject()->GetObjectField("face");
+							auto JSONObjectface = currentsuit->AsObject()->GetObjectField(TEXT("face"));
 							auto FaceData = FFace(JSONObjectface, SuitData.suitname);
 							SuitData.faceId = FaceData.faceId;
 							VPFrame.Faces.Emplace(MoveTemp(FaceData));
@@ -1620,9 +1620,9 @@ uint32 FVirtualProductionSource::Run()
 					}
 				}
 
-				if (SceneObj->HasField("newtons"))
+				if (SceneObj->HasField(TEXT("newtons")))
 				{
-					TArray<TSharedPtr<FJsonValue>> NewtonsArray = SceneObj->GetArrayField("newtons");
+					TArray<TSharedPtr<FJsonValue>> NewtonsArray = SceneObj->GetArrayField(TEXT("newtons"));
 					for (auto& currentNewton : NewtonsArray)
 					{
 						FNewtonData NewtonData;
@@ -1631,7 +1631,7 @@ uint32 FVirtualProductionSource::Run()
 
 						if (NewtonData.HasFace)
 						{
-							auto JSONObjectface = currentNewton->AsObject()->GetObjectField("face");
+							auto JSONObjectface = currentNewton->AsObject()->GetObjectField(TEXT("face"));
 							auto FaceData = FFace(JSONObjectface, NewtonData.NewtonName);
 							VPFrame.Faces.Emplace(MoveTemp(FaceData));
 						}
@@ -1639,9 +1639,9 @@ uint32 FVirtualProductionSource::Run()
 					}
 				}
 
-				if (SceneObj->HasField("characters"))
+				if (SceneObj->HasField(TEXT("characters")))
 				{
-					TArray<TSharedPtr<FJsonValue>> CharactersArray = SceneObj->GetArrayField("characters");
+					TArray<TSharedPtr<FJsonValue>> CharactersArray = SceneObj->GetArrayField(TEXT("characters"));
 					for (auto& currentcharacter : CharactersArray)
 					{
 						FCharacterData CharacterData;
