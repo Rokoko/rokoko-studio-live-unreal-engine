@@ -52,7 +52,7 @@ FRadiusReferencePoint::FRadiusReferencePoint(TSharedPtr<FJsonObject> jsonObject)
 {
 	radius = jsonObject->GetNumberField(TEXT("radius"));
 	position = USmartsuitBlueprintLibrary::GetVectorField(jsonObject->GetObjectField(TEXT("position")));
-	rotation = USmartsuitBlueprintLibrary::GetQuaternionField(jsonObject->GetObjectField(TEXT("rotation")));
+	rotation = USmartsuitBlueprintLibrary::GetQuaternionField(jsonObject->GetObjectField(TEXT("rotation")));
 }
 
 FTracker::FTracker(TSharedPtr<FJsonObject> jsonObject)
@@ -201,7 +201,7 @@ FFace::FFace(TSharedPtr<FJsonObject> jsonObject, const FString& InActorName)
 	}
 
 	constexpr float scale{ 0.01f };
-
+	
 	eyeBlinkLeft = jsonObject->GetNumberField(TEXT("eyeBlinkLeft")) * scale;
 	eyeLookDownLeft = jsonObject->GetNumberField(TEXT("eyeLookDownLeft")) * scale;
 	eyeLookInLeft = jsonObject->GetNumberField(TEXT("eyeLookInLeft")) * scale;

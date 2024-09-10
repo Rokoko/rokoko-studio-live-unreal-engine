@@ -1502,7 +1502,7 @@ void UpdateNewtonsFromJson(FNewtonData* newtonData, const TSharedPtr<FJsonObject
 			const TSharedPtr< FJsonObject > JoinJSONObject = JointElem->AsObject();
 
 			FRokokoCharacterJoint CharacterJoint;
-            CharacterJoint.name = *JoinJSONObject->GetStringField(TEXT("name"));
+			CharacterJoint.name = *JoinJSONObject->GetStringField(TEXT("name"));
 			CharacterJoint.parentIndex = JoinJSONObject->GetIntegerField(TEXT("parent"));
 			CharacterJoint.position = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField(TEXT("position")));
 			CharacterJoint.rotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField(TEXT("rotation")));
@@ -1587,7 +1587,7 @@ uint32 FVirtualProductionSource::Run()
 			
 			//SCENE
 			{
-				TSharedPtr<FJsonObject> SceneObj = JsonObject->GetObjectField(TEXT("scene"));
+				TSharedPtr<FJsonObject> SceneObj = JsonObject-> GetObjectField(TEXT("scene"));
 				if (SceneObj->HasField(TEXT("props")))
 				{
 					TArray<TSharedPtr<FJsonValue>> Livepropsarray = SceneObj->GetArrayField(TEXT("props"));

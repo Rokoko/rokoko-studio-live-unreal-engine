@@ -53,7 +53,7 @@ void ARokokoRemote::OnInfoRequestComplete(FHttpRequestPtr HttpRequest, FHttpResp
 	// Deserialize the json data given Reader and the actual object to deserialize
 	if (FJsonSerializer::Deserialize(Reader, JsonObject))
 	{
-        auto& Arr = JsonObject->GetArrayField(TEXT("parameters"));
+		auto& Arr = JsonObject->GetArrayField(TEXT("parameters"));
 
 		TArray<FString> StringsDevices;
 		TArray<FString> StringsClips;

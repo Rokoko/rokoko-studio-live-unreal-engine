@@ -200,7 +200,7 @@ struct FRokokoCharacterJoint
 
 	FName name;
 	int32 parentIndex;
-    FTransform transform;
+	FTransform transform;
 	FVector position;
 	FQuat rotation;
 };
