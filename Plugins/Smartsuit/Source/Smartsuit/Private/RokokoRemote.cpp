@@ -53,7 +53,7 @@ void ARokokoRemote::OnInfoRequestComplete(FHttpRequestPtr HttpRequest, FHttpResp
 	// Deserialize the json data given Reader and the actual object to deserialize
 	if (FJsonSerializer::Deserialize(Reader, JsonObject))
 	{
-		auto& Arr = JsonObject->GetArrayField("parameters");
+		auto& Arr = JsonObject->GetArrayField(TEXT("parameters"));
 
 		TArray<FString> StringsDevices;
 		TArray<FString> StringsClips;
@@ -118,19 +118,19 @@ void ARokokoRemote::OnTrackerRequestComplete(FHttpRequestPtr HttpRequest, FHttpR
 	// Deserialize the json data given Reader and the actual object to deserialize
 	if (FJsonSerializer::Deserialize(Reader, JsonObject))
 	{
-		auto& Arr = JsonObject->GetArrayField("parameters");
+		auto& Arr = JsonObject->GetArrayField(TEXT("parameters"));
 
 		if (!Arr.IsEmpty())
 		{
 			auto& ObjectPosition = Arr[0]->AsObject();
 			auto& ObjectRotation = Arr[1]->AsObject();
 
-			FVector Position(WORLD_SCALE * ObjectPosition->GetNumberField("X"),
-				-WORLD_SCALE * ObjectPosition->GetNumberField("Z"),
-				WORLD_SCALE * ObjectPosition->GetNumberField("Y"));
+			FVector Position(WORLD_SCALE * ObjectPosition->GetNumberField(TEXT("X")),
+				-WORLD_SCALE * ObjectPosition->GetNumberField(TEXT("Z")),
+				WORLD_SCALE * ObjectPosition->GetNumberField(TEXT("Y")));
 			// TODO: do we need to convert rotation to UE coord system ?!
-			FQuat Rotation(ObjectRotation->GetNumberField("X"), ObjectRotation->GetNumberField("Y"), ObjectRotation->GetNumberField("Z"),
-				ObjectRotation->GetNumberField("W"));
+			FQuat Rotation(ObjectRotation->GetNumberField(TEXT("X")), ObjectRotation->GetNumberField(TEXT("Y")), ObjectRotation->GetNumberField(TEXT("Z")),
+				ObjectRotation->GetNumberField(TEXT("W")));
 
 			OnTrackerRequest.Broadcast(Position, Rotation);
 		}
@@ -146,7 +146,7 @@ void ARokokoRemote::OnPlaybackRequestComplete(FHttpRequestPtr HttpRequest, FHttp
 	// Deserialize the json data given Reader and the actual object to deserialize
 	if (FJsonSerializer::Deserialize(Reader, JsonObject))
 	{
-		auto& Arr = JsonObject->GetArrayField("parameters");
+		auto& Arr = JsonObject->GetArrayField(TEXT("parameters"));
 
 		if (!Arr.IsEmpty())
 		{
