@@ -35,6 +35,10 @@ such that the marketplace version will not interfere with this one.
 Once you have Unreal Engine installed, simply clone this project and open it in Unreal Engine.
 
 If you wish to simply install the latest release into your _own_ Unreal Engine project, download the Smartsuit.zip fron the release and unzip it into the Plugins folder of your project.
+After copying the folder you may need to restart Unreal Engine, and ensure that `Show Pluging Content` is toggled ON in the settings of your Content Browser.
+
+> [!NOTE]
+> To take full advantage of the plugin, ensure that the official LiveLink plugin is installed as well.
 
 > [!IMPORTANT]
 > Packaging and distribution of the plugin is reserved for Rokoko and is therefore not discussed on this page.
@@ -42,6 +46,8 @@ If you wish to simply install the latest release into your _own_ Unreal Engine p
 ## Usage
 
 Inside the Plugins folder of the Unreal Engine project you will find the `Smartsuit` folder which is the root of the actual plugin.
+
+The plugin provides you with a `Rokoko Studio Source` livelink source, and once such a source has been instantiated you can stream from Rokoko Studio.
 
 ## Contributing
 
