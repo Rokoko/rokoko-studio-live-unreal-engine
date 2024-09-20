@@ -22,26 +22,40 @@ https://github.com/Rokoko/rokoko-studio-live-unreal-engine/releases/tag/v1.12.3-
 
 ## Table of Contents
 - [Installation](#installation)
+- [Building Manually](#building-manually)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [Issues](#issues)
 - [License](#license)
 
 ## Installation
-Note that this repository is an Unreal Engine project with a custom plugin, as thus you are expected to have Unreal Engine installed.
-Be advised that it recommended that you disable the official plugin on the marketplace before trying to open this specific project,
-such that the marketplace version will not interfere with this one.
+> [!WARNING]
+> Be advised that it recommended that you disable the official plugin on the marketplace before trying to open this specific project, such that the marketplace version will not interfere with this one.
 
-Once you have Unreal Engine installed, simply clone this project and open it in Unreal Engine.
-
-If you wish to simply install the latest release into your _own_ Unreal Engine project, download the Smartsuit.zip fron the release and unzip it into the Plugins folder of your project.
+Ensure that the special Plugins folder is created in your Unreal Engine project. Download the `Smartsuit.zip` from the respected [release](https://github.com/Rokoko/rokoko-studio-live-unreal-engine/releases)
+and unzip it into the Plugins folder.
 After copying the folder you may need to restart Unreal Engine, and ensure that `Show Pluging Content` is toggled ON in the settings of your Content Browser.
 
-> [!NOTE]
-> To take full advantage of the plugin, ensure that the official LiveLink plugin is installed as well.
+The latest release offers Windows and MacOS support.
+
+To take full advantage of the plugin, ensure that the official LiveLink plugin is installed as well.
+
+## Building Manually
+Note that this repository is an Unreal Engine project with a custom plugin, as thus you are expected to have Unreal Engine installed.
+Once you have Unreal Engine installed, simply clone this project and open it in Unreal Engine.
+
+To build the plugin run the Package command from inside the Plugin window:
+![image](https://github.com/user-attachments/assets/ff8060e8-bcd4-4eb9-94d3-9c35b501258c)
+
+Should any compile errors arise, or any SDKs be missing, you must deal with them before retrying the Package command. If Packaging, without any local changes to the plugin, results in any compile errors related to the plugin please consider reporting it as an [issue](#issues).
+
+The latest version of the project supports Windows, Linux and MacOS support.
 
 > [!IMPORTANT]
 > Packaging and distribution of the plugin is reserved for Rokoko and is therefore not discussed on this page.
+
+### LZ4
+For compression we use [LZ4](https://github.com/lz4/lz4) and the latest version includes binaries build from the [official 1.9.4 version](https://github.com/lz4/lz4/releases/tag/v1.9.4).
 
 ## Usage
 
