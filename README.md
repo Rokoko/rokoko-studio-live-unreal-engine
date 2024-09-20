@@ -30,7 +30,7 @@ https://github.com/Rokoko/rokoko-studio-live-unreal-engine/releases/tag/v1.12.3-
 
 ## Installation
 > [!WARNING]
-> Be advised that it recommended that you disable the official plugin on the marketplace before trying to open this specific project, such that the marketplace version will not interfere with this one.
+> Be advised that if you already have the plugin installed via the Unreal Engine marketplace. It is recommended that you uninstall it in the marketplace before trying to open this specific project, such that the marketplace version will not interfere with this one.
 
 Ensure that the special Plugins folder is created in your Unreal Engine project. Download the `Smartsuit.zip` from the respected [release](https://github.com/Rokoko/rokoko-studio-live-unreal-engine/releases)
 and unzip it into the Plugins folder.
@@ -52,7 +52,7 @@ Should any compile errors arise, or any SDKs be missing, you must deal with them
 The latest version of the project supports Windows, Linux and MacOS support.
 
 > [!IMPORTANT]
-> Packaging and distribution of the plugin is reserved for Rokoko and is therefore not discussed on this page.
+> Distribution of the plugin is reserved for Rokoko and is therefore not discussed on this page.
 
 ### LZ4
 For compression we use [LZ4](https://github.com/lz4/lz4) and the latest version includes binaries build from the [official 1.9.4 version](https://github.com/lz4/lz4/releases/tag/v1.9.4).
