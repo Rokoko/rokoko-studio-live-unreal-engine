@@ -1,117 +1,75 @@
-<h1 align="center">Rokoko Studio Live Plugin for Unreal Engine</h1>
-
+# Rokoko Studio Live Plugin for Unreal Engine
 [Rokoko Studio](https://www.rokoko.com/en/products/studio) is a powerful and intuitive software for recording, visualizing and exporting motion capture.
 
 This plugin let's you stream animation data from Rokoko Studio into Unreal Engine to preview and work with all your motion capture data easily and intuitively.
 
----
-
 ## Requirements
 - Unreal Engine 5.x
 - Rokoko Studio or Rokoko Studio Legacy (starting from 1.19.0b)
+- The plugin supports both Windows, Mac and Linux
 
 ## Features
 - Live stream data:
   * Up to 3 actors that can all include both body, face (52 blendshapes) and finger data at the same time.
-  * Character data
+  * Custom character data
 - Control Rokoko Studio from within Unreal Engine
- 
----
 
-## Getting Started for Streaming
+## Latest Release
+Latest release requires Unreal Engine 5.4 and Rokoko Studio or Rokoko Studio Legacy (starting from 1.19.0b).
+To get access to the latest streaming features you need Rokoko Studio 2.4.5 or higher.
 
-To learn more about how to use Virtual Production in Rokoko Studio, read our guide [here](https://help.rokoko.com/support/solutions/47000518297)
+https://github.com/Rokoko/rokoko-studio-live-unreal-engine/releases/tag/v1.12.3-UE5.4
 
+## Table of Contents
+- [Installation](#installation)
+- [Building Manually](#building-manually)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [Issues](#issues)
+- [License](#license)
 
-### Setting up Studio Live for Unreal Engine streaming
+## Installation
+> [!WARNING]
+> Be advised that if you already have the plugin installed via the Unreal Engine marketplace. It is recommended that you uninstall it in the marketplace before trying to open this specific project, such that the marketplace version will not interfere with this one.
 
-**Make sure the model is ready for Studio Live**
+Ensure that the special Plugins folder is created in your Unreal Engine project. Download the `Smartsuit.zip` from the respected [release](https://github.com/Rokoko/rokoko-studio-live-unreal-engine/releases)
+and unzip it into the Plugins folder.
+After copying the folder you may need to restart Unreal Engine, and ensure that `Show Pluging Content` is toggled ON in the settings of your Content Browser.
 
-Before importing your model into Unreal Engine. Make sure that the character's hands and fingers are modeled as close to the Newton model as possible, to get the best possible retargeting of finger animation. The fingers should be straight and the thumb pointing 45 degrees away from the other fingers.
+The latest release offers Windows and MacOS support.
 
-<img src="Images/newtonHand.PNG">
+To take full advantage of the plugin, ensure that the official LiveLink plugin is installed as well.
 
-Studio Live supports up to a 4 finger joint setup: Metacarpal, Proximal, Medial and Distal finger joint.
+## Building Manually
+Note that this repository is an Unreal Engine project with a custom plugin, as thus you are expected to have Unreal Engine installed.
+Once you have Unreal Engine installed, simply clone this project and open it in Unreal Engine.
 
-<img src="Images/newtonHandTop.png">
+To build the plugin run the Package command from inside the Plugin window:
+![image](https://github.com/user-attachments/assets/ff8060e8-bcd4-4eb9-94d3-9c35b501258c)
 
-**Getting the plugin to work manualy**
+Should any compile errors arise, or any SDKs be missing, you must deal with them before retrying the Package command. If Packaging, without any local changes to the plugin, results in any compile errors related to the plugin please consider reporting it as an [issue](#issues).
 
-_Note: You can skip this step by getting the plugin from the Unreal Engine marketplace:_
+The latest version of the project supports Windows, Linux and MacOS support.
 
-https://unrealengine.com/marketplace/en-US/product/smartsuit-plugin
+> [!IMPORTANT]
+> Distribution of the plugin is reserved for Rokoko and is therefore not discussed on this page.
 
-For the plugin to work at its current state you need this development buid of Rokoko Studio: [https://developer.cloud.unity3d.com/share/share.html?shareId=-koPxa5S4I](https://developer.cloud.unity3d.com/share/share.html?shareId=-koPxa5S4I)
+### LZ4
+For compression we use [LZ4](https://github.com/lz4/lz4) and the latest version includes binaries build from the [official 1.9.4 version](https://github.com/lz4/lz4/releases/tag/v1.9.4).
 
-Then you need to download the Studio Live plugin and install it manualy by moving it into your Unreal project's **plugins folder:** [https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins](https://github.com/Rokoko/rokoko-studio-live-unreal-engine/tree/4.25_jsonv3/Plugins)
+## Usage
 
-_Note: If your unreal project doesn't have a plugins folder, then create a folder called "Plugins"._
+Inside the Plugins folder of the Unreal Engine project you will find the `Smartsuit` folder which is the root of the actual plugin.
 
-Now when you open your project a pop-up error will appear. Click yes to it and wait for it to build. If the building fails, you need to go into **Visual Studio Installer.**
+The plugin provides you with a `Rokoko Studio Source` livelink source, and once such a source has been instantiated you can stream from Rokoko Studio.
 
-<img src="Images/errorMessege.png">
+## Contributing
 
-Open up Visual Studio Installer and click on Individual Components. Then search for Unreal Engine Installer and install that. Now open the Demo project again and say yes to the pop-up and it should built.
-
-<img src="Images/visualInstaller.png">
-
-If it still doesn't work install theise optional packages under **desktop development with C++.**
-
-<img src="Images/visualInstallerDownload.png">
-
-When the unreal project is open, go into settings → Plugins and search for **Rokoko Studio Live** and make sure the enable mark is on. If you clicked enable you have to restart the urneal project. 
-
-**Setting up the character inside Unreal Engine 4.25**
-
-When the character is imported into Unreal Engine. Right-click on the **character** **skeletal mesh** and select **Create** and then **Anim blueprint.** Name it character_AnimBP and then open it. 
-
-Inside the anim blueprint create a "**Rokoko body pose**", "**Component to local**" and a "**Rokoko Face Pose**" node. Connect them in that order and then to the **Output Pose.**
-
-<img src="Images/animBPSetup.png">
-
-Now click on the **plus** next to variables and change the variable type to **Name** and the variable name to **Rokoko Actor Name**. Then drag it out into the animGraph and chose **Get Rokoko Actor Name**. Connect it to Rokoko Body Pose and the Rokoko Face Pose. Then click on the **Rokoko Actor Name** and type in the Actor Name from Studio. Hit apply and compile the blueprint. 
-
-<img src="Images/animBPVariable.png">
-
-<img src="Images/ActorProfileName.PNG"> <img src="Images/ActorName.PNG">
-
-Right-click on the content browser and create a blueprint of type RokokoBodyMapData. Name it something like **character_BoneMap.** Now open it and write the names of the corresponding joints in the hierarchy. (If you use the same joint naming on more characters you can reuse this asset)
-
-When the BoneMap is done, click on the **plus** next to variables and change the variable type to **RokoBodyMapData** and the variable name to something such as **BodyMapRetargetAsset**. Then drag it out into the animGraph and chose **Get BodyMapRetargetAsset**, then connect it to the RetargetAsset pin on the Rokoko Body Pose node. Set the default value of this variable to the body remap asset you just created.
-
-Right-click on the content browser and create a blueprint of type RokokoFaceMapData. Name it something like **character_FaceMap.** Now open it and write the names of the blendshape names you'd like to override. (If you use the same blendshape names on more characters you can reuse this asset)
-
-When the face remapping asset is created, click on the **plus** next to variables and change the variable type to **RokoFaceMapData** and the variable name to something such as **FaceMapRetargetAsset**. Then drag it out into the animGraph and chose **Get FaceMapRetargetAsset**, then connect it to the RetargetAsset pin on the Rokoko Face Pose node. Set the default value of this variable to the face remap asset you just created.
-
-<img src="Images/boneMapOverwrite.png">
-
-Now add the character skeletal mesh to the scene and navigate to the details panel and pick your animBlueprint under **Animation → Anim Class.** Then under Place Actors search for **Smartsuit controller** and **Smartsuit Reciever** and drag them into the scene. Click on the S**martsuit Receiver** in the **world outliner** and change the Streaming Data Port to **14043.**
-
-<img src="Images/smartSuitReciverSetup.PNG">
-
-To enable Rokoko Studio, go to Window → Studio Live and under **Source** click on R**okoko Studio Source** and choose **Studio**.
-
-<img src="Images/UELivelinkTap.PNG">
-
-**Setting up Rokoko studio for Studio Live** 
-When the scene is open and the suit is paired up with a profile. Go to **Start Live Stream.**
-Then navigate to **Custom** and click on the cogwheel. 
-Now change the port to **14045** and change the Data format to **JSON v3**. Then click on the little slider beside the port number.
-
-<img src="Images/studioSetup.PNG">
-
-**Show the Rokoko Studio UI inside Unreal Engine**
-In the content browser, click on **View Options** and enable **Show Plugins Content.** Then in the content view find **Widgets** under **Smartsuit Content**, and drag it into the scene. This will enable the UI when streaming from Rokoko Studio.
-
-<img src="Images/recordingWidget.PNG">
-
-Inside Unreal Engine click **Play** and the suit and gloves should be setup with Studio Live, from Rokoko Studio.
-
-<img src="Images/fingerShowcase.png">
+To contribute please create a pull request with a meaningful title, description and ping us at support@rokoko.com and/or in the official Rokoko [Discord server](https://discordapp.com/channels/897473293500710912/897482352417202176).
 
 ## Issues
 
-File a bug in [GitHub Issues](https://github.com/RokokoElectronics/rokoko-studio-unreal-sample-project/issues)
+For any issues please write to support@rokoko.com and considered added a Github issue for others to see in [GitHub Issues](https://github.com/RokokoElectronics/rokoko-studio-unreal-sample-project/issues).
 
 ## License
 
