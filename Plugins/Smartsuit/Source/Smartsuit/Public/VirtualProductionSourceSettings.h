@@ -16,6 +16,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Source")
 	bool bTrimNamespaces = false;
 
+	UPROPERTY(EditAnywhere, Category = "Source")
+	bool bExcludeActorRootBone = false;
+
 	/** do a position and rotation a mixamo compatible, ZYX rotation order **/
 	UPROPERTY(EditAnywhere, Category = "Source")
 	bool bUseRotationOrderZYX = false;
