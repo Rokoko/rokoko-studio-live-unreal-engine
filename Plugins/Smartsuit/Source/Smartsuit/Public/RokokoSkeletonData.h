@@ -385,7 +385,7 @@ struct FNewtonData
 
 	FName GetSubjectName() const
 	{
-		FString TempSubjectName = "newton:" + NewtonName + ":body";
+		FString TempSubjectName = "newton:" + NewtonName + ":body"+":"+ FString::FromInt(Joints.Num());
 #if ENGINE_MAJOR_VERSION == 5 || (ENGINE_MAJOR_VERSION == 4 && ENGINE_MINOR_VERSION >= 25)
 		return FName(TempSubjectName);
 #else
