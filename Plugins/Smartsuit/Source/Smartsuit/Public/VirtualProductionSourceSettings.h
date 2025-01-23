@@ -16,7 +16,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Source")
 	bool bTrimNamespaces = false;
 
-	UPROPERTY(EditAnywhere, Category = "Source")
+	UPROPERTY(EditAnywhere, Category = "Newton")
 	bool bExcludeActorRootBone = false;
 
 	/** do a position and rotation a mixamo compatible, ZYX rotation order **/
@@ -26,4 +26,8 @@ public:
 	/** pre rotation for a hips **/
 	UPROPERTY(EditAnywhere, Category = "Source")
 	FRotator HipPreRotation;
+
+	/** pre rotation for a hips **/
+	UPROPERTY(EditAnywhere, Category = "Newton")
+	FRotator RootRotationOffset;
 };
