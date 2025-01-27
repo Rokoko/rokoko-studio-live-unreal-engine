@@ -878,13 +878,12 @@ void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
 			// Change Rotation Order - ZYX
 			qu = qz * qy * qx;
 
-			//if (parentIndex < 0)
-			//{
-			//	static FQuat preRotation = FQuat::MakeFromRotator(SavedSourceSettings->HipPreRotation);
-			//	//static FQuat preRotation = FQuat::MakeFromEuler(FVector(90, 0, -90));
-			//	AdjustedJointPosition = preRotation * AdjustedJointPosition;
-			//	qu = preRotation;
-			//}
+			if (parentIndex < 0)
+			{
+				static FQuat preRotation = FQuat::MakeFromEuler(FVector(90, 0, -90));
+				AdjustedJointPosition = preRotation * AdjustedJointPosition;
+				qu = preRotation * qu;
+			}
 
 			transforms[transformIndex].SetComponents(qu, AdjustedJointPosition, FVector::One());
 		}
@@ -1519,22 +1518,8 @@ void UpdateNewtonsFromJson(UVirtualProductionSourceSettings* SavedSourceSettings
 				}
 			}
 
-			//if (CharacterJoint.name == "Root")
-			//{
-			//	CharacterJoint.name = "Elon";
-			//}
-
 			CharacterJoint.position = USmartsuitBlueprintLibrary::GetVectorField(JoinJSONObject->GetObjectField(TEXT("position")));
 			CharacterJoint.rotation = USmartsuitBlueprintLibrary::GetQuaternionField(JoinJSONObject->GetObjectField(TEXT("rotation")));
-
-			if (CharacterJoint.name == "Root")
-			{
-				FQuat preRotation = FQuat::MakeFromRotator(SavedSourceSettings->RootRotationOffset);
-				if (!preRotation.IsIdentity())
-				{
-					CharacterJoint.rotation = preRotation * CharacterJoint.rotation;
-				}
-			}
 
 			FTransform JointTransform(CharacterJoint.rotation, CharacterJoint.position, FVector::OneVector);
 			CharacterJoint.transform = JointTransform;
