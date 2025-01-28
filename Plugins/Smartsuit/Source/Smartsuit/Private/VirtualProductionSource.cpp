@@ -1505,9 +1505,11 @@ void UpdateNewtonsFromJson(UVirtualProductionSourceSettings* SavedSourceSettings
 			CharacterJoint.name = *JoinJSONObject->GetStringField(TEXT("name"));
 			CharacterJoint.parentIndex = JoinJSONObject->GetIntegerField(TEXT("parent"));
 
+			// The Newton skeleton is a pre-defined skeleton where the root bone is the Actor-named bone.
+			// This option removes that bone to ensure that the actual root bone is the 'Root'-named bone.
+			// This provides better compatibility with some systems in UE.
 			if (SavedSourceSettings != nullptr && SavedSourceSettings->bExcludeActorRootBone)
 			{
-				// HERE
 				if (CharacterJoint.parentIndex == -1)
 				{
 					continue;
