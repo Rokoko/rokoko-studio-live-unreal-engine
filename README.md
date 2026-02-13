@@ -63,6 +63,84 @@ Inside the Plugins folder of the Unreal Engine project you will find the `Smarts
 
 The plugin provides you with a `Rokoko Studio Source` livelink source, and once such a source has been instantiated you can stream from Rokoko Studio.
 
+## In Game Usage
+
+It is possible to animate a character in your packaged game. The most important step is to enable the UDP messaging plugin before packaging.
+
+First make sure it is enabled.
+
+![UDP-Plugin](Images/udp_plugin.png)
+
+Then apply the settings shown below:
+
+![UDP-Messaging](Images/udp_messaging_settings.png)
+
+Bare in mind that 0.0.0.0 binds to the default network interface on Windows and to all network interfaces (including your LAN IP) on Linux and Mac! Make sure you are on a trusted network!
+
+Alternatively consult the settings from [Unreal Engine docs](https://dev.epicgames.com/documentation/en-us/unreal-engine/udp-messaging-settings-in-the-unreal-engine-project-settings) for a configuration that suits your needs!
+
+> [!IMPORTANT]
+> If you notice that the Unreal Engine settings do not persist across restarts, add the below to your project's Config/DefaultEngine.ini 
+
+```ini
+[/Script/UdpMessaging.UdpMessagingSettings]
+EnabledByDefault=True
+EnableTransport=True
+bAutoRepair=True
+MaxSendRate=1.000000
+AutoRepairAttemptLimit=10
+WorkQueueSize=1024
+ReliableQueuePriority=75.000000
+bStopServiceWhenAppDeactivates=True
+UnicastEndpoint=0.0.0.0
+MulticastEndpoint=230.0.0.1:6666
+MessageFormat=CborPlatformEndianness
+MulticastTimeToLive=1
+bShareKnownNodesWithActiveConnections=False
+MaxConcurrentDeserializationTasks=8
+ConnectionTimeoutPeriod=5.000000
+EnableTunnel=False
+TunnelUnicastEndpoint=
+TunnelMulticastEndpoint=
+```
+
+To generate this config yourself simply click the export button shown below
+
+![export_udp_settings](/Images/export_udp_messaging_settings.png)
+
+and copy paste the contents of the file in the `DefaultEngine.ini` . Then
+restart your engine to confirm these settings persist.
+
+Package your game and before you run it make sure Unreal Engine is closed
+otherwise neither the Editor nor your Game may have the working streamed animation.
+
+> [!IMPORTANT]
+> - Make sure the name of the actor and the skeletal mesh match as in your editor.
+> - If you want a more dynamic way to stream actors with different names,
+you'll need to add the programming yourself
+> - When in doubt use the plugin widget to verify that the connection is working via the `RokokoUIController`
+> - If you create a shipping build you may need to start your Game with
+`ALLOW_UDP_MESSAGING_SHIPPING=1` set.
+
+
+### Expected results
+
+It's suggested that at your first try you use the RokokoUIController so
+you may understand better the reason in case things are not working. Check
+the images below for some working and non-working scenarios.
+
+#### Not connected / Not streaming from Rokoko Studio
+
+![not_streaming](/Images/udp_not_streaming.png)
+
+#### Connected but actor name does not match
+
+![wrong_actor_name](/Images/udp_wrong_actor_name.png)
+
+#### Streaming is working
+
+![working_stream](/Images/udp_streaming_working.png)
+
 ## Contributing
 
 To contribute please create a pull request with a meaningful title, description and ping us at support@rokoko.com and/or in the official Rokoko [Discord server](https://discordapp.com/channels/897473293500710912/897482352417202176).
