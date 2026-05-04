@@ -310,6 +310,26 @@ FVector GetPosition3(const FName& BoneName, FLiveLinkSubjectFrameData &InSubject
 	return FVector::ZeroVector;
 }
 
+FQuat GetCachedRotation(const FName& BoneName, const TMap<FName, FTransform>& CachedTransforms)
+{
+	if (const FTransform* CachedTransform = CachedTransforms.Find(BoneName))
+	{
+		return CachedTransform->GetRotation();
+	}
+
+	return FQuat::Identity;
+}
+
+FVector GetCachedPosition(const FName& BoneName, const TMap<FName, FTransform>& CachedTransforms)
+{
+	if (const FTransform* CachedTransform = CachedTransforms.Find(BoneName))
+	{
+		return CachedTransform->GetLocation();
+	}
+
+	return FVector::ZeroVector;
+}
+
 //PRAGMA_DISABLE_OPTIMIZATION
 void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseContext& Output, TArray<FBoneTransform>& OutBoneTransforms)
 {
@@ -325,11 +345,37 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	}
 
 	FLiveLinkSubjectFrameData SubjectFrameData;
-	FLiveLinkSubjectName LiveLinkSubjectName = GetLiveLinkSubjectName();
 
-	TSubclassOf<ULiveLinkRole> SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole_AnyThread(LiveLinkSubjectName);
-	if (SubjectRole)
+	bool bHasValidLiveFrame = false;
+	bool bTriedBoundSubjectEvaluation = false;
+	if (bHasBoundSubjectKey_AnyThread)
 	{
+		bTriedBoundSubjectEvaluation = true;
+		TSubclassOf<ULiveLinkRole> SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole_AnyThread(BoundSubjectKey_AnyThread);
+		if (SubjectRole && SubjectRole->IsChildOf(ULiveLinkAnimationRole::StaticClass()))
+		{
+			bHasValidLiveFrame = LiveLinkClient_AnyThread->EvaluateFrameFromSource_AnyThread(BoundSubjectKey_AnyThread, ULiveLinkAnimationRole::StaticClass(), SubjectFrameData);
+			if (!bHasValidLiveFrame)
+			{
+				++ConsecutiveKeyedFrameMisses_AnyThread;
+				if (ConsecutiveKeyedFrameMisses_AnyThread == 1 || (ConsecutiveKeyedFrameMisses_AnyThread % 60) == 0)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("[Rokoko][PoseNode] Keyed frame miss Actor=%s Source=%s Subject=%s Misses=%d"), *RokokoActorName.ToString(), *BoundSubjectKey_AnyThread.Source.ToString(), *BoundSubjectKey_AnyThread.SubjectName.ToString(), ConsecutiveKeyedFrameMisses_AnyThread);
+				}
+			}
+			else
+			{
+				ConsecutiveKeyedFrameMisses_AnyThread = 0;
+			}
+		}
+	}
+
+	if (!bHasValidLiveFrame)
+	{
+		FLiveLinkSubjectName LiveLinkSubjectName = GetLiveLinkSubjectName();
+		TSubclassOf<ULiveLinkRole> SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole_AnyThread(LiveLinkSubjectName);
+		if (SubjectRole)
+		{
 //#ifdef USE_SMARTSUIT_ANIMATION_ROLE
 //		if (SubjectRole->IsChildOf(ULiveLinkSmartsuitRole::StaticClass()))
 //		{
@@ -350,41 +396,67 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 //			return;
 //		}
 //#else
-		if (SubjectRole->IsChildOf(ULiveLinkAnimationRole::StaticClass()))
-		{
-			//Process animation data if the subject is from that type
-			if (LiveLinkClient_AnyThread->EvaluateFrame_AnyThread(LiveLinkSubjectName, ULiveLinkAnimationRole::StaticClass(), SubjectFrameData))
+			if (SubjectRole->IsChildOf(ULiveLinkAnimationRole::StaticClass()))
 			{
-
+				bHasValidLiveFrame = LiveLinkClient_AnyThread->EvaluateFrame_AnyThread(LiveLinkSubjectName, ULiveLinkAnimationRole::StaticClass(), SubjectFrameData);
 			}
-			else
-			{
-				return;
-			}
-
-
-	}
-		else
-		{
-			return;
-		}
 //#endif
+		}
+	}
+
+	if (bHasValidLiveFrame)
+	{
+		if (ConsecutiveLiveFrameMisses_AnyThread > 0)
+		{
+			UE_LOG(LogTemp, Display, TEXT("[Rokoko][PoseNode] Live frame recovered Actor=%s MissesBeforeRecovery=%d"), *RokokoActorName.ToString(), ConsecutiveLiveFrameMisses_AnyThread);
+			ConsecutiveLiveFrameMisses_AnyThread = 0;
+		}
+
+		FLiveLinkSkeletonStaticData* SkeletonData = SubjectFrameData.StaticData.Cast<FLiveLinkSkeletonStaticData>();
+		FLiveLinkAnimationFrameData* FrameData = SubjectFrameData.FrameData.Cast<FLiveLinkAnimationFrameData>();
+
+		if (SkeletonData != nullptr && FrameData != nullptr)
+		{
+			CachedSmartsuitTransforms.Reset();
+			const int32 NumTransforms = FMath::Min(SkeletonData->BoneNames.Num(), FrameData->Transforms.Num());
+			for (int32 Index = 0; Index < NumTransforms; ++Index)
+			{
+				CachedSmartsuitTransforms.Add(SkeletonData->BoneNames[Index], FrameData->Transforms[Index]);
+			}
+			bHasCachedSmartsuitFrame = CachedSmartsuitTransforms.Num() > 0;
+		}
+	}
+	else if (!bHasCachedSmartsuitFrame)
+	{
+		++ConsecutiveLiveFrameMisses_AnyThread;
+		if (ConsecutiveLiveFrameMisses_AnyThread == 1 || (ConsecutiveLiveFrameMisses_AnyThread % 60) == 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("[Rokoko][PoseNode] No live frame and no cache Actor=%s Subject=%s Bound=%s TriedBound=%d Misses=%d"), *RokokoActorName.ToString(), *GetLiveLinkSubjectName().ToString(), bHasBoundSubjectKey_AnyThread ? TEXT("true") : TEXT("false"), bTriedBoundSubjectEvaluation ? 1 : 0, ConsecutiveLiveFrameMisses_AnyThread);
+		}
+		return;
 	}
 	else
 	{
-		return;
+		++ConsecutiveLiveFrameMisses_AnyThread;
+		if (ConsecutiveLiveFrameMisses_AnyThread == 1 || (ConsecutiveLiveFrameMisses_AnyThread % 60) == 0)
+		{
+			UE_LOG(LogTemp, Display, TEXT("[Rokoko][PoseNode] Using cached transforms Actor=%s Subject=%s Misses=%d"), *RokokoActorName.ToString(), *GetLiveLinkSubjectName().ToString(), ConsecutiveLiveFrameMisses_AnyThread);
+		}
 	}
 
 //#ifdef USE_SMARTSUIT_ANIMATION_ROLE
 //	FLiveLinkSmartsuitStaticData* SkeletonData = SubjectFrameData.StaticData.Cast<FLiveLinkSmartsuitStaticData>();
 //	FLiveLinkSmartsuitFrameData* FrameData = SubjectFrameData.FrameData.Cast<FLiveLinkSmartsuitFrameData>();
 //#else
-	FLiveLinkSkeletonStaticData* SkeletonData = SubjectFrameData.StaticData.Cast<FLiveLinkSkeletonStaticData>();
-	FLiveLinkAnimationFrameData* FrameData = SubjectFrameData.FrameData.Cast<FLiveLinkAnimationFrameData>();
+	FLiveLinkSkeletonStaticData* SkeletonData = bHasValidLiveFrame ? SubjectFrameData.StaticData.Cast<FLiveLinkSkeletonStaticData>() : nullptr;
+	FLiveLinkAnimationFrameData* FrameData = bHasValidLiveFrame ? SubjectFrameData.FrameData.Cast<FLiveLinkAnimationFrameData>() : nullptr;
 //#endif
 
-	check(SkeletonData);
-	check(FrameData);
+	if (bHasValidLiveFrame)
+	{
+		check(SkeletonData);
+		check(FrameData);
+	}
 
 
 	EBoneControlSpace TestBoneControlSpace = BCS_ComponentSpace;
@@ -470,69 +542,69 @@ void FSmartsuitPoseNode::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCo
 	FQuat LeftArmSpace = FQuat::MakeFromEuler(FVector(ArmSpace, 0.0f, 0.0f));
 	FQuat RightArmSpace = FQuat::MakeFromEuler(FVector(ArmSpace, 0.0f, 0.0f));
 
-	FQuat hipQuat =						GetRotation3(SmartsuitBones::hip, SubjectFrameData);// *modifier;
-	FVector hipPosition =				GetPosition3(SmartsuitBones::hip, SubjectFrameData);
-	FQuat stomachQuat =					GetRotation3(SmartsuitBones::spine, SubjectFrameData);
-	FQuat chestQuat =					GetRotation3(SmartsuitBones::chest, SubjectFrameData);
-	FQuat neckQuat =					GetRotation3(SmartsuitBones::neck, SubjectFrameData);
-	FQuat headQuat =					GetRotation3(SmartsuitBones::head, SubjectFrameData);
-	FQuat leftShoulderQuat =			GetRotation3(SmartsuitBones::leftShoulder, SubjectFrameData) * LeftShoulderSpace;
-	FQuat leftArmQuat =					GetRotation3(SmartsuitBones::leftUpperArm, SubjectFrameData) * LeftArmSpace;
-	FQuat leftForearmQuat =				GetRotation3(SmartsuitBones::leftLowerArm, SubjectFrameData);
-	FQuat leftHandQuat =				GetRotation3(SmartsuitBones::leftHand, SubjectFrameData);
-	FQuat rightShoulderQuat =			GetRotation3(SmartsuitBones::rightShoulder, SubjectFrameData) * RightShoulderSpace;
-	FQuat rightArmQuat =				GetRotation3(SmartsuitBones::rightUpperArm, SubjectFrameData) * RightArmSpace;
-	FQuat rightForearmQuat =			GetRotation3(SmartsuitBones::rightLowerArm, SubjectFrameData);
-	FQuat rightHandQuat =				GetRotation3(SmartsuitBones::rightHand, SubjectFrameData);
-	FQuat leftUpLegQuat =				GetRotation3(SmartsuitBones::leftUpLeg, SubjectFrameData);
-	FQuat leftLegQuat =					GetRotation3(SmartsuitBones::leftLeg, SubjectFrameData);
-	FQuat leftFootQuat =				GetRotation3(SmartsuitBones::leftFoot, SubjectFrameData);
-	FQuat leftToeQuat =					GetRotation3(SmartsuitBones::leftToe, SubjectFrameData);
-	FQuat rightUpLegQuat =				GetRotation3(SmartsuitBones::rightUpLeg, SubjectFrameData);
-	FQuat rightLegQuat =				GetRotation3(SmartsuitBones::rightLeg, SubjectFrameData);
-	FQuat rightFootQuat =				GetRotation3(SmartsuitBones::rightFoot, SubjectFrameData);
-	FQuat rightToeQuat =				GetRotation3(SmartsuitBones::rightToe, SubjectFrameData);
+	FQuat hipQuat =						bHasValidLiveFrame ? GetRotation3(SmartsuitBones::hip, SubjectFrameData) : GetCachedRotation(SmartsuitBones::hip, CachedSmartsuitTransforms);// *modifier;
+	FVector hipPosition =				bHasValidLiveFrame ? GetPosition3(SmartsuitBones::hip, SubjectFrameData) : GetCachedPosition(SmartsuitBones::hip, CachedSmartsuitTransforms);
+	FQuat stomachQuat =					bHasValidLiveFrame ? GetRotation3(SmartsuitBones::spine, SubjectFrameData) : GetCachedRotation(SmartsuitBones::spine, CachedSmartsuitTransforms);
+	FQuat chestQuat =					bHasValidLiveFrame ? GetRotation3(SmartsuitBones::chest, SubjectFrameData) : GetCachedRotation(SmartsuitBones::chest, CachedSmartsuitTransforms);
+	FQuat neckQuat =					bHasValidLiveFrame ? GetRotation3(SmartsuitBones::neck, SubjectFrameData) : GetCachedRotation(SmartsuitBones::neck, CachedSmartsuitTransforms);
+	FQuat headQuat =					bHasValidLiveFrame ? GetRotation3(SmartsuitBones::head, SubjectFrameData) : GetCachedRotation(SmartsuitBones::head, CachedSmartsuitTransforms);
+	FQuat leftShoulderQuat =			(bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftShoulder, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftShoulder, CachedSmartsuitTransforms)) * LeftShoulderSpace;
+	FQuat leftArmQuat =					(bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftUpperArm, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftUpperArm, CachedSmartsuitTransforms)) * LeftArmSpace;
+	FQuat leftForearmQuat =				bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftLowerArm, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftLowerArm, CachedSmartsuitTransforms);
+	FQuat leftHandQuat =				bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftHand, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftHand, CachedSmartsuitTransforms);
+	FQuat rightShoulderQuat =			(bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightShoulder, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightShoulder, CachedSmartsuitTransforms)) * RightShoulderSpace;
+	FQuat rightArmQuat =				(bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightUpperArm, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightUpperArm, CachedSmartsuitTransforms)) * RightArmSpace;
+	FQuat rightForearmQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightLowerArm, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightLowerArm, CachedSmartsuitTransforms);
+	FQuat rightHandQuat =				bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightHand, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightHand, CachedSmartsuitTransforms);
+	FQuat leftUpLegQuat =				bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftUpLeg, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftUpLeg, CachedSmartsuitTransforms);
+	FQuat leftLegQuat =					bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftLeg, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftLeg, CachedSmartsuitTransforms);
+	FQuat leftFootQuat =				bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftFoot, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftFoot, CachedSmartsuitTransforms);
+	FQuat leftToeQuat =					bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftToe, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftToe, CachedSmartsuitTransforms);
+	FQuat rightUpLegQuat =				bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightUpLeg, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightUpLeg, CachedSmartsuitTransforms);
+	FQuat rightLegQuat =					bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightLeg, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightLeg, CachedSmartsuitTransforms);
+	FQuat rightFootQuat =				bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightFoot, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightFoot, CachedSmartsuitTransforms);
+	FQuat rightToeQuat =				bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightToe, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightToe, CachedSmartsuitTransforms);
 
-	FQuat leftThumbProximalQuat =		GetRotation3(SmartsuitBones::leftThumbProximal, SubjectFrameData);
-	FQuat leftThumbMedialQuat =			GetRotation3(SmartsuitBones::leftThumbMedial, SubjectFrameData);
-	FQuat leftThumbDistalQuat =			GetRotation3(SmartsuitBones::leftThumbDistal, SubjectFrameData);
-	FQuat leftThumbTipQuat =			GetRotation3(SmartsuitBones::leftThumbTip, SubjectFrameData);
-	FQuat leftIndexProximalQuat =		GetRotation3(SmartsuitBones::leftIndexProximal, SubjectFrameData);
-	FQuat leftIndexMedialQuat =			GetRotation3(SmartsuitBones::leftIndexMedial, SubjectFrameData);
-	FQuat leftIndexDistalQuat =			GetRotation3(SmartsuitBones::leftIndexDistal, SubjectFrameData);
-	FQuat leftIndexTipQuat =			GetRotation3(SmartsuitBones::leftIndexTip, SubjectFrameData);
-	FQuat leftMiddleProximalQuat =		GetRotation3(SmartsuitBones::leftMiddleProximal, SubjectFrameData);
-	FQuat leftMiddleMedialQuat =		GetRotation3(SmartsuitBones::leftMiddleMedial, SubjectFrameData);
-	FQuat leftMiddleDistalQuat =		GetRotation3(SmartsuitBones::leftMiddleDistal, SubjectFrameData);
-	FQuat leftMiddleTipQuat =			GetRotation3(SmartsuitBones::leftMiddleTip, SubjectFrameData);
-	FQuat leftRingProximalQuat =		GetRotation3(SmartsuitBones::leftRingProximal, SubjectFrameData);
-	FQuat leftRingMedialQuat =			GetRotation3(SmartsuitBones::leftRingMedial, SubjectFrameData);
-	FQuat leftRingDistalQuat =			GetRotation3(SmartsuitBones::leftRingDistal, SubjectFrameData);
-	FQuat leftRingTipQuat =				GetRotation3(SmartsuitBones::leftRingTip, SubjectFrameData);
-	FQuat leftLittleProximalQuat =		GetRotation3(SmartsuitBones::leftLittleProximal, SubjectFrameData);
-	FQuat leftLittleMedialQuat =		GetRotation3(SmartsuitBones::leftLittleMedial, SubjectFrameData);
-	FQuat leftLittleDistalQuat =		GetRotation3(SmartsuitBones::leftLittleDistal, SubjectFrameData);
-	FQuat leftLittleTipQuat =			GetRotation3(SmartsuitBones::leftLittleTip, SubjectFrameData);
-	FQuat rightThumbProximalQuat =		GetRotation3(SmartsuitBones::rightThumbProximal, SubjectFrameData);
-	FQuat rightThumbMedialQuat =		GetRotation3(SmartsuitBones::rightThumbMedial, SubjectFrameData);
-	FQuat rightThumbDistalQuat =		GetRotation3(SmartsuitBones::rightThumbDistal, SubjectFrameData);
-	FQuat rightThumbTipQuat =			GetRotation3(SmartsuitBones::rightThumbTip, SubjectFrameData);
-	FQuat rightIndexProximalQuat =		GetRotation3(SmartsuitBones::rightIndexProximal, SubjectFrameData);
-	FQuat rightIndexMedialQuat =		GetRotation3(SmartsuitBones::rightIndexMedial, SubjectFrameData);
-	FQuat rightIndexDistalQuat =		GetRotation3(SmartsuitBones::rightIndexDistal, SubjectFrameData);
-	FQuat rightIndexTipQuat =			GetRotation3(SmartsuitBones::rightIndexTip, SubjectFrameData);
-	FQuat rightMiddleProximalQuat =		GetRotation3(SmartsuitBones::rightMiddleProximal, SubjectFrameData);
-	FQuat rightMiddleMedialQuat =		GetRotation3(SmartsuitBones::rightMiddleMedial, SubjectFrameData);
-	FQuat rightMiddleDistalQuat =		GetRotation3(SmartsuitBones::rightMiddleDistal, SubjectFrameData);
-	FQuat rightMiddleTipQuat =			GetRotation3(SmartsuitBones::rightMiddleTip, SubjectFrameData);
-	FQuat rightRingProximalQuat =		GetRotation3(SmartsuitBones::rightRingProximal, SubjectFrameData);
-	FQuat rightRingMedialQuat =			GetRotation3(SmartsuitBones::rightRingMedial, SubjectFrameData);
-	FQuat rightRingDistalQuat =			GetRotation3(SmartsuitBones::rightRingDistal, SubjectFrameData);
-	FQuat rightRingTipQuat =			GetRotation3(SmartsuitBones::rightRingTip, SubjectFrameData);
-	FQuat rightLittleProximalQuat =		GetRotation3(SmartsuitBones::rightLittleProximal, SubjectFrameData);
-	FQuat rightLittleMedialQuat =		GetRotation3(SmartsuitBones::rightLittleMedial, SubjectFrameData);
-	FQuat rightLittleDistalQuat =		GetRotation3(SmartsuitBones::rightLittleDistal, SubjectFrameData);
-	FQuat rightLittleTipQuat =			GetRotation3(SmartsuitBones::rightLittleTip, SubjectFrameData);
+	FQuat leftThumbProximalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftThumbProximal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftThumbProximal, CachedSmartsuitTransforms);
+	FQuat leftThumbMedialQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftThumbMedial, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftThumbMedial, CachedSmartsuitTransforms);
+	FQuat leftThumbDistalQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftThumbDistal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftThumbDistal, CachedSmartsuitTransforms);
+	FQuat leftThumbTipQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftThumbTip, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftThumbTip, CachedSmartsuitTransforms);
+	FQuat leftIndexProximalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftIndexProximal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftIndexProximal, CachedSmartsuitTransforms);
+	FQuat leftIndexMedialQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftIndexMedial, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftIndexMedial, CachedSmartsuitTransforms);
+	FQuat leftIndexDistalQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftIndexDistal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftIndexDistal, CachedSmartsuitTransforms);
+	FQuat leftIndexTipQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftIndexTip, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftIndexTip, CachedSmartsuitTransforms);
+	FQuat leftMiddleProximalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftMiddleProximal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftMiddleProximal, CachedSmartsuitTransforms);
+	FQuat leftMiddleMedialQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftMiddleMedial, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftMiddleMedial, CachedSmartsuitTransforms);
+	FQuat leftMiddleDistalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftMiddleDistal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftMiddleDistal, CachedSmartsuitTransforms);
+	FQuat leftMiddleTipQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftMiddleTip, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftMiddleTip, CachedSmartsuitTransforms);
+	FQuat leftRingProximalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftRingProximal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftRingProximal, CachedSmartsuitTransforms);
+	FQuat leftRingMedialQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftRingMedial, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftRingMedial, CachedSmartsuitTransforms);
+	FQuat leftRingDistalQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftRingDistal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftRingDistal, CachedSmartsuitTransforms);
+	FQuat leftRingTipQuat =				bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftRingTip, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftRingTip, CachedSmartsuitTransforms);
+	FQuat leftLittleProximalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftLittleProximal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftLittleProximal, CachedSmartsuitTransforms);
+	FQuat leftLittleMedialQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftLittleMedial, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftLittleMedial, CachedSmartsuitTransforms);
+	FQuat leftLittleDistalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftLittleDistal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftLittleDistal, CachedSmartsuitTransforms);
+	FQuat leftLittleTipQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::leftLittleTip, SubjectFrameData) : GetCachedRotation(SmartsuitBones::leftLittleTip, CachedSmartsuitTransforms);
+	FQuat rightThumbProximalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightThumbProximal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightThumbProximal, CachedSmartsuitTransforms);
+	FQuat rightThumbMedialQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightThumbMedial, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightThumbMedial, CachedSmartsuitTransforms);
+	FQuat rightThumbDistalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightThumbDistal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightThumbDistal, CachedSmartsuitTransforms);
+	FQuat rightThumbTipQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightThumbTip, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightThumbTip, CachedSmartsuitTransforms);
+	FQuat rightIndexProximalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightIndexProximal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightIndexProximal, CachedSmartsuitTransforms);
+	FQuat rightIndexMedialQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightIndexMedial, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightIndexMedial, CachedSmartsuitTransforms);
+	FQuat rightIndexDistalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightIndexDistal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightIndexDistal, CachedSmartsuitTransforms);
+	FQuat rightIndexTipQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightIndexTip, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightIndexTip, CachedSmartsuitTransforms);
+	FQuat rightMiddleProximalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightMiddleProximal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightMiddleProximal, CachedSmartsuitTransforms);
+	FQuat rightMiddleMedialQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightMiddleMedial, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightMiddleMedial, CachedSmartsuitTransforms);
+	FQuat rightMiddleDistalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightMiddleDistal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightMiddleDistal, CachedSmartsuitTransforms);
+	FQuat rightMiddleTipQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightMiddleTip, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightMiddleTip, CachedSmartsuitTransforms);
+	FQuat rightRingProximalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightRingProximal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightRingProximal, CachedSmartsuitTransforms);
+	FQuat rightRingMedialQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightRingMedial, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightRingMedial, CachedSmartsuitTransforms);
+	FQuat rightRingDistalQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightRingDistal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightRingDistal, CachedSmartsuitTransforms);
+	FQuat rightRingTipQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightRingTip, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightRingTip, CachedSmartsuitTransforms);
+	FQuat rightLittleProximalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightLittleProximal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightLittleProximal, CachedSmartsuitTransforms);
+	FQuat rightLittleMedialQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightLittleMedial, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightLittleMedial, CachedSmartsuitTransforms);
+	FQuat rightLittleDistalQuat =		bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightLittleDistal, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightLittleDistal, CachedSmartsuitTransforms);
+	FQuat rightLittleTipQuat =			bHasValidLiveFrame ? GetRotation3(SmartsuitBones::rightLittleTip, SubjectFrameData) : GetCachedRotation(SmartsuitBones::rightLittleTip, CachedSmartsuitTransforms);
 
 
 
@@ -775,6 +847,67 @@ void FSmartsuitPoseNode::PreUpdate(const UAnimInstance* InAnimInstance)
 		ThisFrameClient = &IModularFeatures::Get().GetModularFeature<ILiveLinkClient>(ILiveLinkClient::ModularFeatureName);
 	}
 	LiveLinkClient_AnyThread = ThisFrameClient;
+	bHasBoundSubjectKey_AnyThread = false;
+
+	if (ThisFrameClient)
+	{
+		const FLiveLinkSubjectName LiveLinkSubjectName = GetLiveLinkSubjectName();
+
+		if (BoundSubjectKey_AnyThread.SubjectName == LiveLinkSubjectName && ThisFrameClient->IsSubjectValid(BoundSubjectKey_AnyThread))
+		{
+			bHasBoundSubjectKey_AnyThread = true;
+		}
+		else
+		{
+			FLiveLinkSubjectKey FallbackSubjectKey;
+			bool bPickedBestKey = false;
+			for (const FLiveLinkSubjectKey& SubjectKey : ThisFrameClient->GetSubjects(true, false))
+			{
+				if (SubjectKey.SubjectName != LiveLinkSubjectName)
+				{
+					continue;
+				}
+
+				if (!ThisFrameClient->IsSubjectValid(SubjectKey) || !ThisFrameClient->DoesSubjectSupportsRole_AnyThread(SubjectKey, ULiveLinkAnimationRole::StaticClass()))
+				{
+					continue;
+				}
+
+				if (!bHasBoundSubjectKey_AnyThread)
+				{
+					FallbackSubjectKey = SubjectKey;
+					bHasBoundSubjectKey_AnyThread = true;
+				}
+
+				if (ThisFrameClient->IsSubjectEnabled(SubjectKey, false))
+				{
+					BoundSubjectKey_AnyThread = SubjectKey;
+					bPickedBestKey = true;
+					break;
+				}
+			}
+
+			if (!bPickedBestKey && bHasBoundSubjectKey_AnyThread)
+			{
+				BoundSubjectKey_AnyThread = FallbackSubjectKey;
+			}
+		}
+	}
+
+	if (bHasBoundSubjectKey_AnyThread)
+	{
+		if (!bHasLastLoggedBoundSubjectKey_AnyThread || LastLoggedBoundSubjectKey_AnyThread != BoundSubjectKey_AnyThread)
+		{
+			UE_LOG(LogTemp, Display, TEXT("[Rokoko][PoseNode] Bound Actor=%s Source=%s Subject=%s"), *RokokoActorName.ToString(), *BoundSubjectKey_AnyThread.Source.ToString(), *BoundSubjectKey_AnyThread.SubjectName.ToString());
+			LastLoggedBoundSubjectKey_AnyThread = BoundSubjectKey_AnyThread;
+			bHasLastLoggedBoundSubjectKey_AnyThread = true;
+		}
+	}
+	else if (bHasLastLoggedBoundSubjectKey_AnyThread)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Rokoko][PoseNode] Lost bound subject Actor=%s Subject=%s"), *RokokoActorName.ToString(), *GetLiveLinkSubjectName().ToString());
+		bHasLastLoggedBoundSubjectKey_AnyThread = false;
+	}
 
 	CreateRetargetAsset(InAnimInstance);
 }

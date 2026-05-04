@@ -81,3 +81,7 @@ ToRelease/
 
 #vscode
 .vscode/
+*.code-workspace
+
+#Makefile is generated with Unreal GenerateProjectFiles.sh
+Makefile

@@ -101,10 +101,22 @@ void FVirtualProductionSource::ClearAllSubjects()
 	{
 		HandleClearSubject(actorNames[i]);
 	}
+	for (int i = 0; i < characterNames.Num(); i++)
+	{
+		HandleClearSubject(characterNames[i]);
+	}
+	for (int i = 0; i < newtonNames.Num(); i++)
+	{
+		HandleClearSubject(newtonNames[i]);
+	}
 
 	subjectNames.Empty();
 	faceNames.Empty();
 	actorNames.Empty();
+	characterNames.Empty();
+	newtonNames.Empty();
+	actorLastSeenTimeSeconds.Empty();
+	characterLastSeenTimeSeconds.Empty();
 }
 
 bool FVirtualProductionSource::RequestSourceShutdown()
@@ -475,18 +487,23 @@ void FVirtualProductionSource::CreateJoint(TArray<FTransform>& transforms, int32
 
 void FVirtualProductionSource::HandleSuits(const TArray<FSuitData>& suits)
 {
+	constexpr double ACTOR_SUBJECT_STALE_TIMEOUT_SECONDS = 2.0;
+	const double CurrentTimeSeconds = FPlatformTime::Seconds();
+
 	//UE_LOG(LogTemp, Warning, TEXT("Handling faces %d"), faces.Num());
 	existingActors.Empty();
 	notExistingSubjects.Empty();
 	for (int subjectIndex = 0; subjectIndex < suits.Num(); subjectIndex++)
 	{
 		const FSuitData& subject = suits[subjectIndex];
+		const FName SubjectName = subject.GetSubjectName();
+		actorLastSeenTimeSeconds.FindOrAdd(SubjectName) = CurrentTimeSeconds;
 
 		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
 		bool nameExists = false;
 		for (int suitNameIndex = 0; suitNameIndex < actorNames.Num(); suitNameIndex++)
 		{
-			if (subject.GetSubjectName() == actorNames[suitNameIndex])
+			if (SubjectName == actorNames[suitNameIndex])
 			{
 				nameExists = true;
 				existingActors.Add(subject);
@@ -498,33 +515,6 @@ void FVirtualProductionSource::HandleSuits(const TArray<FSuitData>& suits)
 		{
 			existingActors.Add(subject);
 			HandleSuitData(subject);
-		}
-		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
-		if (subjectIndex == suits.Num() - 1)
-		{
-			for (int i = 0; i < actorNames.Num(); i++)
-			{
-				bool subjectExists = false;
-				for (int j = 0; j < existingActors.Num(); j++)
-				{
-					if (actorNames[i] == existingActors[j].GetSubjectName())
-					{
-						subjectExists = true;
-					}
-				}
-				if (!subjectExists)
-				{
-					notExistingSubjects.Add(actorNames[i]);
-				}
-			}
-
-			for (int i = 0; i < notExistingSubjects.Num(); i++)
-			{
-				//UE_LOG(LogTemp, Warning, TEXT("Removing face"));
-				Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, notExistingSubjects[i]));
-				actorNames.RemoveSingle(notExistingSubjects[i]);
-				notExistingSubjects.RemoveAt(i);
-			}
 		}
 
 		//#ifdef USE_SMARTSUIT_ANIMATION_ROLE
@@ -633,66 +623,53 @@ void FVirtualProductionSource::HandleSuits(const TArray<FSuitData>& suits)
 		if (Client)
 			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData1));
 	}
+
+	for (int32 actorIndex = actorNames.Num() - 1; actorIndex >= 0; --actorIndex)
+	{
+		const FName actorName = actorNames[actorIndex];
+		const double* lastSeenTime = actorLastSeenTimeSeconds.Find(actorName);
+		if (lastSeenTime == nullptr || (CurrentTimeSeconds - *lastSeenTime) > ACTOR_SUBJECT_STALE_TIMEOUT_SECONDS)
+		{
+			if (Client)
+			{
+				Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, actorName));
+			}
+			actorLastSeenTimeSeconds.Remove(actorName);
+			actorNames.RemoveAtSwap(actorIndex, 1, EAllowShrinking::No);
+		}
+	}
 }
 
 void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& characters)
 {
+	constexpr double CHARACTER_SUBJECT_STALE_TIMEOUT_SECONDS = 2.0;
+	const double CurrentTimeSeconds = FPlatformTime::Seconds();
+
 	if (Client == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Client was null!!!!!!"));
 		return;
 	}
 
-	existingCharacters.Empty();
-	notExistingSubjects.Empty();
-
 	for (int subjectIndex = 0; subjectIndex < characters.Num(); subjectIndex++)
 	{
 		const FCharacterData& subject = characters[subjectIndex];
+		const FName SubjectName = subject.GetSubjectName();
+		characterLastSeenTimeSeconds.FindOrAdd(SubjectName) = CurrentTimeSeconds;
 
-		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
-		bool nameExists = false;
+		bool bNameExists = false;
 		for (int characterNameIndex = 0; characterNameIndex < characterNames.Num(); characterNameIndex++)
 		{
-			if (subject.GetSubjectName() == characterNames[characterNameIndex])
+			if (SubjectName == characterNames[characterNameIndex])
 			{
-				nameExists = true;
-				existingCharacters.Add(subject);
+				bNameExists = true;
 				break;
 			}
 		}
 
-		if (!nameExists)
+		if (!bNameExists)
 		{
-			existingCharacters.Add(subject);
 			HandleCharacterData(subject);
-		}
-		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
-		if (subjectIndex == characters.Num() - 1)
-		{
-			for (int i = 0; i < characterNames.Num(); i++)
-			{
-				bool subjectExists = false;
-				for (int j = 0; j < existingCharacters.Num(); j++)
-				{
-					if (characterNames[i] == existingCharacters[j].GetSubjectName())
-					{
-						subjectExists = true;
-					}
-				}
-				if (!subjectExists)
-				{
-					notExistingSubjects.Add(characterNames[i]);
-				}
-			}
-
-			for (int i = 0; i < notExistingSubjects.Num(); i++)
-			{
-				//UE_LOG(LogTemp, Warning, TEXT("Removing face"));
-				Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, notExistingSubjects[i]));
-				characterNames.RemoveSingle(notExistingSubjects[i]);
-				notExistingSubjects.RemoveAt(i);
-			}
 		}
 
 		FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
@@ -709,6 +686,21 @@ void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& ch
 			const int32 transformIndex = transforms.AddUninitialized(1);
 			const int parentIndex = subject.joints[x].parentIndex;
 
+
+			for (int32 characterIndex = characterNames.Num() - 1; characterIndex >= 0; --characterIndex)
+			{
+				const FName CharacterName = characterNames[characterIndex];
+				const double* LastSeenTime = characterLastSeenTimeSeconds.Find(CharacterName);
+				if (LastSeenTime == nullptr || (CurrentTimeSeconds - *LastSeenTime) > CHARACTER_SUBJECT_STALE_TIMEOUT_SECONDS)
+				{
+					if (Client)
+					{
+						Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, CharacterName));
+					}
+					characterLastSeenTimeSeconds.Remove(CharacterName);
+					characterNames.RemoveAtSwap(characterIndex, 1, EAllowShrinking::No);
+				}
+			}
 			if (parentIndex >= 0)
 			{
 				tm = subject.joints[x].transform.GetRelativeTransform(subject.joints[parentIndex].transform);

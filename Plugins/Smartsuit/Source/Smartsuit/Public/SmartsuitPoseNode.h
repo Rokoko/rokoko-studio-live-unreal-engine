@@ -298,6 +298,16 @@ private:
 	FLiveLinkClientReference LiveLinkClient_GameThread;
 	ILiveLinkClient* LiveLinkClient_AnyThread;
 
+	// Cache the latest valid frame to avoid one-tick pose resets when frame evaluation misses.
+	bool bHasCachedSmartsuitFrame{ false };
+	TMap<FName, FTransform> CachedSmartsuitTransforms;
+	bool bHasBoundSubjectKey_AnyThread{ false };
+	FLiveLinkSubjectKey BoundSubjectKey_AnyThread;
+	bool bHasLastLoggedBoundSubjectKey_AnyThread{ false };
+	FLiveLinkSubjectKey LastLoggedBoundSubjectKey_AnyThread;
+	int32 ConsecutiveKeyedFrameMisses_AnyThread{ 0 };
+	int32 ConsecutiveLiveFrameMisses_AnyThread{ 0 };
+
 	// Root motion support 
 	bool bInitializedRootPosition{};
 	FVector OldRootPosition{};
