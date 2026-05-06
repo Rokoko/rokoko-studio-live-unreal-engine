@@ -1,7 +1,7 @@
 set -e
-ENGINE="/home/vnicolaou/UnrealEngine-5.7/UnrealEngine"
+ENGINE="$HOME/UnrealEngine-5.7/UnrealEngine"
 SCRIPT="$ENGINE/Engine/Build/BatchFiles/Linux/GenerateProjectFiles.sh"
-PROJECT="/home/vnicolaou/rokoko-studio-live-unreal-engine/RokokoUEPlugin.uproject"
+PROJECT="$HOME/rokoko-studio-live-unreal-engine/RokokoUEPlugin.uproject"
 if [[ -f "$SCRIPT" ]]; then
   echo "Found GenerateProjectFiles.sh at $SCRIPT"
   bash "$SCRIPT" -project="$PROJECT" -game -engine -makefile
