@@ -118,6 +118,9 @@ void FVirtualProductionSource::ClearAllSubjects()
 	actorLastSeenTimeSeconds.Empty();
 	characterLastSeenTimeSeconds.Empty();
 	faceLastSeenTimeSeconds.Empty();
+	newtonLastSeenTimeSeconds.Empty();
+	newtonBoneNamesBySubject.Empty();
+	newtonBoneParentsBySubject.Empty();
 }
 
 bool FVirtualProductionSource::RequestSourceShutdown()
@@ -770,63 +773,41 @@ void FVirtualProductionSource::HandleCharacters(const TArray<FCharacterData>& ch
 
 void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
 {
+	constexpr double NEWTON_SUBJECT_STALE_TIMEOUT_SECONDS = 2.0;
+	const double CurrentTimeSeconds = FPlatformTime::Seconds();
+
 	if (Client == nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Client was null!!!!!!"));
 		return;
 	}
 
-	existingNewtons.Empty();
-	notExistingSubjects.Empty();
-
-	if (newtons.Num() == 0) return;
-
 	for (int subjectIndex = 0; subjectIndex < newtons.Num(); subjectIndex++)
 	{
 		const FNewtonData& subject = newtons[subjectIndex];
+		const FName SubjectName = subject.GetSubjectName();
+		newtonLastSeenTimeSeconds.FindOrAdd(SubjectName) = CurrentTimeSeconds;
 
-		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
 		bool nameExists = false;
 		for (int idx = 0; idx < newtonNames.Num(); idx++)
 		{
-			if (subject.GetSubjectName() == newtonNames[idx])
+			if (SubjectName == newtonNames[idx])
 			{
 				nameExists = true;
-				existingNewtons.Add(subject);
 				break;
 			}
 		}
 
 		if (!nameExists)
 		{
-			existingNewtons.Add(subject);
 			HandleNewtonData(subject);
 		}
-		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
-		if (subjectIndex == newtons.Num() - 1)
-		{
-			for (int i = 0; i < newtonNames.Num(); i++)
-			{
-				bool subjectExists = false;
-				for (int j = 0; j < existingNewtons.Num(); j++)
-				{
-					if (newtonNames[i] == existingNewtons[j].GetSubjectName())
-					{
-						subjectExists = true;
-					}
-				}
-				if (!subjectExists)
-				{
-					notExistingSubjects.Add(newtonNames[i]);
-				}
-			}
 
-			for (int i = 0; i < notExistingSubjects.Num(); i++)
-			{
-				Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, notExistingSubjects[i]));
-				newtonNames.RemoveSingle(notExistingSubjects[i]);
-				notExistingSubjects.RemoveAt(i);
-			}
+		const TArray<FName>* CachedBoneNames = newtonBoneNamesBySubject.Find(SubjectName);
+		const TArray<int32>* CachedBoneParents = newtonBoneParentsBySubject.Find(SubjectName);
+		if (CachedBoneNames == nullptr || CachedBoneParents == nullptr || CachedBoneNames->Num() == 0 || CachedBoneNames->Num() != CachedBoneParents->Num())
+		{
+			continue;
 		}
 
 		FLiveLinkFrameDataStruct FrameData1(FLiveLinkAnimationFrameData::StaticStruct());
@@ -835,21 +816,50 @@ void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
 		AnimFrameData.WorldTime = FLiveLinkWorldTime();
 
 		TArray<FTransform> transforms;
-		transforms.Reset(subject.Joints.Num());
+		transforms.Reset(CachedBoneNames->Num());
 		FTransform tm;
+		TMap<FName, FTransform> JointWorldByName;
+		JointWorldByName.Reserve(subject.Joints.Num());
+		for (const FRokokoCharacterJoint& Joint : subject.Joints)
+		{
+			JointWorldByName.Add(Joint.name, Joint.transform);
+		}
 
-		for (int x = 0; x < subject.Joints.Num(); x++)
+		for (int x = 0; x < CachedBoneNames->Num(); x++)
 		{
 			const int32 transformIndex = transforms.AddUninitialized(1);
-			const int parentIndex = subject.Joints[x].parentIndex;
+			const int parentIndex = (*CachedBoneParents)[x];
+			const FName BoneName = (*CachedBoneNames)[x];
+
+			const FTransform* JointWorldTransform = JointWorldByName.Find(BoneName);
+			if (JointWorldTransform == nullptr)
+			{
+				transforms[transformIndex].SetComponents(FQuat::Identity, FVector::ZeroVector, FVector::OneVector);
+				continue;
+			}
 
 			if (parentIndex >= 0)
 			{
-				tm = subject.Joints[x].transform.GetRelativeTransform(subject.Joints[parentIndex].transform);
+				if (parentIndex < CachedBoneNames->Num())
+				{
+					const FName ParentBoneName = (*CachedBoneNames)[parentIndex];
+					if (const FTransform* ParentWorldTransform = JointWorldByName.Find(ParentBoneName))
+					{
+						tm = JointWorldTransform->GetRelativeTransform(*ParentWorldTransform);
+					}
+					else
+					{
+						tm = *JointWorldTransform;
+					}
+				}
+				else
+				{
+					tm = *JointWorldTransform;
+				}
 			}
 			else
 			{
-				tm = subject.Joints[x].transform;
+				tm = *JointWorldTransform;
 			}
 
 			const FVector JointPosition = tm.GetLocation();
@@ -886,6 +896,20 @@ void FVirtualProductionSource::HandleNewtons(const TArray<FNewtonData>& newtons)
 		if (Client)
 		{
 			Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData1));
+		}
+	}
+
+	for (int32 newtonIndex = newtonNames.Num() - 1; newtonIndex >= 0; --newtonIndex)
+	{
+		const FName NewtonName = newtonNames[newtonIndex];
+		const double* LastSeenTime = newtonLastSeenTimeSeconds.Find(NewtonName);
+		if (LastSeenTime == nullptr || (CurrentTimeSeconds - *LastSeenTime) > NEWTON_SUBJECT_STALE_TIMEOUT_SECONDS)
+		{
+			Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, NewtonName));
+			newtonLastSeenTimeSeconds.Remove(NewtonName);
+			newtonBoneNamesBySubject.Remove(NewtonName);
+			newtonBoneParentsBySubject.Remove(NewtonName);
+			newtonNames.RemoveAtSwap(newtonIndex, 1, EAllowShrinking::No);
 		}
 	}
 }
@@ -948,6 +972,9 @@ void FVirtualProductionSource::HandleNewtonData(const FNewtonData& newton)
 		boneNames.Add(newton.Joints[x].name);
 		boneParents.Add(newton.Joints[x].parentIndex);
 	}
+
+	newtonBoneNamesBySubject.Add(newton.GetSubjectName(), boneNames);
+	newtonBoneParentsBySubject.Add(newton.GetSubjectName(), boneParents);
 
 	FLiveLinkStaticDataStruct StaticData(FLiveLinkSkeletonStaticData::StaticStruct());
 	FLiveLinkSkeletonStaticData* SkeletonData = StaticData.Cast<FLiveLinkSkeletonStaticData>();
