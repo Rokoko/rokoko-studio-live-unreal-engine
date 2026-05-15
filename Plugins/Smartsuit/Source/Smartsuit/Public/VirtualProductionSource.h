@@ -94,6 +94,7 @@ private:
 	TArray<FNewtonData> existingNewtons;
 	TMap<FName, double> actorLastSeenTimeSeconds;
 	TMap<FName, double> characterLastSeenTimeSeconds;
+	TMap<FName, double> faceLastSeenTimeSeconds;
 
 	TArray<FName> notExistingSubjects;
 

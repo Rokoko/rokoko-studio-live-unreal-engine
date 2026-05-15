@@ -117,6 +117,7 @@ void FVirtualProductionSource::ClearAllSubjects()
 	newtonNames.Empty();
 	actorLastSeenTimeSeconds.Empty();
 	characterLastSeenTimeSeconds.Empty();
+	faceLastSeenTimeSeconds.Empty();
 }
 
 bool FVirtualProductionSource::RequestSourceShutdown()
@@ -962,6 +963,9 @@ void FVirtualProductionSource::HandleNewtonData(const FNewtonData& newton)
 
 void FVirtualProductionSource::HandleFace(const TArray<FFace>& faces)
 {
+	constexpr double FACE_SUBJECT_STALE_TIMEOUT_SECONDS = 2.0;
+	const double CurrentTimeSeconds = FPlatformTime::Seconds();
+
 	//verify(Client != nullptr);
 
 	if (Client == nullptr)
@@ -971,55 +975,25 @@ void FVirtualProductionSource::HandleFace(const TArray<FFace>& faces)
 	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("Handling faces %d"), faces.Num());
-	existingFaces.Empty();
-	notExistingSubjects.Empty();
 	for (int subjectIndex = 0; subjectIndex < faces.Num(); subjectIndex++)
 	{
 		const FFace& subject = faces[subjectIndex];
+		const FName SubjectName = subject.GetSubjectName();
+		faceLastSeenTimeSeconds.FindOrAdd(SubjectName) = CurrentTimeSeconds;
 
-		//check in the known subjects list which ones don't exist anymore in subjects, and clear the ones that don't exist
 		bool nameExists = false;
 		for (int faceNameIndex = 0; faceNameIndex < faceNames.Num(); faceNameIndex++)
 		{
-			if (subject.GetSubjectName() == faceNames[faceNameIndex])
+			if (SubjectName == faceNames[faceNameIndex])
 			{
 				nameExists = true;
-				existingFaces.Add(subject);
 				break;
 			}
 		}
 
 		if (!nameExists)
 		{
-			existingFaces.Add(subject);
 			HandleFaceData(subject);
-		}
-		//check in the subjects for the ones that don't exist in the known subjects list and create the ones that don't exist
-		if (subjectIndex == faces.Num() - 1)
-		{
-			for (int i = 0; i < faceNames.Num(); i++)
-			{
-				bool subjectExists = false;
-				for (int j = 0; j < existingFaces.Num(); j++)
-				{
-					if (faceNames[i] == existingFaces[j].GetSubjectName())
-					{
-						subjectExists = true;
-					}
-				}
-				if (!subjectExists)
-				{
-					notExistingSubjects.Add(faceNames[i]);
-				}
-			}
-
-			for (int i = 0; i < notExistingSubjects.Num(); i++)
-			{
-				//UE_LOG(LogTemp, Warning, TEXT("Removing face"));
-				Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, notExistingSubjects[i]));
-				faceNames.RemoveSingle(notExistingSubjects[i]);
-				notExistingSubjects.RemoveAt(i);
-			}
 		}
 
 		//FTimer timer;
@@ -1084,6 +1058,18 @@ void FVirtualProductionSource::HandleFace(const TArray<FFace>& faces)
 			});
 
 		Client->PushSubjectFrameData_AnyThread(FLiveLinkSubjectKey(SourceGuid, subject.GetSubjectName()), MoveTemp(FrameData));
+	}
+
+	for (int32 faceIndex = faceNames.Num() - 1; faceIndex >= 0; --faceIndex)
+	{
+		const FName FaceName = faceNames[faceIndex];
+		const double* LastSeenTime = faceLastSeenTimeSeconds.Find(FaceName);
+		if (LastSeenTime == nullptr || (CurrentTimeSeconds - *LastSeenTime) > FACE_SUBJECT_STALE_TIMEOUT_SECONDS)
+		{
+			Client->RemoveSubject_AnyThread(FLiveLinkSubjectKey(SourceGuid, FaceName));
+			faceLastSeenTimeSeconds.Remove(FaceName);
+			faceNames.RemoveAtSwap(faceIndex, 1, EAllowShrinking::No);
+		}
 	}
 }
 
