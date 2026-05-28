@@ -1244,7 +1244,7 @@ TSharedPtr<FVirtualProductionSource> FVirtualProductionSource::Get()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("[Rokoko] modular feature {0} is not available"), ILiveLinkClient::ModularFeatureName);
+			UE_LOG(LogTemp, Warning, TEXT("[Rokoko] modular feature %s is not available"), *ILiveLinkClient::ModularFeatureName.ToString());
 		}
 	}
 
