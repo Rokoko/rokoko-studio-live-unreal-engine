@@ -1,0 +1,40 @@
+{
+    "FileVersion": 3,
+    "Version": 1,
+    "VersionName": "1.0",
+    "FriendlyName": "Live Link Hub Rokoko Device",
+    "Description": "Live Link Hub device for controlling Rokoko Studio recording via Rokoko Command API.",
+    "Category": "Virtual Production",
+    "CreatedBy": "Rokoko",
+    "CreatedByURL": "https://rokoko.com",
+    "CanContainContent": false,
+    "IsBetaVersion": false,
+    "IsExperimentalVersion": true,
+    "Installed": false,
+    "EnabledByDefault": true,
+    "Modules": [
+        {
+            "Name": "LiveLinkRokokoDevice",
+            "Type": "Editor",
+            "LoadingPhase": "Default"
+        }
+    ],
+    "Plugins": [
+        {
+            "Name": "CaptureManagerApp",
+            "Enabled": true
+        },
+        {
+            "Name": "CaptureManagerDevices",
+            "Enabled": true
+        },
+        {
+            "Name": "LiveLinkDevice",
+            "Enabled": true
+        },
+        {
+            "Name": "LiveLinkHub",
+            "Enabled": true
+        }
+    ]
+}
