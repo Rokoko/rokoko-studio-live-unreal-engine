@@ -50,25 +50,15 @@
 	],
 	"Plugins": [
 		{
-			"Name": "CaptureManagerApp",
-			"Enabled": true,
-			"TargetAllowList": [
-				"Editor"
-			]
-		},
-		{
-			"Name": "CaptureManagerDevices",
-			"Enabled": true,
-			"TargetAllowList": [
-				"Editor"
-			]
-		},
-		{
 			"Name": "LiveLinkDevice",
+			"Enabled": true
+		},		
+		{
+			"Name": "LiveLinkHub",
 			"Enabled": true
 		},
 		{
-			"Name": "LiveLinkHub",
+			"Name": "LiveLinkGenericRecordingDevice",
 			"Enabled": true
 		},
 		{
