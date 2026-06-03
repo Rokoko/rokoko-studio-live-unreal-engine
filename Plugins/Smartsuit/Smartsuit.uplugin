@@ -15,7 +15,7 @@
 	"IsBetaVersion": false,
 	"Installed": true,
 	"EnabledByDefault": true,
-	"EngineVersion": "5.7.0",
+	"EngineVersion": "5.8.0",
 	"Modules": [
 		{
 			"Name": "Smartsuit",
@@ -51,11 +51,17 @@
 	"Plugins": [
 		{
 			"Name": "CaptureManagerApp",
-			"Enabled": true
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
 		},
 		{
 			"Name": "CaptureManagerDevices",
-			"Enabled": true
+			"Enabled": true,
+			"TargetAllowList": [
+				"Editor"
+			]
 		},
 		{
 			"Name": "LiveLinkDevice",
