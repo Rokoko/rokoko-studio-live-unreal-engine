@@ -36,9 +36,35 @@
 				"Mac",
 				"Linux"
 			]
+		},
+		{
+			"Name": "LiveLinkRokokoDevice",
+			"Type": "Editor",
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [
+				"Win64",
+				"Mac",
+				"Linux"
+			]
 		}
 	],
 	"Plugins": [
+		{
+			"Name": "CaptureManagerApp",
+			"Enabled": true
+		},
+		{
+			"Name": "CaptureManagerDevices",
+			"Enabled": true
+		},
+		{
+			"Name": "LiveLinkDevice",
+			"Enabled": true
+		},
+		{
+			"Name": "LiveLinkHub",
+			"Enabled": true
+		},
 		{
 			"Name": "LiveLink",
 			"Enabled": true
