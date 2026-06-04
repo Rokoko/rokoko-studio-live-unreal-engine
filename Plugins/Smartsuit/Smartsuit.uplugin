@@ -16,6 +16,7 @@
 	"Installed": true,
 	"EnabledByDefault": true,
 	"EngineVersion": "5.8.0",
+	"SupportedPrograms": ["LiveLinkHub"],
 	"Modules": [
 		{
 			"Name": "Smartsuit",
@@ -41,6 +42,7 @@
 			"Name": "LiveLinkRokokoDevice",
 			"Type": "Editor",
 			"LoadingPhase": "Default",
+			"ProgramAllowList": ["LiveLinkHub"],
 			"PlatformAllowList": [
 				"Win64",
 				"Mac",
