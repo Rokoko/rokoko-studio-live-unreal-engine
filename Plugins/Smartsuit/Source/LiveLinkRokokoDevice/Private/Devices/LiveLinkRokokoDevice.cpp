@@ -119,8 +119,8 @@ ELiveLinkDeviceConnectionStatus ULiveLinkRokokoDevice::GetConnectionStatus_Imple
 
 FString ULiveLinkRokokoDevice::GetHardwareId_Implementation() const
 {
-    const ULiveLinkRokokoDeviceSettings* Settings = GetSettings();
-    return FString::Printf(TEXT("%s:%d"), *Settings->Host, Settings->Port);
+    const ULiveLinkRokokoDeviceSettings* DeviceSettings = GetSettings();
+    return FString::Printf(TEXT("%s:%d"), *DeviceSettings->Host, DeviceSettings->Port);
 }
 
 bool ULiveLinkRokokoDevice::Connect_Implementation()
@@ -175,13 +175,13 @@ bool ULiveLinkRokokoDevice::StartRecording_Implementation()
         Payload->SetStringField(TEXT("filename"), EvaluatedFilename);
     }
 
-    const ULiveLinkRokokoDeviceSettings* Settings = GetSettings();
-    if (Settings->bOverrideFrameRate)
+    const ULiveLinkRokokoDeviceSettings* DeviceSettings = GetSettings();
+    if (DeviceSettings->bOverrideFrameRate)
     {
-        Payload->SetNumberField(TEXT("frame_rate"), Settings->FrameRate);
+        Payload->SetNumberField(TEXT("frame_rate"), DeviceSettings->FrameRate);
     }
 
-    if (Settings->bSendSmpteTime)
+    if (DeviceSettings->bSendSmpteTime)
     {
         Payload->SetStringField(TEXT("time"), FApp::GetTimecode().ToString());
     }
@@ -230,10 +230,10 @@ bool ULiveLinkRokokoDevice::StopRecording_Implementation()
 
     TSharedRef<FJsonObject> Payload = MakeShared<FJsonObject>();
 
-    const ULiveLinkRokokoDeviceSettings* Settings = GetSettings();
-    Payload->SetBoolField(TEXT("back_to_live"), Settings->bBackToLiveOnStop);
+    const ULiveLinkRokokoDeviceSettings* DeviceSettings = GetSettings();
+    Payload->SetBoolField(TEXT("back_to_live"), DeviceSettings->bBackToLiveOnStop);
 
-    if (Settings->bSendSmpteTime)
+    if (DeviceSettings->bSendSmpteTime)
     {
         Payload->SetStringField(TEXT("time"), FApp::GetTimecode().ToString());
     }
@@ -389,8 +389,8 @@ void ULiveLinkRokokoDevice::RecomputeFilename()
         LastTake = Session.GetTakeNumber();
     }
 
-    const ULiveLinkRokokoDeviceSettings* Settings = GetSettings();
-    EvaluatedFilename = Settings->FilenameFormat;
+    const ULiveLinkRokokoDeviceSettings* DeviceSettings = GetSettings();
+    EvaluatedFilename = DeviceSettings->FilenameFormat;
 
     if (!GEngine)
     {
@@ -406,7 +406,7 @@ void ULiveLinkRokokoDevice::RecomputeFilename()
     FNamingTokenFilterArgs FilterArgs;
     FilterArgs.AdditionalNamespacesToInclude.Add(TEXT("llh"));
 
-    const FNamingTokenResultData Result = TokenSubsystem->EvaluateTokenText(FText::FromString(Settings->FilenameFormat), FilterArgs);
+    const FNamingTokenResultData Result = TokenSubsystem->EvaluateTokenText(FText::FromString(DeviceSettings->FilenameFormat), FilterArgs);
     EvaluatedFilename = Result.EvaluatedText.ToString();
 }
 
@@ -491,11 +491,11 @@ void ULiveLinkRokokoDevice::ClearReconnectTicker()
 FRokokoHttpRequestConfig ULiveLinkRokokoDevice::MakeHttpConfig() const
 {
     FRokokoHttpRequestConfig Config;
-    const ULiveLinkRokokoDeviceSettings* Settings = GetSettings();
+    const ULiveLinkRokokoDeviceSettings* DeviceSettings = GetSettings();
 
-    Config.Host = Settings->Host;
-    Config.Port = Settings->Port;
-    Config.ApiKey = Settings->ApiKey;
+    Config.Host = DeviceSettings->Host;
+    Config.Port = DeviceSettings->Port;
+    Config.ApiKey = DeviceSettings->ApiKey;
     Config.ApiVersion = TEXT("v1");
     Config.TimeoutSeconds = 3.0f;
 
