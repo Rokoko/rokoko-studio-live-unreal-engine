@@ -15,8 +15,6 @@
 	"IsBetaVersion": false,
 	"Installed": true,
 	"EnabledByDefault": true,
-	"EngineVersion": "5.8.0",
-	"SupportedPrograms": ["LiveLinkHub"],
 	"Modules": [
 		{
 			"Name": "Smartsuit",
