@@ -32,11 +32,11 @@ bool FRokokoHttpClient::PostCommand(
         ActiveRequests.Add(HttpRequest);
     }
 
-    TWeakPtr<FRokokoHttpClient> WeakThis = AsShared();
+    TWeakPtr<FRokokoHttpClient> WeakSelf = AsShared();
     HttpRequest->OnProcessRequestComplete().BindLambda(
-        [WeakThis, Callback = MoveTemp(InCallback)](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) mutable
+        [WeakSelf, Callback = MoveTemp(InCallback)](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) mutable
         {
-            TSharedPtr<FRokokoHttpClient> This = WeakThis.Pin();
+            TSharedPtr<FRokokoHttpClient> This = WeakSelf.Pin();
             if (!This.IsValid())
             {
                 return;
