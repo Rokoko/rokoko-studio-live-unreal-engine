@@ -382,16 +382,6 @@ void ULiveLinkRokokoDevice::ProbeConnection()
 
 void ULiveLinkRokokoDevice::RecomputeFilename()
 {
-    if (IModularFeatures::Get().IsModularFeatureAvailable(ILiveLinkRecordingSession::GetModularFeatureName()))
-    {
-        ILiveLinkRecordingSession& Session = ILiveLinkRecordingSession::Get();
-        LastSlate = Session.GetSlateName();
-        LastTake = Session.GetTakeNumber();
-    }
-
-    const ULiveLinkRokokoDeviceSettings* DeviceSettings = GetSettings();
-    EvaluatedFilename = DeviceSettings->FilenameFormat;
-
     if (!GEngine)
     {
         return;
@@ -403,11 +393,22 @@ void ULiveLinkRokokoDevice::RecomputeFilename()
         return;
     }
 
+    if (IModularFeatures::Get().IsModularFeatureAvailable(ILiveLinkRecordingSession::GetModularFeatureName()))
+    {
+        ILiveLinkRecordingSession& Session = ILiveLinkRecordingSession::Get();
+        LastSlate = Session.GetSlateName();
+        LastTake = Session.GetTakeNumber();
+    }
+
+    const ULiveLinkRokokoDeviceSettings* DeviceSettings = GetSettings();
+
     FNamingTokenFilterArgs FilterArgs;
     FilterArgs.AdditionalNamespacesToInclude.Add(TEXT("llh"));
 
     const FNamingTokenResultData Result = TokenSubsystem->EvaluateTokenText(FText::FromString(DeviceSettings->FilenameFormat), FilterArgs);
     EvaluatedFilename = Result.EvaluatedText.ToString();
+    UE_LOGFMT(LogLiveLinkRokokoDevice, Log, "{DeviceName}: Setting OBS recording filename to '{Filename}'.",
+        GetSettings()->DisplayName, EvaluatedFilename);
 }
 
 void ULiveLinkRokokoDevice::HandleSlateNameChanged(FStringView InSlateName)
