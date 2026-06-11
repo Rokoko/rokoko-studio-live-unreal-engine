@@ -407,7 +407,7 @@ void ULiveLinkRokokoDevice::RecomputeFilename()
 
     const FNamingTokenResultData Result = TokenSubsystem->EvaluateTokenText(FText::FromString(DeviceSettings->FilenameFormat), FilterArgs);
     EvaluatedFilename = Result.EvaluatedText.ToString();
-    UE_LOGFMT(LogLiveLinkRokokoDevice, Log, "{DeviceName}: Setting OBS recording filename to '{Filename}'.",
+    UE_LOGFMT(LogLiveLinkRokokoDevice, Log, "{DeviceName}: Setting Rokoko Studio recording filename to '{Filename}'.",
         GetSettings()->DisplayName, EvaluatedFilename);
 }
 
