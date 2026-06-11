@@ -22,7 +22,9 @@ class ULiveLinkRokokoDeviceSettings : public ULiveLinkDeviceSettings
 public:
     ULiveLinkRokokoDeviceSettings()
     {
+#if ROKOKO_WITH_LIVELINKHUB
         DisplayName = TEXT("Rokoko Studio Device");
+#endif
     }
 
     UPROPERTY(EditAnywhere, Category = "Rokoko Device")

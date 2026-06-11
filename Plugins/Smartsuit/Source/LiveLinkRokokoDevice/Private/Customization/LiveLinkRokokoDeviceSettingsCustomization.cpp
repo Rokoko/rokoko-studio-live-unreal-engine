@@ -6,8 +6,11 @@
 #include "DetailWidgetRow.h"
 #include "Devices/LiveLinkRokokoDevice.h"
 #include "IDetailPropertyRow.h"
+
+#if ROKOKO_WITH_LIVELINKHUB
 #include "NamingTokensSpecifiers.h"
 #include "SNamingTokensEditableTextBox.h"
+#endif
 
 #define LOCTEXT_NAMESPACE "LiveLinkRokokoDevice"
 
@@ -23,9 +26,11 @@ void FLiveLinkRokokoDeviceSettingsCustomization::CustomizeDetails(IDetailLayoutB
     TArray<TSharedRef<IPropertyHandle>> DefaultProperties;
     Category.GetDefaultProperties(DefaultProperties);
 
+#if ROKOKO_WITH_LIVELINKHUB
     FNamingTokenFilterArgs FilterArgs;
     FilterArgs.bIncludeGlobal = false;
     FilterArgs.AdditionalNamespacesToInclude.Add(TEXT("llh"));
+#endif
 
     for (const TSharedRef<IPropertyHandle>& PropertyHandle : DefaultProperties)
     {
@@ -36,6 +41,7 @@ void FLiveLinkRokokoDeviceSettingsCustomization::CustomizeDetails(IDetailLayoutB
     {
         IDetailPropertyRow& Row = Category.AddProperty(PropertyHandle);
 
+#if ROKOKO_WITH_LIVELINKHUB
         if (!PropertyHandle->HasMetaData(*UE::NamingTokens::Specifiers::UseNamingTokens))
         {
             continue;
@@ -64,6 +70,9 @@ void FLiveLinkRokokoDeviceSettingsCustomization::CustomizeDetails(IDetailLayoutB
                     PropertyHandle->SetValue(InText.ToString());
                 })
             ];
+        #else
+            (void)Row;
+        #endif
     }
 }
 

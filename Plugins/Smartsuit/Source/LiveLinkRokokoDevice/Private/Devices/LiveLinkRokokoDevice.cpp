@@ -420,8 +420,8 @@ void ULiveLinkRokokoDevice::RecomputeFilename()
     EvaluatedFilename = Result.EvaluatedText.ToString();
 #endif
 
-    UE_LOGFMT(LogLiveLinkRokokoDevice, Log, "{DeviceName}: Setting Rokoko Studio recording filename to '{Filename}'.",
-        GetSettings()->DisplayName, EvaluatedFilename);
+    UE_LOGFMT(LogLiveLinkRokokoDevice, Log, "Rokoko Studio recording filename set to '{Filename}'.",
+        EvaluatedFilename);
 }
 
 void ULiveLinkRokokoDevice::HandleSlateNameChanged(FStringView InSlateName)
