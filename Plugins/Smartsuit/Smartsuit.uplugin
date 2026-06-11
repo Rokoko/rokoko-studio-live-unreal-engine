@@ -57,11 +57,13 @@
 		},		
 		{
 			"Name": "LiveLinkHub",
-			"Enabled": true
+			"Enabled": true,
+			"Optional": true
 		},
 		{
 			"Name": "LiveLinkGenericRecordingDevice",
-			"Enabled": true
+			"Enabled": true,
+			"Optional": true
 		},
 		{
 			"Name": "LiveLink",

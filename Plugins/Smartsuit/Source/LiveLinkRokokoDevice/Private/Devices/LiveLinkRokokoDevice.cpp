@@ -5,10 +5,13 @@
 #include "Dom/JsonObject.h"
 #include "Engine/Engine.h"
 #include "Http/RokokoHttpClient.h"
-#include "LiveLinkHub/ILiveLinkRecordingSession.h"
 #include "Misc/App.h"
+
+#if ROKOKO_WITH_LIVELINKHUB
 #include "Features/IModularFeatures.h"
+#include "LiveLinkHub/ILiveLinkRecordingSession.h"
 #include "NamingTokensEngineSubsystem.h"
+#endif
 
 DEFINE_LOG_CATEGORY(LogLiveLinkRokokoDevice);
 
@@ -65,12 +68,14 @@ void ULiveLinkRokokoDevice::OnDeviceAdded()
 {
     Super::OnDeviceAdded();
 
+#if ROKOKO_WITH_LIVELINKHUB
     if (IModularFeatures::Get().IsModularFeatureAvailable(ILiveLinkRecordingSession::GetModularFeatureName()))
     {
         ILiveLinkRecordingSession& Session = ILiveLinkRecordingSession::Get();
         Session.OnSlateNameChanged().AddUObject(this, &ULiveLinkRokokoDevice::HandleSlateNameChanged);
         Session.OnTakeNumberChanged().AddUObject(this, &ULiveLinkRokokoDevice::HandleTakeNumberChanged);
     }
+#endif
 
     RecomputeFilename();
     ConnectInternal();
@@ -78,12 +83,14 @@ void ULiveLinkRokokoDevice::OnDeviceAdded()
 
 void ULiveLinkRokokoDevice::OnDeviceRemoved()
 {
+#if ROKOKO_WITH_LIVELINKHUB
     if (IModularFeatures::Get().IsModularFeatureAvailable(ILiveLinkRecordingSession::GetModularFeatureName()))
     {
         ILiveLinkRecordingSession& Session = ILiveLinkRecordingSession::Get();
         Session.OnSlateNameChanged().RemoveAll(this);
         Session.OnTakeNumberChanged().RemoveAll(this);
     }
+#endif
 
     DisconnectInternal(true);
 
@@ -160,12 +167,14 @@ bool ULiveLinkRokokoDevice::StartRecording_Implementation()
         return false;
     }
 
+#if ROKOKO_WITH_LIVELINKHUB
     if (IModularFeatures::Get().IsModularFeatureAvailable(ILiveLinkRecordingSession::GetModularFeatureName()))
     {
         ILiveLinkRecordingSession& Session = ILiveLinkRecordingSession::Get();
         LastSlate = Session.GetSlateName();
         LastTake = Session.GetTakeNumber();
     }
+#endif
 
     RecomputeFilename();
 
@@ -382,6 +391,10 @@ void ULiveLinkRokokoDevice::ProbeConnection()
 
 void ULiveLinkRokokoDevice::RecomputeFilename()
 {
+    const ULiveLinkRokokoDeviceSettings* DeviceSettings = GetSettings();
+    EvaluatedFilename = DeviceSettings->FilenameFormat;
+
+#if ROKOKO_WITH_LIVELINKHUB
     if (!GEngine)
     {
         return;
@@ -400,13 +413,13 @@ void ULiveLinkRokokoDevice::RecomputeFilename()
         LastTake = Session.GetTakeNumber();
     }
 
-    const ULiveLinkRokokoDeviceSettings* DeviceSettings = GetSettings();
-
     FNamingTokenFilterArgs FilterArgs;
     FilterArgs.AdditionalNamespacesToInclude.Add(TEXT("llh"));
 
     const FNamingTokenResultData Result = TokenSubsystem->EvaluateTokenText(FText::FromString(DeviceSettings->FilenameFormat), FilterArgs);
     EvaluatedFilename = Result.EvaluatedText.ToString();
+#endif
+
     UE_LOGFMT(LogLiveLinkRokokoDevice, Log, "{DeviceName}: Setting Rokoko Studio recording filename to '{Filename}'.",
         GetSettings()->DisplayName, EvaluatedFilename);
 }
