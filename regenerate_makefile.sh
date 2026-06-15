@@ -1,5 +1,5 @@
 set -e
-ENGINE="$HOME/UnrealEngine-5.7/UnrealEngine"
+ENGINE="$HOME/UnrealEngine-5.8/UnrealEngine"
 SCRIPT="$ENGINE/Engine/Build/BatchFiles/Linux/GenerateProjectFiles.sh"
 PROJECT="$HOME/rokoko-studio-live-unreal-engine/RokokoUEPlugin.uproject"
 if [[ -f "$SCRIPT" ]]; then
