@@ -40,6 +40,39 @@ void FAnimNode_RokokoFacePose::Initialize_AnyThread(const FAnimationInitializeCo
 void FAnimNode_RokokoFacePose::PreUpdate(const UAnimInstance* InAnimInstance)
 {
 	LiveLinkClient_AnyThread = LiveLinkClient_GameThread.GetClient();
+	bHasBoundSubjectKey_AnyThread = false;
+
+	if (LiveLinkClient_AnyThread)
+	{
+		const FLiveLinkSubjectName LiveLinkSubjectName = GetLiveLinkSubjectName();
+
+		if (BoundSubjectKey_AnyThread.SubjectName == LiveLinkSubjectName && LiveLinkClient_AnyThread->IsSubjectValid(BoundSubjectKey_AnyThread))
+		{
+			bHasBoundSubjectKey_AnyThread = true;
+		}
+		else
+		{
+			for (const FLiveLinkSubjectKey& SubjectKey : LiveLinkClient_AnyThread->GetSubjects(true, false))
+			{
+				if (SubjectKey.SubjectName != LiveLinkSubjectName)
+				{
+					continue;
+				}
+
+				if (!LiveLinkClient_AnyThread->IsSubjectValid(SubjectKey) || !LiveLinkClient_AnyThread->DoesSubjectSupportsRole_AnyThread(SubjectKey, ULiveLinkAnimationRole::StaticClass()))
+				{
+					continue;
+				}
+
+				BoundSubjectKey_AnyThread = SubjectKey;
+				bHasBoundSubjectKey_AnyThread = true;
+				if (LiveLinkClient_AnyThread->IsSubjectEnabled(SubjectKey, false))
+				{
+					break;
+				}
+			}
+		}
+	}
 
 	// Protection as a class graph pin does not honor rules on abstract classes and NoClear
 	UClass* RetargetAssetPtr = RetargetAsset.Get();
@@ -83,13 +116,32 @@ void FAnimNode_RokokoFacePose::Evaluate_AnyThread(FPoseContext& Output)
 
 	FLiveLinkSubjectName LiveLinkSubjectName = GetLiveLinkSubjectName();
 
-	TSubclassOf<ULiveLinkRole> SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole_AnyThread(LiveLinkSubjectName);
+	TSubclassOf<ULiveLinkRole> SubjectRole;
+	if (bHasBoundSubjectKey_AnyThread)
+	{
+		SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole_AnyThread(BoundSubjectKey_AnyThread);
+	}
+	if (!SubjectRole)
+	{
+		SubjectRole = LiveLinkClient_AnyThread->GetSubjectRole_AnyThread(LiveLinkSubjectName);
+	}
+
 	if (SubjectRole)
 	{
 		if (SubjectRole->IsChildOf(ULiveLinkAnimationRole::StaticClass()))
 		{
+			bool bHasFrame = false;
+			if (bHasBoundSubjectKey_AnyThread)
+			{
+				bHasFrame = LiveLinkClient_AnyThread->EvaluateFrameFromSource_AnyThread(BoundSubjectKey_AnyThread, ULiveLinkAnimationRole::StaticClass(), SubjectFrameData);
+			}
+			if (!bHasFrame)
+			{
+				bHasFrame = LiveLinkClient_AnyThread->EvaluateFrame_AnyThread(LiveLinkSubjectName, ULiveLinkAnimationRole::StaticClass(), SubjectFrameData);
+			}
+
 			//Process animation data if the subject is from that type
-			if (LiveLinkClient_AnyThread->EvaluateFrame_AnyThread(LiveLinkSubjectName, ULiveLinkAnimationRole::StaticClass(), SubjectFrameData))
+			if (bHasFrame)
 			{
 				FLiveLinkSkeletonStaticData* SkeletonData = SubjectFrameData.StaticData.Cast<FLiveLinkSkeletonStaticData>();
 				FLiveLinkAnimationFrameData* FrameData = SubjectFrameData.FrameData.Cast<FLiveLinkAnimationFrameData>();
@@ -103,8 +155,18 @@ void FAnimNode_RokokoFacePose::Evaluate_AnyThread(FPoseContext& Output)
 		}
 		else
 		{
+			bool bHasFrame = false;
+			if (bHasBoundSubjectKey_AnyThread)
+			{
+				bHasFrame = LiveLinkClient_AnyThread->EvaluateFrameFromSource_AnyThread(BoundSubjectKey_AnyThread, ULiveLinkBasicRole::StaticClass(), SubjectFrameData);
+			}
+			if (!bHasFrame)
+			{
+				bHasFrame = LiveLinkClient_AnyThread->EvaluateFrame_AnyThread(LiveLinkSubjectName, ULiveLinkBasicRole::StaticClass(), SubjectFrameData);
+			}
+
 			//Otherwise, fetch basic data that contains property / curve data
-			if (LiveLinkClient_AnyThread->EvaluateFrame_AnyThread(LiveLinkSubjectName, ULiveLinkBasicRole::StaticClass(), SubjectFrameData))
+			if (bHasFrame)
 			{
 				FLiveLinkBaseStaticData* BaseStaticData = SubjectFrameData.StaticData.Cast<FLiveLinkBaseStaticData>();
 				FLiveLinkBaseFrameData* BaseFrameData = SubjectFrameData.FrameData.Cast<FLiveLinkBaseFrameData>();

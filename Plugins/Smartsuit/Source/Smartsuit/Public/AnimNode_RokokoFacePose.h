@@ -69,6 +69,8 @@ private:
 
 	FLiveLinkClientReference LiveLinkClient_GameThread;
 	ILiveLinkClient* LiveLinkClient_AnyThread;
+	bool bHasBoundSubjectKey_AnyThread{ false };
+	FLiveLinkSubjectKey BoundSubjectKey_AnyThread;
 
 	// Delta time from update so that it can be passed to retargeter
 	float CachedDeltaTime;
