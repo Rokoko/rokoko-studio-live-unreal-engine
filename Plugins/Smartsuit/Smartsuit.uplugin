@@ -15,7 +15,6 @@
 	"IsBetaVersion": false,
 	"Installed": true,
 	"EnabledByDefault": true,
-	"EngineVersion": "5.7.0",
 	"Modules": [
 		{
 			"Name": "Smartsuit",
@@ -36,9 +35,34 @@
 				"Mac",
 				"Linux"
 			]
+		},
+		{
+			"Name": "LiveLinkRokokoDevice",
+			"Type": "Editor",
+			"LoadingPhase": "Default",
+			"ProgramAllowList": ["LiveLinkHub"],
+			"PlatformAllowList": [
+				"Win64",
+				"Mac",
+				"Linux"
+			]
 		}
 	],
 	"Plugins": [
+		{
+			"Name": "LiveLinkDevice",
+			"Enabled": true
+		},		
+		{
+			"Name": "LiveLinkHub",
+			"Enabled": true,
+			"Optional": true
+		},
+		{
+			"Name": "LiveLinkGenericRecordingDevice",
+			"Enabled": true,
+			"Optional": true
+		},
 		{
 			"Name": "LiveLink",
 			"Enabled": true

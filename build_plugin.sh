@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PLUGINNAME="Smartsuit"
-ENGINEDIR="$HOME/UnrealEngine-5.7/UnrealEngine" # Adjust this path to your Unreal Engine root
+ENGINEDIR="$HOME/UnrealEngine-5.8/UnrealEngine" # Adjust this path to your Unreal Engine root
 RUNUAT="$ENGINEDIR/Engine/Build/BatchFiles/RunUAT.sh"
 PACKAGE_DIR="$(pwd)/Build/Plugins/$PLUGINNAME"
 PLUGIN_DIR="$(pwd)/Plugins/$PLUGINNAME"
