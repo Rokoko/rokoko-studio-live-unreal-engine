@@ -50,20 +50,6 @@
 	],
 	"Plugins": [
 		{
-			"Name": "LiveLinkDevice",
-			"Enabled": true
-		},		
-		{
-			"Name": "LiveLinkHub",
-			"Enabled": true,
-			"Optional": true
-		},
-		{
-			"Name": "LiveLinkGenericRecordingDevice",
-			"Enabled": true,
-			"Optional": true
-		},
-		{
 			"Name": "LiveLink",
 			"Enabled": true
 		},
