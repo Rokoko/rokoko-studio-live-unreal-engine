@@ -1543,7 +1543,9 @@ void UpdateNewtonsFromJson(UVirtualProductionSourceSettings* SavedSourceSettings
 //PRAGMA_DISABLE_OPTIMIZATION
 uint32 FVirtualProductionSource::Run()
 {
-	static LZ4F_decompressionContext_t g_dCtx;
+	// Scoped to this thread/instance rather than shared across every FVirtualProductionSource,
+	// since LZ4F_decompress is stateful and not safe to share between concurrent streams.
+	LZ4F_decompressionContext_t g_dCtx;
 	LZ4F_createDecompressionContext(&g_dCtx, LZ4F_VERSION);
 	bool added = false;
 
@@ -1589,7 +1591,14 @@ uint32 FVirtualProductionSource::Run()
 		decompressResult = LZ4F_decompress(g_dCtx, UncompressedData.GetData(), &dstSize, PacketData.GetData(), &srcSize, nullptr);
 		if (decompressResult != 0)
 		{
+			// Each datagram is expected to be one complete, self-contained LZ4 frame. A non-zero
+			// result here means this datagram didn't decode as one (dropped/truncated/reordered
+			// packet, oversized payload, etc). Per the LZ4F docs the context is left in an
+			// undefined state after this and MUST be reset before reuse, otherwise every
+			// subsequent packet on this stream desyncs against the abandoned frame and never
+			// recovers for the rest of the session.
 			UE_LOG(LogTemp, Error, TEXT("Error decompressing frame : unfinished frame \n"));
+			LZ4F_resetDecompressionContext(g_dCtx);
 			continue;
 		}
 		if (srcSize != (size_t)bytes_read)
@@ -1707,6 +1716,7 @@ uint32 FVirtualProductionSource::Run()
 		HandleCharacters(GlobalVPFrame.Characters);
 		HandleNewtons(GlobalVPFrame.Newtons);
 	}
+	LZ4F_freeDecompressionContext(g_dCtx);
 	return 0;
 }
 //PRAGMA_ENABLE_OPTIMIZATION
